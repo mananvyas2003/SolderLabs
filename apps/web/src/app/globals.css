@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@import "@flux/ui/tokens.css";
+
+@theme {
+  --font-sans: "Sora", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 60%),
+    radial-gradient(900px 500px at -10% 20%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 55%),
+    var(--surface-0);
+  color: var(--text);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
+}

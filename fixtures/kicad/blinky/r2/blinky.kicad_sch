@@ -1,0 +1,99 @@
+(symbol
+	(lib_id "Device:R")
+	(at 50.8 50.8 0)
+	(unit 1)
+	(exclude_from_sim no)
+	(in_bom yes)
+	(on_board yes)
+	(property "Reference" "R1"
+		(at 53 48 0)
+	)
+	(property "Value" "10k"
+		(at 53 53 0)
+	)
+	(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
+		(at 50.8 50.8 0)
+	)
+	(property "MPN" "RC0402FR-0710KL"
+		(at 50.8 50.8 0)
+	)
+)
+
+(symbol
+	(lib_id "Device:C")
+	(at 70 50.8 0)
+	(unit 1)
+	(property "Reference" "C12"
+		(at 72 48 0)
+	)
+	(property "Value" "1uF"
+		(at 72 53 0)
+	)
+	(property "Footprint" "Capacitor_SMD:C_0402_1005Metric"
+		(at 70 50.8 0)
+	)
+	(property "MPN" "CL05A105KA5NQNC"
+		(at 70 50.8 0)
+	)
+)
+
+(symbol
+	(lib_id "Regulator_Linear:AP2112K-3.3")
+	(at 100 50.8 0)
+	(unit 1)
+	(property "Reference" "U1"
+		(at 100 45 0)
+	)
+	(property "Value" "AP2112K-3.3"
+		(at 100 56 0)
+	)
+	(property "Footprint" "Package_TO_SOT_SMD:SOT-23-5"
+		(at 100 50.8 0)
+	)
+	(property "MPN" "AP2112K-3.3TRG1"
+		(at 100 50.8 0)
+	)
+	(property "Manufacturer" "Diodes Incorporated"
+		(at 100 50.8 0)
+	)
+)
+
+(symbol
+	(lib_id "Device:LED")
+	(at 130 50.8 0)
+	(unit 1)
+	(property "Reference" "D1"
+		(at 132 48 0)
+	)
+	(property "Value" "LED"
+		(at 132 53 0)
+	)
+	(property "Footprint" "LED_SMD:LED_0402_1005Metric"
+		(at 130 50.8 0)
+	)
+)
+
+(symbol
+	(lib_id "Device:C")
+	(at 85 65 0)
+	(unit 1)
+	(property "Reference" "C13"
+		(at 87 62 0)
+	)
+	(property "Value" "10uF"
+		(at 87 68 0)
+	)
+	(property "Footprint" "Capacitor_SMD:C_0805_2012Metric"
+		(at 85 65 0)
+	)
+)
+
+(label "VDD"
+	(at 90 40 0)
+)
+(label "LED_ANODE"
+	(at 120 40 0)
+)
+(global_label "GND"
+	(at 90 70 0)
+)

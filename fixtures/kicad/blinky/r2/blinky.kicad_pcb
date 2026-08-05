@@ -1,0 +1,58 @@
+(kicad_pcb (version 20240108) (generator flux)
+
+  (general
+    (thickness 1.6)
+  )
+
+  (paper "A4")
+
+  (layers
+    (0 "F.Cu" signal)
+    (31 "B.Cu" signal)
+    (44 "Edge.Cuts" user)
+  )
+
+  (gr_line (start 0 0) (end 55 0) (layer "Edge.Cuts") (width 0.1))
+  (gr_line (start 55 0) (end 55 32) (layer "Edge.Cuts") (width 0.1))
+  (gr_line (start 55 32) (end 0 32) (layer "Edge.Cuts") (width 0.1))
+  (gr_line (start 0 32) (end 0 0) (layer "Edge.Cuts") (width 0.1))
+
+  (segment (start 10 10) (end 25 10) (width 0.25) (layer "F.Cu"))
+  (segment (start 25 10) (end 25 20) (width 0.25) (layer "F.Cu"))
+  (segment (start 25 20) (end 38 20) (width 0.4) (layer "F.Cu"))
+
+  (footprint "Resistor_SMD:R_0402_1005Metric"
+    (layer "F.Cu")
+    (at 12 10 0)
+    (property "Reference" "R1" (at 0 0 0))
+    (property "Value" "10k" (at 0 0 0))
+  )
+
+  (footprint "Capacitor_SMD:C_0402_1005Metric"
+    (layer "F.Cu")
+    (at 22 10 0)
+    (property "Reference" "C12" (at 0 0 0))
+    (property "Value" "1uF" (at 0 0 0))
+  )
+
+  (footprint "Capacitor_SMD:C_0805_2012Metric"
+    (layer "F.Cu")
+    (at 22 20 0)
+    (property "Reference" "C13" (at 0 0 0))
+    (property "Value" "10uF" (at 0 0 0))
+  )
+
+  (footprint "Package_TO_SOT_SMD:SOT-23-5"
+    (layer "F.Cu")
+    (at 32 15 0)
+    (property "Reference" "U1" (at 0 0 0))
+    (property "Value" "AP2112K-3.3" (at 0 0 0))
+  )
+
+  (footprint "LED_SMD:LED_0402_1005Metric"
+    (layer "F.Cu")
+    (at 42 10 0)
+    (property "Reference" "D1" (at 0 0 0))
+    (property "Value" "LED" (at 0 0 0))
+  )
+)

@@ -1,0 +1,33 @@
+:root {
+  --surface-0: #0c0d0f;
+  --surface-1: #14161a;
+  --surface-2: #1c1f26;
+  --border: #2a2f3a;
+  --text: #e8eaef;
+  --text-muted: #8b93a7;
+  --accent: #d4894a;
+  --accent-2: #f0b429;
+  --danger: #e85d4c;
+  --warn: #e0a106;
+  --success: #3dbe7b;
+  --info: #5b8def;
+  --diff-add: #1f6f4a;
+  --diff-del: #8b2e2e;
+  --diff-chg: #8a6a1f;
+  --font-sans: "Sora", "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+  --radius: 6px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--surface-0);
+  color: var(--text);
+  font-family: var(--font-sans);
+}

@@ -1,0 +1,21 @@
+{
+  "name": "flux",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "workers/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @flux/web",
+    "build": "npm run build -w @flux/web",
+    "db:push": "npm run push -w @flux/db",
+    "db:seed": "npm run seed -w @flux/db",
+    "lint": "npm run lint -w @flux/web",
+    "test": "npm run test -w @flux/design-core",
+    "flux": "node packages/cli/bin/flux.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
