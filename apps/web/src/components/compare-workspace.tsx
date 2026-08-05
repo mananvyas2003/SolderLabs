@@ -21,9 +21,9 @@ export function CompareWorkspace({
   reviewId?: string;
 }) {
   const [diff, setDiff] = useState<DiffBundleData | null>(null);
-  const [tab, setTab] = useState<"schematic" | "pcb" | "bom" | "copilot">(
-    "schematic",
-  );
+  const [tab, setTab] = useState<
+    "schematic" | "electrical" | "pcb" | "bom" | "copilot"
+  >("schematic");
   const [overlay, setOverlay] = useState(0.55);
   const [markdown, setMarkdown] = useState("");
   const [findings, setFindings] = useState<CopilotFinding[]>([]);
@@ -132,6 +132,9 @@ export function CompareWorkspace({
           <Button variant="outline" onClick={() => runCopilot("/bom")}>
             /bom
           </Button>
+          <Button variant="outline" onClick={() => runCopilot("/nets")}>
+            /nets
+          </Button>
         </div>
       </div>
 
@@ -144,13 +147,22 @@ export function CompareWorkspace({
           <span>
             PCB +{diff.summary.pcbAdded ?? 0}/−{diff.summary.pcbRemoved ?? 0}
           </span>
+          <span>
+            Electrical {diff.summary.significantElectrical ?? 0} sig
+            {diff.summary.criticalElectrical
+              ? ` / ${diff.summary.criticalElectrical} crit`
+              : ""}{" "}
+            · gate {diff.summary.electricalGate ?? "—"}
+          </span>
         </div>
       ) : (
         <p className="text-sm text-[var(--text-muted)]">Loading diff…</p>
       )}
 
       <div className="flex gap-2 border-b border-[var(--border)] pb-2 text-sm">
-        {(["schematic", "pcb", "bom", "copilot"] as const).map((t) => (
+        {(
+          ["schematic", "electrical", "pcb", "bom", "copilot"] as const
+        ).map((t) => (
           <button
             key={t}
             type="button"
@@ -165,6 +177,52 @@ export function CompareWorkspace({
           </button>
         ))}
       </div>
+
+      {tab === "electrical" && diff?.electrical ? (
+        <div className="space-y-3">
+          <p className="text-sm text-[var(--text-muted)]">
+            Semantic connectivity diff (NetDiff-style). Gate:{" "}
+            <span className="font-mono text-[var(--text)]">
+              {diff.electrical.summary.gate}
+            </span>{" "}
+            · {diff.electrical.summary.significantCount} significant /{" "}
+            {diff.electrical.summary.cosmeticCount} cosmetic /{" "}
+            {diff.electrical.summary.criticalCount} critical
+          </p>
+          <ul className="divide-y divide-[var(--border)] border border-[var(--border)]">
+            {diff.electrical.changes.map((ch, i) => (
+              <li
+                key={`${ch.type}-${i}`}
+                id={`elec-${encodeURIComponent(ch.pin ?? ch.net ?? ch.refdes ?? String(i))}`}
+                className="flex flex-wrap items-start justify-between gap-2 px-3 py-2 text-sm"
+              >
+                <div>
+                  <div className="font-mono text-xs text-[var(--accent)]">
+                    {ch.type}
+                  </div>
+                  <div>{ch.message}</div>
+                </div>
+                <Badge
+                  tone={
+                    ch.significance === "critical"
+                      ? "danger"
+                      : ch.significance === "significant"
+                        ? "warn"
+                        : "info"
+                  }
+                >
+                  {ch.significance}
+                </Badge>
+              </li>
+            ))}
+            {!diff.electrical.changes.length ? (
+              <li className="px-3 py-4 text-sm text-[var(--text-muted)]">
+                Electrically identical pin-sets (drawing moves ignored).
+              </li>
+            ) : null}
+          </ul>
+        </div>
+      ) : null}
 
       {tab === "pcb" && diff ? <PcbDiffViewer diff={diff} /> : null}
 
@@ -284,7 +342,7 @@ export function CompareWorkspace({
                 value={command}
                 onChange={(e) => setCommand(e.target.value)}
                 className="font-mono"
-                placeholder="/summarize · /risks · /bom · /explain C12"
+                placeholder="/summarize · /risks · /bom · /nets · /explain C12"
               />
               <Button type="submit">Run</Button>
             </form>

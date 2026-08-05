@@ -1,10 +1,11 @@
+(kicad_sch
+	(version 20231120)
+	(generator flux)
+
 (symbol
 	(lib_id "Device:R")
 	(at 50.8 50.8 0)
 	(unit 1)
-	(exclude_from_sim no)
-	(in_bom yes)
-	(on_board yes)
 	(property "Reference" "R1"
 		(at 53 48 0)
 	)
@@ -88,12 +89,76 @@
 	)
 )
 
-(label "VDD"
-	(at 90 40 0)
+(wire
+	(pts
+		(xy 101.27 48.26)
+		(xy 70 54.61)
+	)
 )
-(label "LED_ANODE"
-	(at 120 40 0)
+(wire
+	(pts
+		(xy 70 54.61)
+		(xy 50.8 54.61)
+	)
+)
+(junction
+	(at 70 54.61 0)
+)
+(label "VDD"
+	(at 70 54.61 0)
+)
+
+(wire
+	(pts
+		(xy 100 53.34)
+		(xy 70 46.99)
+	)
+)
+(wire
+	(pts
+		(xy 70 46.99)
+		(xy 130 46.99)
+	)
+)
+(wire
+	(pts
+		(xy 70 46.99)
+		(xy 85 61.19)
+	)
+)
+(junction
+	(at 70 46.99 0)
 )
 (global_label "GND"
-	(at 90 70 0)
+	(at 70 46.99 0)
+)
+
+(wire
+	(pts
+		(xy 50.8 46.99)
+		(xy 90 50.8)
+	)
+)
+(wire
+	(pts
+		(xy 90 50.8)
+		(xy 130 54.61)
+	)
+)
+(junction
+	(at 90 50.8 0)
+)
+(label "LED_ANODE"
+	(at 90 50.8 0)
+)
+
+(wire
+	(pts
+		(xy 102.54 53.34)
+		(xy 85 68.81)
+	)
+)
+(label "ENABLE"
+	(at 102.54 53.34 0)
+)
 )

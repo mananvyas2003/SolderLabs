@@ -9,13 +9,15 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "build": "tsc --noEmit"
+    "build": "tsc --noEmit",
+    "test": "node --import tsx --test src/connectivity.test.ts"
   },
   "dependencies": {
     "@flux/design-core": "*"
   },
   "devDependencies": {
     "@types/node": "^22.13.9",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   }
 }

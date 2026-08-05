@@ -1,8 +1,8 @@
 import type { DesignSnapshot, SnapshotComponent, SnapshotNet } from "@flux/design-core";
 import fs from "node:fs";
 import path from "node:path";
+import { resolveConnectivity } from "./connectivity";
 
-/** Minimal KiCad s-expr property extractor (MVP — not a full parser) */
 function extractQuoted(block: string, key: string): string | undefined {
   const re = new RegExp(`\\(${key}\\s+"([^"]*)"\\)`);
   const m = block.match(re);
@@ -10,10 +10,7 @@ function extractQuoted(block: string, key: string): string | undefined {
 }
 
 function extractProperty(block: string, name: string): string | undefined {
-  const re = new RegExp(
-    `\\(property\\s+"${name}"\\s+"([^"]*)"`,
-    "i",
-  );
+  const re = new RegExp(`\\(property\\s+"${name}"\\s+"([^"]*)"`, "i");
   const m = block.match(re);
   return m?.[1];
 }
@@ -24,7 +21,6 @@ function extractSymbolBlocks(src: string): string[] {
   while (i < src.length) {
     const start = src.indexOf("(symbol", i);
     if (start < 0) break;
-    // skip lib_symbols section symbols that are definitions (have "lib_id" differently)
     let depth = 0;
     let j = start;
     for (; j < src.length; j++) {
@@ -38,9 +34,14 @@ function extractSymbolBlocks(src: string): string[] {
       }
     }
     const block = src.slice(start, j);
-    // Instance symbols in sheets look like: (symbol (lib_id "...") (at ...) (unit 1) ... (property "Reference" "R1"
-    if (block.includes('(property "Reference"') || block.includes("(property \"Reference\"")) {
-      blocks.push(block);
+    if (
+      block.includes('(property "Reference"') ||
+      block.includes('(property "Reference"')
+    ) {
+      // Skip lib_symbols definitions (they use "SymbolName" not Reference instances)
+      if (!/^\(symbol\s+"/.test(block.trim()) || block.includes("(lib_id")) {
+        if (block.includes("(lib_id")) blocks.push(block);
+      }
     }
     i = j;
   }
@@ -57,41 +58,20 @@ function parseComponent(block: string): SnapshotComponent | null {
     extractProperty(block, "Manufacturer_Part_Number") ??
     extractProperty(block, "PartNumber");
   const manufacturer = extractProperty(block, "Manufacturer");
-  const at = block.match(/\(at\s+([-\d.]+)\s+([-\d.]+)/);
+  const libId = extractQuoted(block, "lib_id");
+  const at = block.match(/\(at\s+([-\d.]+)\s+([-\d.]+)(?:\s+([-\d.]+))?/);
   return {
     refdes,
     value,
     footprint,
     mpn: mpn || undefined,
     manufacturer: manufacturer || undefined,
+    libId: libId || undefined,
     sheetId: "root",
     x: at ? Number(at[1]) : undefined,
     y: at ? Number(at[2]) : undefined,
+    rotation: at?.[3] != null ? Number(at[3]) : 0,
   };
-}
-
-function parseNetsFromLabels(src: string): SnapshotNet[] {
-  const nets = new Map<string, Set<string>>();
-  const labelRe = /\(label\s+"([^"]+)"/g;
-  let m: RegExpExecArray | null;
-  while ((m = labelRe.exec(src))) {
-    const name = m[1];
-    if (!nets.has(name)) nets.set(name, new Set());
-  }
-  const globalRe = /\(global_label\s+"([^"]+)"/g;
-  while ((m = globalRe.exec(src))) {
-    const name = m[1];
-    if (!nets.has(name)) nets.set(name, new Set());
-  }
-  return [...nets.entries()].map(([name, nodes]) => ({
-    name,
-    class: /^(VCC|VDD|VBUS|\+|[0-9]+V|GND|AGND|PGND)/i.test(name)
-      ? name.toUpperCase().includes("GND")
-        ? "ground"
-        : "power"
-      : "signal",
-    nodes: [...nodes],
-  }));
 }
 
 export function parseKicadSchematicText(src: string): DesignSnapshot {
@@ -101,7 +81,6 @@ export function parseKicadSchematicText(src: string): DesignSnapshot {
     const c = parseComponent(b);
     if (c) components.push(c);
   }
-  // Deduplicate by refdes (multi-unit)
   const byRef = new Map<string, SnapshotComponent>();
   for (const c of components) {
     if (!byRef.has(c.refdes)) byRef.set(c.refdes, c);
@@ -109,16 +88,36 @@ export function parseKicadSchematicText(src: string): DesignSnapshot {
   const uniq = [...byRef.values()].sort((a, b) =>
     a.refdes.localeCompare(b.refdes, undefined, { numeric: true }),
   );
-  const nets = parseNetsFromLabels(src);
+
+  const resolved = resolveConnectivity(src, uniq);
+  // Fallback: if no wires produced nets, keep label names for presence
+  let nets = resolved.nets;
+  if (!nets.length) {
+    const labelNames = new Set<string>();
+    for (const m of src.matchAll(/\(label\s+"([^"]+)"/g)) labelNames.add(m[1]);
+    for (const m of src.matchAll(/\(global_label\s+"([^"]+)"/g))
+      labelNames.add(m[1]);
+    nets = [...labelNames].sort().map((name) => ({
+      name,
+      class: /GND/i.test(name)
+        ? ("ground" as const)
+        : /^(VCC|VDD)/i.test(name)
+          ? ("power" as const)
+          : ("signal" as const),
+      nodes: [] as string[],
+      isNamed: true,
+    }));
+  }
+
   return {
     schemaVersion: 1,
     tool: { name: "kicad", version: extractQuoted(src, "version") },
     sheets: [{ id: "root", name: "Root", title: "Main" }],
-    components: uniq,
+    components: resolved.components,
     nets,
     meta: {
       sheetCount: 1,
-      componentCount: uniq.length,
+      componentCount: resolved.components.length,
       netCount: nets.length,
     },
   };
@@ -146,7 +145,6 @@ export function parseKicadProjectDir(dir: string): DesignSnapshot {
   if (!files.length) {
     throw new Error("No .kicad_sch files found in upload");
   }
-  // Prefer root schematic (not in subsheets named differently) — merge all unique refdes
   const merged: DesignSnapshot = {
     schemaVersion: 1,
     tool: { name: "kicad" },
@@ -180,7 +178,9 @@ export function parseKicadProjectDir(dir: string): DesignSnapshot {
   merged.components = [...compMap.values()].sort((a, b) =>
     a.refdes.localeCompare(b.refdes, undefined, { numeric: true }),
   );
-  merged.nets = [...netMap.values()].sort((a, b) => a.name.localeCompare(b.name));
+  merged.nets = [...netMap.values()].sort((a, b) =>
+    a.name.localeCompare(b.name),
+  );
   merged.meta = {
     sheetCount: merged.sheets.length,
     componentCount: merged.components.length,
@@ -190,4 +190,4 @@ export function parseKicadProjectDir(dir: string): DesignSnapshot {
 }
 
 export * from "./pcb";
-
+export { resolveConnectivity } from "./connectivity";

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   diffSnapshots,
   localCopilotFindings,
+  semanticDiff,
   type DesignSnapshot,
 } from "./index.ts";
 
@@ -19,6 +20,10 @@ const base: DesignSnapshot = {
       sheetId: "root",
       x: 10,
       y: 20,
+      pins: [
+        { number: "1", name: "~", net: "VDD" },
+        { number: "2", name: "~", net: "GND" },
+      ],
     },
     {
       refdes: "U1",
@@ -28,10 +33,19 @@ const base: DesignSnapshot = {
       sheetId: "root",
       x: 40,
       y: 20,
+      pins: [
+        { number: "1", name: "VIN", net: "VIN" },
+        { number: "2", name: "GND", net: "GND" },
+        { number: "5", name: "VOUT", net: "VDD" },
+      ],
     },
   ],
-  nets: [{ name: "VDD", class: "power", nodes: ["U1.1", "C12.1"] }],
-  meta: { sheetCount: 1, componentCount: 2, netCount: 1 },
+  nets: [
+    { name: "VDD", class: "power", nodes: ["U1.5", "C12.1"], isNamed: true },
+    { name: "GND", class: "ground", nodes: ["U1.2", "C12.2"], isNamed: true },
+    { name: "VIN", class: "power", nodes: ["U1.1"], isNamed: true },
+  ],
+  meta: { sheetCount: 1, componentCount: 2, netCount: 3 },
 };
 
 const head: DesignSnapshot = {
@@ -45,6 +59,10 @@ const head: DesignSnapshot = {
       sheetId: "root",
       x: 10,
       y: 20,
+      pins: [
+        { number: "1", name: "~", net: "VDD" },
+        { number: "2", name: "~", net: "GND" },
+      ],
     },
     {
       refdes: "U1",
@@ -54,6 +72,11 @@ const head: DesignSnapshot = {
       sheetId: "root",
       x: 40,
       y: 20,
+      pins: [
+        { number: "1", name: "VIN", net: "VIN" },
+        { number: "2", name: "GND", net: "GND" },
+        { number: "5", name: "VOUT", net: "VDD" },
+      ],
     },
     {
       refdes: "R1",
@@ -62,13 +85,29 @@ const head: DesignSnapshot = {
       sheetId: "root",
       x: 60,
       y: 20,
+      pins: [
+        { number: "1", name: "~", net: "VDD" },
+        { number: "2", name: "~", net: "LED_ANODE" },
+      ],
     },
   ],
   nets: [
-    { name: "VDD", class: "power", nodes: ["U1.1", "C12.1"] },
-    { name: "N$1", class: "signal", nodes: ["R1.1", "U1.4"] },
+    {
+      name: "VDD",
+      class: "power",
+      nodes: ["U1.5", "C12.1", "R1.1"],
+      isNamed: true,
+    },
+    { name: "GND", class: "ground", nodes: ["U1.2", "C12.2"], isNamed: true },
+    { name: "VIN", class: "power", nodes: ["U1.1"], isNamed: true },
+    {
+      name: "LED_ANODE",
+      class: "signal",
+      nodes: ["R1.2"],
+      isNamed: true,
+    },
   ],
-  meta: { sheetCount: 1, componentCount: 3, netCount: 2 },
+  meta: { sheetCount: 1, componentCount: 3, netCount: 4 },
 };
 
 test("diffSnapshots detects value change and add", () => {
@@ -83,6 +122,8 @@ test("diffSnapshots detects value change and add", () => {
   assert.equal(c12.kind, "changed");
   assert.ok(c12.fields?.includes("value"));
   assert.ok(c12.fields?.includes("mpn"));
+  assert.ok(d.electrical);
+  assert.ok((d.summary.significantElectrical ?? 0) >= 1);
 });
 
 test("localCopilotFindings risks includes C12 and missing MPN on R1", () => {
@@ -93,4 +134,106 @@ test("localCopilotFindings risks includes C12 and missing MPN on R1", () => {
   const { findings } = localCopilotFindings(d, "/risks");
   assert.ok(findings.some((f) => f.evidence[0]?.ref === "C12"));
   assert.ok(findings.some((f) => f.evidence[0]?.ref === "R1"));
+});
+
+test("semanticDiff detects net rename by pin-set", () => {
+  const a: DesignSnapshot = {
+    ...base,
+    nets: [
+      {
+        name: "LED_DRIVE",
+        nodes: ["R1.1", "D1.1"],
+        isNamed: true,
+      },
+    ],
+    components: [
+      {
+        refdes: "R1",
+        value: "10k",
+        footprint: "R",
+        sheetId: "root",
+        pins: [{ number: "1", name: "~", net: "LED_DRIVE" }],
+      },
+      {
+        refdes: "D1",
+        value: "LED",
+        footprint: "LED",
+        sheetId: "root",
+        pins: [{ number: "1", name: "~", net: "LED_DRIVE" }],
+      },
+    ],
+  };
+  const b: DesignSnapshot = {
+    ...a,
+    nets: [
+      {
+        name: "LED_ANODE",
+        nodes: ["R1.1", "D1.1"],
+        isNamed: true,
+      },
+    ],
+    components: [
+      {
+        refdes: "R1",
+        value: "10k",
+        footprint: "R",
+        sheetId: "root",
+        pins: [{ number: "1", name: "~", net: "LED_ANODE" }],
+      },
+      {
+        refdes: "D1",
+        value: "LED",
+        footprint: "LED",
+        sheetId: "root",
+        pins: [{ number: "1", name: "~", net: "LED_ANODE" }],
+      },
+    ],
+  };
+  const d = semanticDiff(a, b);
+  assert.ok(d.changes.some((c) => c.type === "NetRenamed"));
+  assert.equal(d.summary.gate, "FAIL");
+});
+
+test("semanticDiff flags pin rewire", () => {
+  const a: DesignSnapshot = {
+    schemaVersion: 1,
+    tool: { name: "t" },
+    sheets: [],
+    components: [
+      {
+        refdes: "U1",
+        value: "X",
+        footprint: "F",
+        sheetId: "root",
+        pins: [
+          { number: "7", name: "SDA", net: "GND" },
+          { number: "8", name: "VSS", net: "GND" },
+        ],
+      },
+    ],
+    nets: [{ name: "GND", nodes: ["U1.7", "U1.8"] }],
+    meta: { sheetCount: 1, componentCount: 1 },
+  };
+  const b: DesignSnapshot = {
+    ...a,
+    components: [
+      {
+        refdes: "U1",
+        value: "X",
+        footprint: "F",
+        sheetId: "root",
+        pins: [
+          { number: "7", name: "SDA", net: "+3V3" },
+          { number: "8", name: "VSS", net: "GND" },
+        ],
+      },
+    ],
+    nets: [
+      { name: "+3V3", nodes: ["U1.7"] },
+      { name: "GND", nodes: ["U1.8"] },
+    ],
+  };
+  const d = semanticDiff(a, b);
+  assert.ok(d.changes.some((c) => c.type === "PinConnectionChanged"));
+  assert.ok(d.changes.some((c) => c.message.includes("U1.7")));
 });

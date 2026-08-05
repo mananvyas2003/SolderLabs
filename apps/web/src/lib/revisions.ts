@@ -4,7 +4,7 @@ import {
   parseKicadProjectDir,
   parseKicadPcbProjectDir,
 } from "@flux/parser";
-import { snapshotToBom } from "@flux/design-core";
+import { snapshotToBom, semanticDiff, type DesignSnapshot } from "@flux/design-core";
 import { sha256, writeStorage, storagePath } from "@/lib/storage";
 import { logActivity } from "@/lib/activity";
 import { storageKeyFor } from "@/lib/residency";
@@ -279,6 +279,54 @@ export async function createRevisionFromZip(opts: {
     });
     ingestErcDrcReports(opts.projectId, revisionId, parseRoot);
 
+    // NetDiff-style connectivity gate vs parent revision
+    if (opts.parentRevisionId) {
+      const parentSnapRow = db.designSnapshots.find(
+        (s) => s.revisionId === opts.parentRevisionId,
+      );
+      if (parentSnapRow) {
+        try {
+          const parentSnap = JSON.parse(
+            parentSnapRow.dataJson,
+          ) as DesignSnapshot;
+          const elec = semanticDiff(parentSnap, snapshot, {
+            failOn: "significant",
+          });
+          db.checkRuns.push({
+            id: nanoid(),
+            projectId: opts.projectId,
+            revisionId,
+            reviewId: null,
+            name: "connectivity-gate",
+            status: elec.summary.gate === "FAIL" ? "fail" : "pass",
+            summary:
+              elec.summary.gate === "FAIL"
+                ? `${elec.summary.significantCount} significant electrical change(s)` +
+                  (elec.summary.criticalCount
+                    ? ` (${elec.summary.criticalCount} critical)`
+                    : "")
+                : "No significant connectivity changes vs parent",
+            detailsJson: JSON.stringify(elec),
+            createdAt: now,
+          });
+        } catch {
+          /* ignore bad parent snapshot */
+        }
+      }
+    } else {
+      db.checkRuns.push({
+        id: nanoid(),
+        projectId: opts.projectId,
+        revisionId,
+        reviewId: null,
+        name: "connectivity-gate",
+        status: "pass",
+        summary: "Root revision — no parent to diff",
+        detailsJson: JSON.stringify({ skipped: true }),
+        createdAt: now,
+      });
+    }
+
     const rev = db.revisions.find((r) => r.id === revisionId)!;
     rev.parseStatus = "succeeded";
   } catch (e) {
@@ -346,6 +394,8 @@ export function revisionChecksPassing(projectId: string, revisionId: string) {
       c.status === "fail" &&
       (c.name === "bom-policy" ||
         c.name === "drc" ||
+        (c.name === "connectivity-gate" &&
+          /critical/i.test(c.summary ?? "")) ||
         (c.name === "erc" && !c.summary?.includes("skipped"))),
   );
   if (project?.requireGreenChecks && hardFails.length) {

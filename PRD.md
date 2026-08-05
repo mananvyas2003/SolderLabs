@@ -875,6 +875,8 @@ Handled by Clerk/Auth.js middleware.
 
 **Implementation status (local platform):** Demo SSO ACS + org SAML settings, DFM partner jobs (JLCPCB/PCBWay/Eurocircuits heuristics), firmware pinout sync + `.h` export, org data-residency regions with storage prefixes, public explore/star/fork. Production IdP crypto, live fab APIs, and multi-cloud residency are integration next steps.
 
+**Electrical core status:** TypeScript KiCad connectivity resolve (wires/junctions/labels + pin heuristics, inspired by [parser_new](https://github.com/mananvyas2003/parser_new) / [NetDiff](https://github.com/mananvyas2003/NetDiff) engine), NetDiff-style semantic electrical diff in `@flux/design-core`, Compare electrical tab, Copilot `/nets`, and `connectivity-gate` check runs. Optional later: call native NetDiff CLI/WASM for oracle parity with `kicad-cli`.
+
 ---
 
 ## 14. Success metrics

@@ -12,7 +12,7 @@
     "db:push": "npm run push -w @flux/db",
     "db:seed": "npm run seed -w @flux/db",
     "lint": "npm run lint -w @flux/web",
-    "test": "npm run test -w @flux/design-core",
+    "test": "npm run test -w @flux/design-core && npm run test -w @flux/parser",
     "flux": "node packages/cli/bin/flux.mjs"
   },
   "engines": {
