@@ -12,7 +12,9 @@ inputs:
     required: false
     default: .
   registry:
-    description: Optional path to BSC registry directory (sets --registry)
+    description: >
+      Optional path to BSC registry directory (sets --registry). Relative
+      paths are resolved from the repository root, not from cwd.
     required: false
     default: ""
 runs:
@@ -32,6 +34,12 @@ runs:
         fi
         ARGS=(bsc check --scan "${{ inputs.scan-dir }}")
         if [[ -n "${{ inputs.registry }}" ]]; then
-          ARGS+=(--registry "${{ inputs.registry }}")
+          REG="${{ inputs.registry }}"
+          # Absolute paths stay as-is; relative paths are repo-root-relative
+          # so workflow callers can pass fixtures/corpus/bsc while cwd is an example.
+          if [[ "$REG" != /* && ! "$REG" =~ ^[A-Za-z]:[\\/] ]]; then
+            REG="$REPO_ROOT/$REG"
+          fi
+          ARGS+=(--registry "$REG")
         fi
         node "$CLI" "${ARGS[@]}"
