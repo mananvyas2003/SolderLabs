@@ -40,13 +40,8 @@ export default async function ComparePage({
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-4">
-      <Link
-        href={`/app/${orgSlug}/${projectSlug}`}
-        className="text-sm text-[var(--accent)]"
-      >
-        ← {project.name}
-      </Link>
+    <div className="space-y-4">
+      <h2 className="text-lg font-semibold tracking-tight">Compare</h2>
       <CompareWorkspace
         orgSlug={orgSlug}
         projectSlug={projectSlug}

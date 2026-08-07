@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
+import { Source_Sans_3, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const plexSans = IBM_Plex_Sans({
+const sourceSans = Source_Sans_3({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-plex-sans",
+  weight: ["400", "600"],
+  variable: "--font-source-sans",
 });
 
 const plexMono = IBM_Plex_Mono({
@@ -28,7 +28,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plexSans.variable} ${plexMono.variable}`}
+      className={`${sourceSans.variable} ${plexMono.variable}`}
     >
       <body
         className="antialiased"

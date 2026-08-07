@@ -32,22 +32,26 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--surface-0)] px-6">
-      <div className="w-full max-w-[360px]">
-        <BrandMark className="mb-8" />
-        <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-6 shadow-[var(--shadow-sm)]">
-          <h1 className="text-lg font-semibold tracking-tight">Sign in</h1>
-          <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-muted)]">
-            Demo:{" "}
-            <span className="font-mono text-[13px] text-[var(--text)]">
-              demo@solderlab.dev
-            </span>{" "}
-            /{" "}
-            <span className="font-mono text-[13px] text-[var(--text)]">demo</span>
+    <div className="flex min-h-screen flex-col bg-[var(--surface-0)]">
+      <header className="border-b border-[var(--border)] bg-[var(--surface-1)]">
+        <div className="mx-auto flex h-14 max-w-5xl items-center px-6">
+          <BrandMark />
+        </div>
+      </header>
+      <div className="flex flex-1 items-start justify-center px-6 pt-16">
+        <div className="w-full max-w-[380px]">
+          <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+          <p className="mt-2 text-sm text-[var(--text-muted)]">
+            Use{" "}
+            <span className="font-mono text-[var(--text)]">demo@solderlab.dev</span>{" "}
+            / <span className="font-mono text-[var(--text)]">demo</span>
           </p>
-          <form onSubmit={onSubmit} className="mt-6 space-y-3.5">
+          <form
+            onSubmit={onSubmit}
+            className="mt-8 space-y-4 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-5"
+          >
             <div>
-              <label className="mb-1 block text-xs font-medium text-[var(--text-muted)]">
+              <label className="mb-1 block text-xs font-semibold text-[var(--text-muted)]">
                 Email
               </label>
               <Input
@@ -56,10 +60,11 @@ export default function SignInPage() {
                 type="email"
                 required
                 autoComplete="username"
+                autoFocus
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-[var(--text-muted)]">
+              <label className="mb-1 block text-xs font-semibold text-[var(--text-muted)]">
                 Password
               </label>
               <Input

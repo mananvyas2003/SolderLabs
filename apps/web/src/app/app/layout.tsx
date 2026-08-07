@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getDb } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
-import { BrandMark } from "@/components/brand-mark";
+import { ensureDb } from "@/lib/ensure-db";
+import { AppSidebar, type SidebarOrg } from "@/components/app-sidebar";
+import { SignOutControl } from "@/components/sign-out-control";
 
 export default async function AppLayout({
   children,
@@ -11,51 +14,38 @@ export default async function AppLayout({
   const user = await getSessionUser();
   if (!user) redirect("/sign-in");
 
-  return (
-    <div className="min-h-screen bg-[var(--surface-0)]">
-      <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--surface-1)]/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-2.5">
-          <div className="flex items-center gap-5">
-            <BrandMark href="/app" size="sm" />
-            <span className="hidden h-4 w-px bg-[var(--border)] sm:block" />
-            <span className="hidden text-xs text-[var(--text-muted)] sm:inline">
-              Hardware collaboration
-            </span>
-          </div>
-          <div className="flex items-center gap-4 text-sm">
-            <Link
-              href="/admin/metrics"
-              className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]"
-            >
-              Metrics
-            </Link>
-            <span className="text-xs text-[var(--text-muted)]">{user.name}</span>
-            <form action="/api/auth/sign-out" method="POST">
-              <SignOutButton />
-            </form>
-          </div>
-        </div>
-      </header>
-      <div className="mx-auto max-w-6xl px-5 py-6">{children}</div>
-    </div>
-  );
-}
+  ensureDb();
+  const db = getDb();
+  const orgs: SidebarOrg[] = db.memberships
+    .filter((m) => m.userId === user.id)
+    .map((m) => db.organizations.find((o) => o.id === m.orgId))
+    .filter((o): o is NonNullable<typeof o> => Boolean(o))
+    .map((o) => ({
+      slug: o.slug,
+      name: o.name,
+      projects: db.projects
+        .filter((p) => p.orgId === o.id)
+        .map((p) => ({ slug: p.slug, name: p.name })),
+    }));
 
-function SignOutButton() {
   return (
-    <button
-      formAction={async () => {
-        "use server";
-        const { cookies } = await import("next/headers");
-        const { COOKIE } = await import("@/lib/auth");
-        const { redirect } = await import("next/navigation");
-        const jar = await cookies();
-        jar.delete(COOKIE);
-        redirect("/sign-in");
-      }}
-      className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]"
-    >
-      Sign out
-    </button>
+    <div className="flex min-h-screen bg-[var(--surface-0)]">
+      <AppSidebar orgs={orgs} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="sticky top-0 z-20 flex h-12 items-center justify-end gap-2 border-b border-[var(--border)] bg-[var(--surface-1)] px-4 md:px-5">
+          <span className="mr-auto pl-12 text-sm text-[var(--text-muted)] md:pl-0">
+            {user.name}
+          </span>
+          <Link
+            href="/app"
+            className="rounded-[var(--radius-sm)] px-2.5 py-1 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+          >
+            Home
+          </Link>
+          <SignOutControl />
+        </header>
+        <div className="min-w-0 flex-1 px-4 py-5 md:px-6">{children}</div>
+      </div>
+    </div>
   );
 }

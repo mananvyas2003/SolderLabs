@@ -37,56 +37,38 @@ export default async function ProjectPage({
     ? db.checkRuns.filter((c) => c.revisionId === latest.id)
     : [];
 
-  const base = revs[1]?.id;
-  const head = revs[0]?.id;
-
   return (
-    <div className="mx-auto max-w-5xl space-y-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <p className="font-mono text-xs text-[var(--text-muted)]">
-            {org.slug} / {project.slug}
-          </p>
-          <h1 className="text-2xl font-semibold">{project.name}</h1>
-          <p className="mt-1 text-sm text-[var(--text-muted)]">
-            {project.description || "Hardware project"}
-          </p>
-        </div>
-        <nav className="flex flex-wrap gap-2 text-sm">
-          <NavChip href={`/app/${orgSlug}/${projectSlug}/history`}>History</NavChip>
-          <NavChip href={`/app/${orgSlug}/${projectSlug}/files`}>Files</NavChip>
-          <NavChip href={`/app/${orgSlug}/${projectSlug}/bom`}>BOM</NavChip>
-          <NavChip href={`/app/${orgSlug}/${projectSlug}/checks`}>Checks</NavChip>
-          <NavChip href={`/app/${orgSlug}/${projectSlug}/pinout`}>Pinout</NavChip>
-          <NavChip href={`/app/${orgSlug}/${projectSlug}/reviews`}>Reviews</NavChip>
-          <NavChip href={`/app/${orgSlug}/${projectSlug}/releases`}>Releases</NavChip>
-          <NavChip href={`/app/${orgSlug}/${projectSlug}/settings`}>Settings</NavChip>
-          {base && head ? (
-            <NavChip
-              href={`/app/${orgSlug}/${projectSlug}/compare?base=${base}&head=${head}`}
-              accent
-            >
-              Compare latest
-            </NavChip>
-          ) : null}
-        </nav>
-      </div>
+    <div className="space-y-8">
+      <aside className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-4 py-3 lg:hidden">
+        <p className="text-sm font-semibold">SolderLab Review</p>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Open the <span className="font-medium text-[var(--text)]">Review · AI</span>{" "}
+          button (bottom-right) for risk suggestions on your latest diff. On desktop
+          the Review rail is always on the right.
+        </p>
+      </aside>
 
-      <section className="grid gap-6 md:grid-cols-2">
+      <section className="grid gap-4 md:grid-cols-2">
         <div className="space-y-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-4">
-          <h2 className="text-sm font-medium text-[var(--text-muted)]">
-            Revisions
-          </h2>
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm font-semibold">Revisions</h2>
+            <Link
+              href={`/app/${orgSlug}/${projectSlug}/history`}
+              className="text-xs font-medium text-[var(--accent)] hover:underline"
+            >
+              Full history
+            </Link>
+          </div>
           {revs.length === 0 ? (
             <p className="text-sm text-[var(--text-muted)]">
-              No revisions yet. Seed fixtures or upload a KiCad zip.
+              No revisions yet. Seed fixtures or upload a KiCad zip / .kicad_sch.
             </p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="divide-y divide-[var(--border)]">
               {revs.slice(0, 5).map((r) => (
                 <li
                   key={r.id}
-                  className="flex items-center justify-between gap-2 text-sm"
+                  className="flex items-center justify-between gap-2 py-2 text-sm first:pt-0 last:pb-0"
                 >
                   <span className="truncate">{r.message}</span>
                   <Badge
@@ -104,28 +86,26 @@ export default async function ProjectPage({
               ))}
             </ul>
           )}
-          <div className="flex flex-wrap gap-2 pt-2">
+          <div className="pt-1">
             <SeedFixturesButton orgSlug={orgSlug} projectSlug={projectSlug} />
           </div>
         </div>
 
         <div className="space-y-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-4">
-          <h2 className="text-sm font-medium text-[var(--text-muted)]">
-            Upload revision
-          </h2>
+          <h2 className="text-sm font-semibold">Upload revision</h2>
           <UploadRevisionForm orgSlug={orgSlug} projectSlug={projectSlug} />
           {checks.length ? (
-            <div className="pt-2">
-              <p className="mb-1 text-xs text-[var(--text-muted)]">
+            <div className="border-t border-[var(--border)] pt-3">
+              <p className="mb-2 text-xs font-medium text-[var(--text-muted)]">
                 Latest checks
               </p>
-              <ul className="space-y-1">
+              <ul className="space-y-1.5">
                 {checks.map((c) => (
                   <li key={c.id} className="flex items-center gap-2 text-sm">
                     <Badge tone={c.status === "pass" ? "success" : "danger"}>
                       {c.status}
                     </Badge>
-                    <span>
+                    <span className="truncate">
                       {c.name}: {c.summary}
                     </span>
                   </li>
@@ -138,16 +118,18 @@ export default async function ProjectPage({
 
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm text-[var(--text-muted)]">Design Reviews</h2>
+          <h2 className="text-sm font-semibold">Design reviews</h2>
           <Link
             href={`/app/${orgSlug}/${projectSlug}/reviews`}
-            className="text-xs text-[var(--accent)]"
+            className="text-xs font-medium text-[var(--accent)] hover:underline"
           >
             View all
           </Link>
         </div>
         {reviews.length === 0 ? (
-          <p className="text-sm text-[var(--text-muted)]">No open reviews.</p>
+          <p className="rounded-[var(--radius)] border border-dashed border-[var(--border)] bg-[var(--surface-1)] px-4 py-8 text-sm text-[var(--text-muted)]">
+            No open reviews. Open the Reviews tab to start one.
+          </p>
         ) : (
           <ul className="divide-y divide-[var(--border)] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)]">
             {reviews.map((r) => (
@@ -156,8 +138,11 @@ export default async function ProjectPage({
                   href={`/app/${orgSlug}/${projectSlug}/reviews/${r.id}`}
                   className="flex items-center justify-between px-4 py-3 hover:bg-[var(--surface-2)]"
                 >
-                  <span>
-                    #{r.number} {r.title}
+                  <span className="text-sm">
+                    <span className="font-mono text-[var(--text-muted)]">
+                      #{r.number}
+                    </span>{" "}
+                    {r.title}
                   </span>
                   <Badge
                     tone={
@@ -179,28 +164,5 @@ export default async function ProjectPage({
         )}
       </section>
     </div>
-  );
-}
-
-function NavChip({
-  href,
-  children,
-  accent,
-}: {
-  href: string;
-  children: React.ReactNode;
-  accent?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className={
-        accent
-          ? "rounded-[var(--radius)] bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-[var(--accent-fg)]"
-          : "rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-3 py-1.5 text-sm hover:bg-[var(--surface-2)]"
-      }
-    >
-      {children}
-    </Link>
   );
 }

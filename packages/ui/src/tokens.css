@@ -1,63 +1,59 @@
 /**
- * SolderLab brand kit — “Instrument Lab”
+ * SolderLab brand kit — “Slate + Ember”
  *
- * Personality: precise, calm, engineering-first. Closer to a metrology bench
- * than a marketing site. Flat surfaces, hairline borders, one accent.
+ * Personality: industrial and assured. Cool slate chrome, one warm ember
+ * for primary action. Flat — no gradients as identity.
  *
- * Accent: Teal oxide (#0f766e) — PCB / lab instrument, not purple SaaS.
- * Neutrals: cool paper & ink (GitHub-adjacent density, original palette).
- * Diff: muted green / rose — readable, not neon.
- *
- * Do not use gradients as brand identity. Accent appears in type, links,
- * focus rings, and primary actions only.
+ * Accent: Ember (#c2410c) — heat of solder, used sparingly.
+ * Neutrals: zinc slate paper & near-black ink.
  */
 
 :root {
   /* Surfaces */
-  --surface-0: #f6f8fa;
+  --surface-0: #f4f4f5;
   --surface-1: #ffffff;
-  --surface-2: #eef1f4;
-  --surface-inset: #eaeef2;
+  --surface-2: #e4e4e7;
+  --surface-inset: #ebebec;
 
   /* Ink */
-  --text: #1f2328;
-  --text-muted: #636c76;
-  --text-subtle: #8b949e;
+  --text: #18181b;
+  --text-muted: #52525b;
+  --text-subtle: #71717a;
 
   /* Lines */
-  --border: #d0d7de;
-  --border-muted: #e6eaef;
-  --border-strong: #afb8c1;
+  --border: #d4d4d8;
+  --border-muted: #e4e4e7;
+  --border-strong: #a1a1aa;
 
   /* Brand */
-  --accent: #0f766e;
-  --accent-hover: #0d9488;
-  --accent-muted: #ccfbf1;
+  --accent: #c2410c;
+  --accent-hover: #9a3412;
+  --accent-muted: #ffedd5;
   --accent-fg: #ffffff;
-  --accent-2: #115e59;
+  --accent-2: #9a3412;
 
   /* Status */
-  --danger: #cf222e;
-  --warn: #9a6700;
-  --success: #1a7f37;
-  --info: #0969da;
+  --danger: #b91c1c;
+  --warn: #a16207;
+  --success: #15803d;
+  --info: #1d4ed8;
 
-  /* Diff (schematic / review) */
-  --diff-add: #dafbe1;
-  --diff-add-fg: #116329;
-  --diff-del: #ffebe9;
-  --diff-del-fg: #82071e;
-  --diff-chg: #fff8c5;
-  --diff-chg-fg: #7d4e00;
+  /* Diff */
+  --diff-add: #dcfce7;
+  --diff-add-fg: #166534;
+  --diff-del: #fee2e2;
+  --diff-del-fg: #991b1b;
+  --diff-chg: #fef9c3;
+  --diff-chg-fg: #854d0e;
 
   /* Type */
-  --font-sans: var(--font-plex-sans), "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-sans: var(--font-source-sans), "Source Sans 3", "Segoe UI", sans-serif;
   --font-mono: var(--font-plex-mono), "IBM Plex Mono", "Consolas", monospace;
 
   /* Shape */
   --radius: 6px;
   --radius-sm: 4px;
-  --shadow-sm: 0 1px 0 rgba(31, 35, 40, 0.04);
+  --shadow-sm: 0 1px 0 rgba(24, 24, 27, 0.04);
 }
 
 * {
@@ -71,6 +67,5 @@ body {
   background: var(--surface-0);
   color: var(--text);
   font-family: var(--font-sans);
-  font-feature-settings: "ss01" on, "cv11" on;
   -webkit-font-smoothing: antialiased;
 }

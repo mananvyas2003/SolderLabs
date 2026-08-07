@@ -596,10 +596,10 @@ export function localCopilotFindings(
     cmd.startsWith("/nets") ||
     cmd === ""
   ) {
-    for (const row of diff.bom) {
+    for (const [i, row] of diff.bom.entries()) {
       if (row.kind === "added") {
         findings.push({
-          id: `bom-add-${row.refdes}`,
+          id: `bom-add-${row.refdes}-${i}`,
           severity: row.after?.mpn ? "info" : "medium",
           title: `BOM add ${row.refdes}`,
           body: row.after?.mpn
@@ -620,7 +620,7 @@ export function localCopilotFindings(
         });
       } else if (row.kind === "removed") {
         findings.push({
-          id: `bom-rm-${row.refdes}`,
+          id: `bom-rm-${row.refdes}-${i}`,
           severity: "high",
           title: `BOM remove ${row.refdes}`,
           body: `Removed ${row.refdes} (${row.before?.value ?? "?"})`,
@@ -644,7 +644,7 @@ export function localCopilotFindings(
             ? "high"
             : "medium";
         findings.push({
-          id: `bom-ch-${row.refdes}`,
+          id: `bom-ch-${row.refdes}-${i}`,
           severity: sev,
           title: `BOM change ${row.refdes}`,
           body: `${row.refdes}: ${fields
@@ -674,7 +674,7 @@ export function localCopilotFindings(
       }
     }
 
-    for (const ch of diff.electrical?.changes ?? []) {
+    for (const [i, ch] of (diff.electrical?.changes ?? []).entries()) {
       if (ch.significance === "cosmetic" && !cmd.startsWith("/nets")) continue;
       const sev: import("./types").FindingSeverity =
         ch.significance === "critical"
@@ -687,7 +687,7 @@ export function localCopilotFindings(
               ? "medium"
               : "info";
       findings.push({
-        id: `elec-${ch.type}-${ch.message.slice(0, 40)}`,
+        id: `elec-${ch.type}-${i}`,
         severity: sev,
         title: ch.type,
         body: ch.message,
@@ -709,9 +709,11 @@ export function localCopilotFindings(
 
     // Legacy net list fallback when electrical empty
     if (!diff.electrical?.changes.length) {
-      for (const n of diff.nets.filter((x) => x.kind !== "unchanged")) {
+      for (const [i, n] of diff.nets
+        .filter((x) => x.kind !== "unchanged")
+        .entries()) {
         findings.push({
-          id: `net-${n.name}`,
+          id: `net-${n.name}-${i}`,
           severity: n.kind === "removed" ? "high" : "medium",
           title: `Net ${n.name} ${n.kind}`,
           body: `Net \`${n.name}\` is ${n.kind}.`,

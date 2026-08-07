@@ -128,7 +128,8 @@ export function getDb(): SolderLabDb {
 export function persist() {
   if (!cache || !cachePath) return;
   fs.mkdirSync(path.dirname(cachePath), { recursive: true });
-  fs.writeFileSync(cachePath, JSON.stringify(cache, null, 2), "utf8");
+  // Compact JSON — pretty-print was a major sync I/O cost on every write.
+  fs.writeFileSync(cachePath, JSON.stringify(cache), "utf8");
 }
 
 export function resetDbCache() {

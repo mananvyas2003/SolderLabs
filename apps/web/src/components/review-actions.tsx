@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Button } from "@solderlab/ui";
 
 export function ReviewActions({
@@ -17,30 +17,40 @@ export function ReviewActions({
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
 
   async function act(action: string) {
+    if (busy) return;
+    setBusy(action);
     setError(null);
-    const res = await fetch(
-      `/api/orgs/${orgSlug}/projects/${projectSlug}/reviews/${reviewId}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
-      },
-    );
-    if (!res.ok) {
-      const j = (await res.json()) as {
-        error?: string;
-        failing?: Array<{ name: string; summary: string | null }>;
-      };
-      setError(
-        j.failing?.length
-          ? `${j.error}: ${j.failing.map((f) => f.name).join(", ")}`
-          : j.error ?? "Action failed",
+    try {
+      const res = await fetch(
+        `/api/orgs/${orgSlug}/projects/${projectSlug}/reviews/${reviewId}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action }),
+        },
       );
-      return;
+      if (!res.ok) {
+        const j = (await res.json()) as {
+          error?: string;
+          failing?: Array<{ name: string; summary: string | null }>;
+        };
+        setError(
+          j.failing?.length
+            ? `${j.error}: ${j.failing.map((f) => f.name).join(", ")}`
+            : j.error ?? "Action failed",
+        );
+        return;
+      }
+      startTransition(() => {
+        router.refresh();
+      });
+    } finally {
+      setBusy(null);
     }
-    router.refresh();
   }
 
   return (
@@ -48,13 +58,29 @@ export function ReviewActions({
       <div className="flex gap-2">
         {state !== "merged" ? (
           <>
-            <Button variant="outline" onClick={() => act("approve")}>
-              Approve
+            <Button
+              type="button"
+              variant="outline"
+              disabled={Boolean(busy)}
+              onClick={() => void act("approve")}
+            >
+              {busy === "approve" ? "…" : "Approve"}
             </Button>
-            <Button variant="ghost" onClick={() => act("request-changes")}>
-              Request changes
+            <Button
+              type="button"
+              variant="ghost"
+              disabled={Boolean(busy)}
+              onClick={() => void act("request-changes")}
+            >
+              {busy === "request-changes" ? "…" : "Request changes"}
             </Button>
-            <Button onClick={() => act("merge")}>Merge</Button>
+            <Button
+              type="button"
+              disabled={Boolean(busy)}
+              onClick={() => void act("merge")}
+            >
+              {busy === "merge" ? "…" : "Merge"}
+            </Button>
           </>
         ) : null}
       </div>

@@ -7,12 +7,13 @@ export function cx(...parts: Array<string | false | null | undefined>) {
 export function Button({
   variant = "primary",
   className,
+  type = "button",
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: "primary" | "ghost" | "danger" | "outline";
 }) {
   const base =
-    "inline-flex items-center justify-center gap-2 rounded-[var(--radius)] px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] disabled:opacity-50";
+    "inline-flex cursor-pointer items-center justify-center gap-2 rounded-[var(--radius)] px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] active:opacity-90 disabled:pointer-events-none disabled:opacity-50";
   const styles = {
     primary:
       "bg-[var(--accent)] text-[var(--accent-fg)] hover:bg-[var(--accent-hover)]",
@@ -23,7 +24,11 @@ export function Button({
       "border border-[var(--border)] bg-[var(--surface-1)] text-[var(--text)] hover:bg-[var(--surface-2)]",
   } as const;
   return (
-    <button className={cx(base, styles[variant], className)} {...props} />
+    <button
+      type={type}
+      className={cx(base, styles[variant], className)}
+      {...props}
+    />
   );
 }
 

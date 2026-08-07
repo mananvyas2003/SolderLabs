@@ -21,55 +21,82 @@ export default async function OrgPage({
   const list = getDb().projects.filter((p) => p.orgId === org.id);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
-      <div>
-        <p className="font-mono text-xs text-[var(--text-muted)]">{org.slug}</p>
-        <h1 className="text-2xl font-semibold">{org.name}</h1>
-        <div className="mt-3 flex flex-wrap gap-2 text-sm">
-          <Link
-            href={`/app/${org.slug}/library`}
-            className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-3 py-1.5 hover:bg-[var(--surface-2)]"
-          >
-            Library
-          </Link>
-          <Link
-            href={`/app/${org.slug}/activity`}
-            className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-3 py-1.5 hover:bg-[var(--surface-2)]"
-          >
-            Activity
-          </Link>
-          <Link
-            href={`/app/${org.slug}/webhooks`}
-            className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-3 py-1.5 hover:bg-[var(--surface-2)]"
-          >
-            Webhooks
-          </Link>
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <nav className="font-mono text-xs text-[var(--text-muted)]">
+            <Link href="/app" className="hover:text-[var(--accent)]">
+              orgs
+            </Link>
+            <span aria-hidden> / </span>
+            <span className="text-[var(--text)]">{org.slug}</span>
+          </nav>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight">
+            {org.name}
+          </h1>
         </div>
+        <nav className="flex flex-wrap gap-1 text-sm">
+          {(
+            [
+              ["Library", "library"],
+              ["Activity", "activity"],
+              ["Webhooks", "webhooks"],
+            ] as const
+          ).map(([label, seg]) => (
+            <Link
+              key={seg}
+              href={`/app/${org.slug}/${seg}`}
+              className="rounded-[var(--radius)] px-3 py-1.5 text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
       </div>
 
       <section>
-        <h2 className="mb-3 text-sm text-[var(--text-muted)]">Projects</h2>
-        <ul className="divide-y divide-[var(--border)] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)]">
-          {list.map((p) => (
-            <li key={p.id}>
-              <Link
-                href={`/app/${org.slug}/${p.slug}`}
-                className="block px-4 py-3.5 hover:bg-[var(--surface-2)]"
-              >
-                <div className="font-medium">{p.name}</div>
-                <div className="text-sm text-[var(--text-muted)]">
-                  {p.description || "No description"}
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="text-sm font-semibold">Projects</h2>
+          <span className="text-xs text-[var(--text-subtle)]">
+            {list.length} total
+          </span>
+        </div>
+        {list.length === 0 ? (
+          <p className="rounded-[var(--radius)] border border-dashed border-[var(--border)] bg-[var(--surface-1)] px-4 py-8 text-sm text-[var(--text-muted)]">
+            No projects yet. Create one below.
+          </p>
+        ) : (
+          <ul className="divide-y divide-[var(--border)] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)]">
+            {list.map((p) => (
+              <li key={p.id}>
+                <Link
+                  href={`/app/${org.slug}/${p.slug}`}
+                  className="flex items-center justify-between gap-4 px-4 py-3.5 hover:bg-[var(--surface-2)]"
+                >
+                  <div className="min-w-0">
+                    <div className="font-semibold">{p.name}</div>
+                    <div className="truncate text-sm text-[var(--text-muted)]">
+                      {p.description || p.slug}
+                    </div>
+                  </div>
+                  <span className="shrink-0 text-sm font-medium text-[var(--accent)]">
+                    Open →
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
-      <section>
-        <h2 className="mb-3 text-sm text-[var(--text-muted)]">New project</h2>
-        <CreateProjectForm orgSlug={org.slug} />
-      </section>
+      <details className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-4">
+        <summary className="cursor-pointer text-sm font-semibold">
+          New project
+        </summary>
+        <div className="mt-4">
+          <CreateProjectForm orgSlug={org.slug} />
+        </div>
+      </details>
     </div>
   );
 }

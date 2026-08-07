@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
@@ -21,17 +20,11 @@ export default async function PinoutPage({
   if (!project) notFound();
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6">
-      <Link
-        href={`/app/${orgSlug}/${projectSlug}`}
-        className="text-sm text-[var(--accent)]"
-      >
-        ← {project.name}
-      </Link>
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold">Firmware pinout sync</h1>
-        <p className="text-sm text-[var(--text-muted)]">
-          Sync MCU/connector pins from schematic nets into firmware headers
+        <h2 className="text-lg font-semibold tracking-tight">Firmware pinout</h2>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Sync MCU/connector pins from schematic nets into firmware headers.
         </p>
       </div>
       <PinoutPanel orgSlug={orgSlug} projectSlug={projectSlug} />

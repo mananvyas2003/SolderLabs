@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
@@ -22,14 +21,8 @@ export default async function ProjectSettingsPage({
   if (!project) notFound();
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
-      <Link
-        href={`/app/${orgSlug}/${projectSlug}`}
-        className="text-sm text-[var(--accent)]"
-      >
-        ← {project.name}
-      </Link>
-      <h1 className="text-2xl font-semibold">Project settings</h1>
+    <div className="max-w-xl space-y-8">
+      <h2 className="text-lg font-semibold tracking-tight">Project settings</h2>
       <ProjectSettingsForm
         orgSlug={orgSlug}
         projectSlug={projectSlug}
@@ -38,9 +31,9 @@ export default async function ProjectSettingsPage({
         visibility={project.visibility}
       />
       <section>
-        <h2 className="mb-2 text-sm text-[var(--text-muted)]">
-          Altium / CSV import (best-effort)
-        </h2>
+        <h3 className="mb-2 text-sm font-semibold text-[var(--text-muted)]">
+          Altium / CSV import
+        </h3>
         <ImportAltiumForm orgSlug={orgSlug} projectSlug={projectSlug} />
       </section>
     </div>

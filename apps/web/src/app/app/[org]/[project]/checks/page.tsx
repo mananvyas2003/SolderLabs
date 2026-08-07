@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
@@ -25,21 +24,15 @@ export default async function ChecksPage({
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <Link
-        href={`/app/${orgSlug}/${projectSlug}`}
-        className="text-sm text-[var(--accent)]"
-      >
-        ← {project.name}
-      </Link>
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold">Hardware checks</h1>
+        <h2 className="text-lg font-semibold tracking-tight">Hardware checks</h2>
         <p className="text-sm text-[var(--text-muted)]">
           requireGreenChecks: {String(project.requireGreenChecks)} · requireApproval:{" "}
           {String(project.requireApproval)}
         </p>
       </div>
-      <ul className="divide-y divide-[var(--border)] border border-[var(--border)]">
+      <ul className="divide-y divide-[var(--border)] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)]">
         {checks.map((c) => (
           <li key={c.id} className="flex items-start justify-between gap-3 px-4 py-3 text-sm">
             <div>

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getDb } from "@solderlab/db";
 import { ensureDb } from "@/lib/ensure-db";
 
@@ -25,10 +26,10 @@ export function getMainBranch(projectId: string) {
   );
 }
 
-export function assertOrgAccess(orgSlug: string, userId: string) {
+export const assertOrgAccess = cache((orgSlug: string, userId: string) => {
   const org = getOrgBySlug(orgSlug);
   if (!org) return { error: "ORG_NOT_FOUND" as const };
   const mem = getMembership(org.id, userId);
   if (!mem) return { error: "FORBIDDEN" as const };
   return { org, membership: mem };
-}
+});

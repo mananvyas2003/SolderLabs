@@ -65,9 +65,9 @@ export default async function ReviewDetailPage({
     <div className="mx-auto max-w-6xl space-y-6">
       <Link
         href={`/app/${orgSlug}/${projectSlug}/reviews`}
-        className="text-sm text-[var(--accent)]"
+        className="inline-flex text-sm font-medium text-[var(--accent)] hover:underline"
       >
-        ← Reviews
+        ← All reviews
       </Link>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>

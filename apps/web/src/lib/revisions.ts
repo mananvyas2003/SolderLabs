@@ -533,6 +533,33 @@ export async function createRevisionFromDir(opts: {
   });
 }
 
+/**
+ * Turn an upload into a project zip. Accepts:
+ * - `.zip` KiCad project archives (passthrough)
+ * - `.kicad_sch` single schematics (wrapped into a one-file project zip)
+ */
+export function normalizeUploadToZip(
+  fileName: string,
+  buffer: Buffer,
+): { zipBuffer: Buffer; kind: "zip" | "kicad_sch" } {
+  const lower = fileName.toLowerCase();
+  if (lower.endsWith(".zip")) {
+    return { zipBuffer: buffer, kind: "zip" };
+  }
+  if (lower.endsWith(".kicad_sch")) {
+    const base = path.basename(fileName).replace(/[^\w.\-()+ ]+/g, "_") || "schematic.kicad_sch";
+    const name = base.toLowerCase().endsWith(".kicad_sch")
+      ? base
+      : `${base}.kicad_sch`;
+    const zip = new AdmZip();
+    zip.addFile(name, buffer);
+    return { zipBuffer: zip.toBuffer(), kind: "kicad_sch" };
+  }
+  throw new Error(
+    "Unsupported file type. Upload a KiCad project .zip or a .kicad_sch schematic.",
+  );
+}
+
 export function revisionChecksPassing(projectId: string, revisionId: string) {
   const db = getDb();
   const project = db.projects.find((p) => p.id === projectId);

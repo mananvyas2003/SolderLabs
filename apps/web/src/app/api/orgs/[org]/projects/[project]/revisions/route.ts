@@ -3,7 +3,7 @@ import { getDb } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject, getMainBranch } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
-import { createRevisionFromZip } from "@/lib/revisions";
+import { createRevisionFromZip, normalizeUploadToZip } from "@/lib/revisions";
 
 export async function GET(
   _req: Request,
@@ -51,12 +51,26 @@ export async function POST(
     return NextResponse.json({ error: "file required" }, { status: 400 });
   }
   const buf = Buffer.from(await file.arrayBuffer());
+  let zipBuffer: Buffer;
+  try {
+    ({ zipBuffer } = normalizeUploadToZip(file.name, buf));
+  } catch (e) {
+    return NextResponse.json(
+      {
+        error:
+          e instanceof Error
+            ? e.message
+            : "Unsupported file type. Upload a .zip or .kicad_sch.",
+      },
+      { status: 400 },
+    );
+  }
   const revisionId = await createRevisionFromZip({
     projectId: project.id,
     branchId: branch.id,
     authorId: user.id,
     message,
-    zipBuffer: buf,
+    zipBuffer,
     parentRevisionId: branch.headRevisionId,
   });
   return NextResponse.json({ revisionId });

@@ -30,6 +30,7 @@ export async function POST(
     headRevisionId?: string;
     command?: string;
     message?: string;
+    stream?: boolean;
   };
   if (!body.baseRevisionId || !body.headRevisionId) {
     return new Response("revisions required", { status: 400 });
@@ -83,26 +84,19 @@ export async function POST(
   const explainTarget = body.message?.match(/^\/explain\s+(\S+)/i)?.[1];
   const result = localCopilotFindings(diff, command, explainTarget);
 
+  // Default to instant JSON — streaming was fake typing and blocked the UI.
+  if (body.stream !== true) {
+    return Response.json(result);
+  }
+
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {
-      const chunks = result.markdown.split(/(\s+)/);
-      let i = 0;
-      const tick = () => {
-        if (i >= chunks.length) {
-          controller.enqueue(
-            encoder.encode(
-              `\n\n__FINDINGS__${JSON.stringify(result.findings)}\n`,
-            ),
-          );
-          controller.close();
-          return;
-        }
-        controller.enqueue(encoder.encode(chunks[i]));
-        i++;
-        setTimeout(tick, 8);
-      };
-      tick();
+      controller.enqueue(encoder.encode(result.markdown));
+      controller.enqueue(
+        encoder.encode(`\n\n__FINDINGS__${JSON.stringify(result.findings)}\n`),
+      );
+      controller.close();
     },
   });
 

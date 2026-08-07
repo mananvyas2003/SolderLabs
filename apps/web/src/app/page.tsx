@@ -7,58 +7,68 @@ import { BrandMark } from "@/components/brand-mark";
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-[var(--surface-0)]">
-      <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-        <BrandMark />
-        <nav className="flex items-center gap-5 text-sm text-[var(--text-muted)]">
-          <Link href="/docs" className="hover:text-[var(--text)]">
-            Docs
-          </Link>
-          <Link
-            href="/sign-in"
-            className="rounded-[var(--radius)] bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-[var(--accent-fg)] hover:bg-[var(--accent-hover)]"
-          >
-            Sign in
-          </Link>
-        </nav>
-      </header>
-
-      <main className="mx-auto grid max-w-5xl items-center gap-12 px-6 pb-20 pt-10 md:grid-cols-2 md:pt-16">
-        <div className="space-y-5">
-          <h1 className="text-4xl font-semibold tracking-tight text-[var(--text)] md:text-[2.75rem] md:leading-[1.1]">
-            SolderLab
-          </h1>
-          <p className="max-w-md text-base leading-relaxed text-[var(--text-muted)]">
-            Version, review, and release boards — review that understands your
-            schematic, not just your filenames.
-          </p>
-          <div className="flex flex-wrap gap-2.5 pt-1">
+      <header className="border-b border-[var(--border)] bg-[var(--surface-1)]">
+        <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-6">
+          <BrandMark />
+          <nav className="flex items-center gap-6 text-sm">
+            <Link
+              href="/docs"
+              className="text-[var(--text-muted)] hover:text-[var(--text)]"
+            >
+              Docs
+            </Link>
             <Link
               href="/sign-in"
-              className="rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--accent-fg)] hover:bg-[var(--accent-hover)]"
+              className="font-semibold text-[var(--accent)] hover:text-[var(--accent-hover)]"
             >
-              Start free
+              Sign in
             </Link>
-            <Link
-              href="/app"
-              className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-4 py-2 text-sm font-medium text-[var(--text)] hover:bg-[var(--surface-2)]"
-            >
-              Open app
-            </Link>
-          </div>
+          </nav>
         </div>
+      </header>
 
-        <motion.div
-          className="relative h-[320px] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] shadow-[var(--shadow-sm)] md:h-[380px]"
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <BoardDiffVisual />
-          <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between font-mono text-[11px] text-[var(--text-subtle)]">
-            <span>rev…a3f2 → rev…c91b</span>
-            <span className="text-[var(--accent)]">schematic diff</span>
+      <main className="mx-auto max-w-5xl px-6">
+        <section className="grid items-center gap-10 pb-16 pt-14 md:grid-cols-[1.05fr_0.95fr] md:pt-20">
+          <div>
+            <p className="text-sm font-semibold text-[var(--accent)]">
+              Hardware collaboration
+            </p>
+            <h1 className="mt-3 max-w-lg text-4xl font-semibold leading-[1.08] tracking-tight text-[var(--text)] md:text-5xl">
+              SolderLab
+            </h1>
+            <p className="mt-4 max-w-md text-[17px] leading-relaxed text-[var(--text-muted)]">
+              Version boards, review schematics with evidence, and ship releases
+              your CM can trust.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-4">
+              <Link
+                href="/sign-in"
+                className="inline-flex rounded-[var(--radius)] bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[var(--accent-fg)] hover:bg-[var(--accent-hover)]"
+              >
+                Sign in to continue
+              </Link>
+              <Link
+                href="/docs"
+                className="text-sm font-medium text-[var(--text-muted)] hover:text-[var(--text)]"
+              >
+                Read the docs →
+              </Link>
+            </div>
           </div>
-        </motion.div>
+
+          <motion.div
+            className="relative h-[300px] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] md:h-[340px]"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <BoardDiffVisual />
+            <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between border-t border-[var(--border)] bg-[var(--surface-1)] px-3 py-2 font-mono text-[11px] text-[var(--text-subtle)]">
+              <span>a3f2 → c91b</span>
+              <span className="font-sans text-[var(--accent)]">schematic diff</span>
+            </div>
+          </motion.div>
+        </section>
       </main>
     </div>
   );
@@ -66,9 +76,9 @@ export default function LandingPage() {
 
 function BoardDiffVisual() {
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0 bottom-9">
       <div
-        className="absolute inset-0 opacity-50"
+        className="absolute inset-0 opacity-60"
         style={{
           backgroundImage:
             "linear-gradient(var(--border-muted) 1px, transparent 1px), linear-gradient(90deg, var(--border-muted) 1px, transparent 1px)",
@@ -76,25 +86,25 @@ function BoardDiffVisual() {
         }}
       />
       <motion.div
-        className="absolute left-[12%] top-[18%] h-[46%] w-[54%] border border-[var(--diff-del-fg)]/20 bg-[var(--diff-del)]"
-        animate={{ opacity: [0.55, 0.25, 0.55] }}
-        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute left-[12%] top-[16%] h-[48%] w-[52%] border border-[var(--diff-del-fg)]/15 bg-[var(--diff-del)]"
+        animate={{ opacity: [0.5, 0.22, 0.5] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute left-[30%] top-[28%] h-[46%] w-[54%] border border-[var(--diff-add-fg)]/20 bg-[var(--diff-add)]"
-        animate={{ opacity: [0.35, 0.7, 0.35] }}
-        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute left-[30%] top-[26%] h-[48%] w-[52%] border border-[var(--diff-add-fg)]/15 bg-[var(--diff-add)]"
+        animate={{ opacity: [0.3, 0.68, 0.3] }}
+        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
       />
-      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 400 300">
+      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 400 280">
         <path
-          d="M48 210 H118 V90 H200 V150 H310"
+          d="M48 200 H120 V80 H205 V140 H320"
           fill="none"
           stroke="var(--accent)"
           strokeWidth="1.75"
           strokeLinejoin="round"
         />
-        <circle cx="118" cy="90" r="3.5" fill="var(--accent)" />
-        <circle cx="200" cy="150" r="3.5" fill="var(--accent)" />
+        <circle cx="120" cy="80" r="3.5" fill="var(--accent)" />
+        <circle cx="205" cy="140" r="3.5" fill="var(--accent)" />
       </svg>
     </div>
   );

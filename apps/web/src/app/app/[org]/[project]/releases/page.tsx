@@ -30,20 +30,14 @@ export default async function ReleasesPage({
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8">
-      <Link
-        href={`/app/${orgSlug}/${projectSlug}`}
-        className="text-sm text-[var(--accent)]"
-      >
-        ← {project.name}
-      </Link>
-      <h1 className="text-2xl font-semibold">Manufacturing releases</h1>
+    <div className="space-y-6">
+      <h2 className="text-lg font-semibold tracking-tight">Manufacturing releases</h2>
       <CreateReleaseForm
         orgSlug={orgSlug}
         projectSlug={projectSlug}
         revisions={revs.map((r) => ({ id: r.id, message: r.message }))}
       />
-      <ul className="divide-y divide-[var(--border)] border border-[var(--border)]">
+      <ul className="divide-y divide-[var(--border)] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)]">
         {releases.map((r) => (
           <li key={r.id}>
             <Link

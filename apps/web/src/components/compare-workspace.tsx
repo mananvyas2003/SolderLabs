@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import type { DiffBundleData, CopilotFinding, ImpactReport } from "@solderlab/design-core";
 import { Badge, Button, Input } from "@solderlab/ui";
 import Link from "next/link";
+import { runCopilot } from "@/lib/copilot-client";
 import { PcbDiffViewer } from "@/components/pcb-diff-viewer";
 import { ImpactPanel } from "@/components/impact-panel";
 
@@ -52,6 +53,7 @@ export function CompareWorkspace({
   const [creating, setCreating] = useState(false);
   const [impact, setImpact] = useState<ImpactReport | null>(null);
   const [impactLoading, setImpactLoading] = useState(false);
+  const [copilotBusy, setCopilotBusy] = useState(false);
   const viewedAt = useRef(Date.now());
   const diffRef = useRef<DiffBundleData | null>(null);
 
@@ -111,40 +113,27 @@ export function CompareWorkspace({
 
   const components = useMemo(() => diff?.components ?? [], [diff]);
 
-  async function runCopilot(cmd: string) {
+  async function runCopilotCmd(cmd: string) {
+    if (copilotBusy) return;
+    setCopilotBusy(true);
     setMarkdown("");
     setFindings([]);
     setTab("review");
-    const res = await fetch(
-      `/api/orgs/${orgSlug}/projects/${projectSlug}/copilot`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          baseRevisionId: base,
-          headRevisionId: head,
-          command: cmd,
-          message: cmd,
-        }),
-      },
-    );
-    const reader = res.body?.getReader();
-    if (!reader) return;
-    const decoder = new TextDecoder();
-    let acc = "";
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      acc += decoder.decode(value);
-      const split = acc.split("__FINDINGS__");
-      setMarkdown(split[0]);
-      if (split[1]) {
-        try {
-          setFindings(JSON.parse(split[1].trim()));
-        } catch {
-          /* wait */
-        }
-      }
+    try {
+      const result = await runCopilot({
+        orgSlug,
+        projectSlug,
+        baseRevisionId: base,
+        headRevisionId: head,
+        command: cmd,
+        message: cmd,
+      });
+      setMarkdown(result.markdown);
+      setFindings(result.findings);
+    } catch {
+      setMarkdown("Review request failed.");
+    } finally {
+      setCopilotBusy(false);
     }
   }
 
@@ -216,14 +205,35 @@ export function CompareWorkspace({
               Back to review
             </Link>
           )}
-          <Button onClick={() => runCopilot("/summarize")}>/summarize</Button>
-          <Button variant="outline" onClick={() => runCopilot("/risks")}>
+          <Button
+            type="button"
+            disabled={copilotBusy}
+            onClick={() => void runCopilotCmd("/summarize")}
+          >
+            {copilotBusy ? "Running…" : "/summarize"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={copilotBusy}
+            onClick={() => void runCopilotCmd("/risks")}
+          >
             /risks
           </Button>
-          <Button variant="outline" onClick={() => runCopilot("/bom")}>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={copilotBusy}
+            onClick={() => void runCopilotCmd("/bom")}
+          >
             /bom
           </Button>
-          <Button variant="outline" onClick={() => runCopilot("/nets")}>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={copilotBusy}
+            onClick={() => void runCopilotCmd("/nets")}
+          >
             /nets
           </Button>
         </div>
@@ -442,7 +452,7 @@ export function CompareWorkspace({
               className="flex gap-2"
               onSubmit={(e) => {
                 e.preventDefault();
-                runCopilot(command);
+                runCopilotCmd(command);
               }}
             >
               <Input
@@ -461,9 +471,9 @@ export function CompareWorkspace({
             <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">
               Findings
             </p>
-            {findings.map((f) => (
+            {findings.map((f, i) => (
               <div
-                key={f.id}
+                key={`${f.id}-${i}`}
                 className="border border-[var(--border)] p-3"
               >
                 <motion.button

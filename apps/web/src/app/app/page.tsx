@@ -16,12 +16,14 @@ export default async function AppHome() {
     .filter(Boolean);
 
   return (
-    <div className="mx-auto max-w-4xl space-y-10">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Organizations</h1>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Pick a workspace or create one.
-        </p>
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Organizations</h1>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">
+            Choose a workspace to open projects.
+          </p>
+        </div>
       </div>
 
       {orgs.length === 0 ? (
@@ -36,15 +38,17 @@ export default async function AppHome() {
             <li key={o.id}>
               <Link
                 href={`/app/${o.slug}`}
-                className="flex items-center justify-between px-4 py-3.5 hover:bg-[var(--surface-2)]"
+                className="flex items-center justify-between gap-4 px-4 py-3.5 hover:bg-[var(--surface-2)]"
               >
-                <div>
-                  <div className="font-medium">{o.name}</div>
+                <div className="min-w-0">
+                  <div className="font-semibold">{o.name}</div>
                   <div className="font-mono text-xs text-[var(--text-muted)]">
                     {o.slug}
                   </div>
                 </div>
-                <span className="text-xs text-[var(--accent)]">Open →</span>
+                <span className="shrink-0 text-sm font-medium text-[var(--accent)]">
+                  Open →
+                </span>
               </Link>
             </li>
           ))}
@@ -52,15 +56,19 @@ export default async function AppHome() {
       )}
 
       {orgs.length > 0 ? (
-        <div>
-          <h2 className="mb-3 text-sm font-medium text-[var(--text-muted)]">
+        <details className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-4">
+          <summary className="cursor-pointer text-sm font-semibold">
             Create organization
-          </h2>
-          <CreateOrgForm />
-        </div>
+          </summary>
+          <div className="mt-4">
+            <CreateOrgForm />
+          </div>
+        </details>
       ) : null}
 
-      {orgs[0] ? <QuickProjects orgSlug={orgs[0].slug} orgId={orgs[0].id} /> : null}
+      {orgs[0] ? (
+        <QuickProjects orgSlug={orgs[0].slug} orgId={orgs[0].id} />
+      ) : null}
     </div>
   );
 }
@@ -70,15 +78,17 @@ function QuickProjects({ orgSlug, orgId }: { orgSlug: string; orgId: string }) {
   if (!list.length) return null;
   return (
     <div>
-      <h2 className="mb-3 text-sm font-medium text-[var(--text-muted)]">
-        Recent in {orgSlug}
+      <h2 className="mb-3 text-sm font-semibold text-[var(--text-muted)]">
+        Jump back in · {orgSlug}
       </h2>
       <div className="flex flex-wrap gap-2">
         {list.map((p) => (
-          <Link key={p.id} href={`/app/${orgSlug}/${p.slug}`}>
-            <span className="inline-flex rounded-[6px] border border-[var(--border)] px-3 py-1.5 text-sm hover:border-[var(--accent)]">
-              {p.name}
-            </span>
+          <Link
+            key={p.id}
+            href={`/app/${orgSlug}/${p.slug}`}
+            className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-3 py-1.5 text-sm font-medium hover:border-[var(--accent)] hover:text-[var(--accent)]"
+          >
+            {p.name}
           </Link>
         ))}
       </div>

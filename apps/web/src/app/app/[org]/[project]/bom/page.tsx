@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getDb } from "@solderlab/db";
 import {
@@ -95,15 +94,9 @@ export default async function BomPage({
   for (const [k, v] of blameMap) blame[k] = v;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-6">
-      <Link
-        href={`/app/${orgSlug}/${projectSlug}`}
-        className="text-sm text-[var(--accent)]"
-      >
-        ← {project.name}
-      </Link>
+    <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-semibold">BOM</h1>
+        <h2 className="text-lg font-semibold tracking-tight">BOM</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
           CAD owns value/footprint. Platform owns MPN / DNP / notes — we flag
           drift, never write back to the schematic.

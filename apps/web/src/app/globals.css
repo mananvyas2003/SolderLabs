@@ -2,7 +2,7 @@
 @import "@solderlab/ui/tokens.css";
 
 @theme {
-  --font-sans: var(--font-plex-sans), "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-sans: var(--font-source-sans), "Source Sans 3", "Segoe UI", sans-serif;
   --font-mono: var(--font-plex-mono), "IBM Plex Mono", "Consolas", monospace;
 }
 
@@ -18,10 +18,9 @@ a {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
 }
 
-/* Shared product chrome helpers */
 .sl-panel {
   border: 1px solid var(--border);
   background: var(--surface-1);
@@ -33,7 +32,6 @@ a {
 }
 
 .sl-link:hover {
-  color: var(--accent-hover);
   text-decoration: underline;
   text-underline-offset: 2px;
 }

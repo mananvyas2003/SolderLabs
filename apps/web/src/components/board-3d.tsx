@@ -41,18 +41,18 @@ export default function Board3D({
       <directionalLight position={[20, 40, 10]} intensity={1.1} />
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]}>
         <boxGeometry args={[w, h, 1.2]} />
-        <meshStandardMaterial color="#134e4a" metalness={0.15} roughness={0.6} />
+        <meshStandardMaterial color="#3f3f46" metalness={0.2} roughness={0.55} />
       </mesh>
       {snap.footprints.map((f) => {
         const kind = kindOf(f.refdes);
         const color =
           kind === "added"
-            ? "#1a7f37"
+            ? "#15803d"
             : kind === "removed"
-              ? "#cf222e"
+              ? "#b91c1c"
               : kind === "changed"
-                ? "#9a6700"
-                : "#0f766e";
+                ? "#a16207"
+                : "#c2410c";
         return (
           <mesh
             key={f.refdes}

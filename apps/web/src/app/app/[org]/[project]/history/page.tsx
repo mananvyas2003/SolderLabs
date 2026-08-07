@@ -25,14 +25,8 @@ export default async function HistoryPage({
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <Link
-        href={`/app/${orgSlug}/${projectSlug}`}
-        className="text-sm text-[var(--accent)]"
-      >
-        ← {project.name}
-      </Link>
-      <h1 className="text-2xl font-semibold">History</h1>
+    <div className="space-y-5">
+      <h2 className="text-lg font-semibold tracking-tight">History</h2>
       <ol className="relative space-y-0 border-l border-[var(--border)] pl-6">
         {revs.map((r, i) => {
           const newer = revs[i - 1];
