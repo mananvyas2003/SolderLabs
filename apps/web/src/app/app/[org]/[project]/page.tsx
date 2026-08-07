@@ -73,7 +73,7 @@ export default async function ProjectPage({
       </div>
 
       <section className="grid gap-6 md:grid-cols-2">
-        <div className="space-y-3 border border-[var(--border)] p-4">
+        <div className="space-y-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-4">
           <h2 className="text-sm font-medium text-[var(--text-muted)]">
             Revisions
           </h2>
@@ -109,7 +109,7 @@ export default async function ProjectPage({
           </div>
         </div>
 
-        <div className="space-y-3 border border-[var(--border)] p-4">
+        <div className="space-y-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-4">
           <h2 className="text-sm font-medium text-[var(--text-muted)]">
             Upload revision
           </h2>
@@ -149,12 +149,12 @@ export default async function ProjectPage({
         {reviews.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">No open reviews.</p>
         ) : (
-          <ul className="divide-y divide-[var(--border)] border border-[var(--border)]">
+          <ul className="divide-y divide-[var(--border)] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)]">
             {reviews.map((r) => (
               <li key={r.id}>
                 <Link
                   href={`/app/${orgSlug}/${projectSlug}/reviews/${r.id}`}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-[var(--surface-1)]"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-[var(--surface-2)]"
                 >
                   <span>
                     #{r.number} {r.title}
@@ -196,8 +196,8 @@ function NavChip({
       href={href}
       className={
         accent
-          ? "rounded-[6px] bg-[var(--accent)] px-3 py-1.5 text-[#1a1208]"
-          : "rounded-[6px] border border-[var(--border)] px-3 py-1.5 hover:border-[var(--accent)]"
+          ? "rounded-[var(--radius)] bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-[var(--accent-fg)]"
+          : "rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-3 py-1.5 text-sm hover:bg-[var(--surface-2)]"
       }
     >
       {children}

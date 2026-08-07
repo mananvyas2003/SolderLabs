@@ -48,9 +48,7 @@ export default async function TwinPage({
   return (
     <div className="mx-auto max-w-2xl space-y-6 px-5 py-10">
       <div>
-        <p className="text-xs uppercase tracking-[0.2em] text-[var(--accent)]">
-          Digital twin
-        </p>
+        <p className="text-xs font-medium text-[var(--accent)]">Digital twin</p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">
           {project.name}
         </h1>

@@ -49,8 +49,8 @@ export default async function FilesPage({
             href={`/app/${orgSlug}/${projectSlug}/files?rev=${r.id}`}
             className={`rounded px-2 py-1 font-mono text-xs ${
               selected?.id === r.id
-                ? "bg-[var(--accent)] text-[#1a1208]"
-                : "border border-[var(--border)] text-[var(--text-muted)]"
+                ? "bg-[var(--accent)] text-[var(--accent-fg)]"
+                : "border border-[var(--border)] bg-[var(--surface-1)] text-[var(--text-muted)]"
             }`}
           >
             {r.id.slice(0, 8)}

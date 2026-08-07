@@ -11,9 +11,7 @@ export default async function AdminMetricsPage() {
     <div className="mx-auto max-w-5xl space-y-6 px-5 py-8">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">
-            Internal
-          </p>
+          <p className="text-xs font-medium text-[var(--text-muted)]">Internal</p>
           <h1 className="text-2xl font-semibold text-[var(--text)]">
             Product metrics
           </h1>

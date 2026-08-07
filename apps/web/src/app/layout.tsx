@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
-import { Sora, IBM_Plex_Mono } from "next/font/google";
+import { IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
-const sora = Sora({
+const plexSans = IBM_Plex_Sans({
   subsets: ["latin"],
-  variable: "--font-sora",
+  weight: ["400", "500", "600"],
+  variable: "--font-plex-sans",
 });
 
-const plex = IBM_Plex_Mono({
+const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
-  variable: "--font-plex",
+  variable: "--font-plex-mono",
 });
 
 export const metadata: Metadata = {
-  title: "SolderLab — GitHub for Hardware",
+  title: "SolderLab — Hardware collaboration",
   description:
-    "Version, review, and release electronics designs together — with AI that understands what actually changed on the board.",
+    "Version, review, and release electronics designs — with review that understands the schematic.",
 };
 
 export default function RootLayout({
@@ -25,12 +26,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${sora.variable} ${plex.variable}`}>
+    <html
+      lang="en"
+      className={`${plexSans.variable} ${plexMono.variable}`}
+    >
       <body
         className="antialiased"
-        style={{
-          fontFamily: "var(--font-sora), var(--font-sans)",
-        }}
+        style={{ fontFamily: "var(--font-sans)" }}
       >
         {children}
       </body>

@@ -53,7 +53,7 @@ export default async function ReviewsPage({
           <li key={r.id}>
             <Link
               href={`/app/${orgSlug}/${projectSlug}/reviews/${r.id}`}
-              className="flex items-center justify-between px-4 py-3 hover:bg-[var(--surface-1)]"
+              className="flex items-center justify-between px-4 py-3 hover:bg-[var(--surface-2)]"
             >
               <span>
                 #{r.number} {r.title}

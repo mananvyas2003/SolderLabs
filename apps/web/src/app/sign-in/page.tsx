@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Input } from "@solderlab/ui";
+import { BrandMark } from "@/components/brand-mark";
 
 export default function SignInPage() {
   const router = useRouter();
@@ -32,46 +32,53 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
-      <Link href="/" className="mb-8 text-sm tracking-[0.2em] text-[var(--accent)]">
-        SOLDERLAB
-      </Link>
-      <h1 className="text-2xl font-semibold">Sign in</h1>
-      <p className="mt-2 text-sm text-[var(--text-muted)]">
-        Demo auth for local Phase 0/1. Use{" "}
-        <span className="font-mono text-[var(--text)]">demo@solderlab.dev</span> /{" "}
-        <span className="font-mono text-[var(--text)]">demo</span>.
-      </p>
-      <form onSubmit={onSubmit} className="mt-8 space-y-4">
-        <div>
-          <label className="mb-1 block text-xs text-[var(--text-muted)]">
-            Email
-          </label>
-          <Input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            required
-          />
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[var(--surface-0)] px-6">
+      <div className="w-full max-w-[360px]">
+        <BrandMark className="mb-8" />
+        <div className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-6 shadow-[var(--shadow-sm)]">
+          <h1 className="text-lg font-semibold tracking-tight">Sign in</h1>
+          <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-muted)]">
+            Demo:{" "}
+            <span className="font-mono text-[13px] text-[var(--text)]">
+              demo@solderlab.dev
+            </span>{" "}
+            /{" "}
+            <span className="font-mono text-[13px] text-[var(--text)]">demo</span>
+          </p>
+          <form onSubmit={onSubmit} className="mt-6 space-y-3.5">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[var(--text-muted)]">
+                Email
+              </label>
+              <Input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                type="email"
+                required
+                autoComplete="username"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[var(--text-muted)]">
+                Password
+              </label>
+              <Input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                type="password"
+                required
+                autoComplete="current-password"
+              />
+            </div>
+            {error ? (
+              <p className="text-sm text-[var(--danger)]">{error}</p>
+            ) : null}
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading ? "Signing in…" : "Sign in"}
+            </Button>
+          </form>
         </div>
-        <div>
-          <label className="mb-1 block text-xs text-[var(--text-muted)]">
-            Password
-          </label>
-          <Input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type="password"
-            required
-          />
-        </div>
-        {error ? (
-          <p className="text-sm text-[var(--danger)]">{error}</p>
-        ) : null}
-        <Button type="submit" disabled={loading} className="w-full">
-          {loading ? "Signing in…" : "Sign in"}
-        </Button>
-      </form>
+      </div>
     </div>
   );
 }

@@ -31,12 +31,12 @@ export default async function AppHome() {
           action={<CreateOrgForm />}
         />
       ) : (
-        <ul className="divide-y divide-[var(--border)] border border-[var(--border)]">
+        <ul className="divide-y divide-[var(--border)] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)]">
           {orgs.map((o) => (
             <li key={o.id}>
               <Link
                 href={`/app/${o.slug}`}
-                className="flex items-center justify-between px-4 py-4 hover:bg-[var(--surface-1)]"
+                className="flex items-center justify-between px-4 py-3.5 hover:bg-[var(--surface-2)]"
               >
                 <div>
                   <div className="font-medium">{o.name}</div>

@@ -28,19 +28,19 @@ export default async function OrgPage({
         <div className="mt-3 flex flex-wrap gap-2 text-sm">
           <Link
             href={`/app/${org.slug}/library`}
-            className="rounded-[6px] border border-[var(--border)] px-3 py-1.5 hover:border-[var(--accent)]"
+            className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-3 py-1.5 hover:bg-[var(--surface-2)]"
           >
             Library
           </Link>
           <Link
             href={`/app/${org.slug}/activity`}
-            className="rounded-[6px] border border-[var(--border)] px-3 py-1.5 hover:border-[var(--accent)]"
+            className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-3 py-1.5 hover:bg-[var(--surface-2)]"
           >
             Activity
           </Link>
           <Link
             href={`/app/${org.slug}/webhooks`}
-            className="rounded-[6px] border border-[var(--border)] px-3 py-1.5 hover:border-[var(--accent)]"
+            className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-3 py-1.5 hover:bg-[var(--surface-2)]"
           >
             Webhooks
           </Link>
@@ -49,12 +49,12 @@ export default async function OrgPage({
 
       <section>
         <h2 className="mb-3 text-sm text-[var(--text-muted)]">Projects</h2>
-        <ul className="divide-y divide-[var(--border)] border border-[var(--border)]">
+        <ul className="divide-y divide-[var(--border)] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)]">
           {list.map((p) => (
             <li key={p.id}>
               <Link
                 href={`/app/${org.slug}/${p.slug}`}
-                className="block px-4 py-4 hover:bg-[var(--surface-1)]"
+                className="block px-4 py-3.5 hover:bg-[var(--surface-2)]"
               >
                 <div className="font-medium">{p.name}</div>
                 <div className="text-sm text-[var(--text-muted)]">

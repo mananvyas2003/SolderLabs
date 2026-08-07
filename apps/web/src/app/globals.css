@@ -2,16 +2,13 @@
 @import "@solderlab/ui/tokens.css";
 
 @theme {
-  --font-sans: "Sora", "Segoe UI", sans-serif;
-  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+  --font-sans: var(--font-plex-sans), "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", "Consolas", monospace;
 }
 
 body {
   min-height: 100vh;
-  background:
-    radial-gradient(1200px 600px at 80% -10%, color-mix(in srgb, var(--accent) 18%, transparent), transparent 60%),
-    radial-gradient(900px 500px at -10% 20%, color-mix(in srgb, var(--accent-2) 8%, transparent), transparent 55%),
-    var(--surface-0);
+  background: var(--surface-0);
   color: var(--text);
 }
 
@@ -21,5 +18,22 @@ a {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* Shared product chrome helpers */
+.sl-panel {
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  border-radius: var(--radius);
+}
+
+.sl-link {
+  color: var(--accent);
+}
+
+.sl-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }

@@ -2,49 +2,45 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { BrandMark } from "@/components/brand-mark";
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen">
-      <header className="flex items-center justify-between px-6 py-5 md:px-10">
-        <span className="text-sm font-semibold tracking-[0.2em] text-[var(--accent)]">
-          SOLDERLAB
-        </span>
-        <nav className="flex items-center gap-4 text-sm text-[var(--text-muted)]">
+    <div className="min-h-screen bg-[var(--surface-0)]">
+      <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+        <BrandMark />
+        <nav className="flex items-center gap-5 text-sm text-[var(--text-muted)]">
           <Link href="/docs" className="hover:text-[var(--text)]">
             Docs
           </Link>
           <Link
             href="/sign-in"
-            className="rounded-[6px] border border-[var(--border)] px-3 py-1.5 text-[var(--text)] hover:border-[var(--accent)]"
+            className="rounded-[var(--radius)] bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-[var(--accent-fg)] hover:bg-[var(--accent-hover)]"
           >
             Sign in
           </Link>
         </nav>
       </header>
 
-      <main className="relative mx-auto grid min-h-[calc(100vh-80px)] max-w-6xl items-center gap-10 px-6 pb-16 pt-6 md:grid-cols-2 md:px-10">
-        <div className="relative z-10 space-y-6">
-          <p className="font-mono text-xs uppercase tracking-[0.25em] text-[var(--accent)]">
-            Collaboration for electronics teams
-          </p>
-          <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl lg:text-6xl">
+      <main className="mx-auto grid max-w-5xl items-center gap-12 px-6 pb-20 pt-10 md:grid-cols-2 md:pt-16">
+        <div className="space-y-5">
+          <h1 className="text-4xl font-semibold tracking-tight text-[var(--text)] md:text-[2.75rem] md:leading-[1.1]">
             SolderLab
           </h1>
-          <p className="max-w-md text-lg text-[var(--text-muted)]">
-            Version, review, and release boards — with evidence-linked review that
-            understands your schematic, not just your filenames.
+          <p className="max-w-md text-base leading-relaxed text-[var(--text-muted)]">
+            Version, review, and release boards — review that understands your
+            schematic, not just your filenames.
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2.5 pt-1">
             <Link
               href="/sign-in"
-              className="rounded-[6px] bg-[var(--accent)] px-5 py-2.5 text-sm font-semibold text-[#1a1208] hover:brightness-110"
+              className="rounded-[var(--radius)] bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--accent-fg)] hover:bg-[var(--accent-hover)]"
             >
               Start free
             </Link>
             <Link
               href="/app"
-              className="rounded-[6px] border border-[var(--border)] px-5 py-2.5 text-sm text-[var(--text)] hover:border-[var(--accent)]"
+              className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-4 py-2 text-sm font-medium text-[var(--text)] hover:bg-[var(--surface-2)]"
             >
               Open app
             </Link>
@@ -52,12 +48,16 @@ export default function LandingPage() {
         </div>
 
         <motion.div
-          className="relative h-[360px] overflow-hidden rounded-sm border border-[var(--border)] bg-[var(--surface-1)] md:h-[420px]"
-          initial={{ opacity: 0, y: 16 }}
+          className="relative h-[320px] overflow-hidden rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] shadow-[var(--shadow-sm)] md:h-[380px]"
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
         >
           <BoardDiffVisual />
+          <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between font-mono text-[11px] text-[var(--text-subtle)]">
+            <span>rev…a3f2 → rev…c91b</span>
+            <span className="text-[var(--accent)]">schematic diff</span>
+          </div>
         </motion.div>
       </main>
     </div>
@@ -68,30 +68,33 @@ function BoardDiffVisual() {
   return (
     <div className="absolute inset-0">
       <div
-        className="absolute inset-0 opacity-40"
+        className="absolute inset-0 opacity-50"
         style={{
           backgroundImage:
-            "linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
+            "linear-gradient(var(--border-muted) 1px, transparent 1px), linear-gradient(90deg, var(--border-muted) 1px, transparent 1px)",
+          backgroundSize: "20px 20px",
         }}
       />
       <motion.div
-        className="absolute left-[12%] top-[22%] h-[48%] w-[58%] border border-[var(--diff-del)]/60 bg-[color-mix(in_srgb,var(--diff-del)_25%,transparent)]"
-        animate={{ opacity: [0.55, 0.2, 0.55] }}
-        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute left-[12%] top-[18%] h-[46%] w-[54%] border border-[var(--diff-del-fg)]/20 bg-[var(--diff-del)]"
+        animate={{ opacity: [0.55, 0.25, 0.55] }}
+        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
       />
       <motion.div
-        className="absolute left-[28%] top-[30%] h-[48%] w-[58%] border border-[var(--diff-add)]/70 bg-[color-mix(in_srgb,var(--diff-add)_28%,transparent)]"
-        animate={{ opacity: [0.35, 0.75, 0.35] }}
-        transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute left-[30%] top-[28%] h-[46%] w-[54%] border border-[var(--diff-add-fg)]/20 bg-[var(--diff-add)]"
+        animate={{ opacity: [0.35, 0.7, 0.35] }}
+        transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
       />
       <svg className="absolute inset-0 h-full w-full" viewBox="0 0 400 300">
         <path
-          d="M40 220 H120 V80 H210 V160 H320"
+          d="M48 210 H118 V90 H200 V150 H310"
           fill="none"
           stroke="var(--accent)"
-          strokeWidth="2"
+          strokeWidth="1.75"
+          strokeLinejoin="round"
         />
+        <circle cx="118" cy="90" r="3.5" fill="var(--accent)" />
+        <circle cx="200" cy="150" r="3.5" fill="var(--accent)" />
       </svg>
     </div>
   );

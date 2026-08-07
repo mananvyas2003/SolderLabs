@@ -1,22 +1,63 @@
+/**
+ * SolderLab brand kit — “Instrument Lab”
+ *
+ * Personality: precise, calm, engineering-first. Closer to a metrology bench
+ * than a marketing site. Flat surfaces, hairline borders, one accent.
+ *
+ * Accent: Teal oxide (#0f766e) — PCB / lab instrument, not purple SaaS.
+ * Neutrals: cool paper & ink (GitHub-adjacent density, original palette).
+ * Diff: muted green / rose — readable, not neon.
+ *
+ * Do not use gradients as brand identity. Accent appears in type, links,
+ * focus rings, and primary actions only.
+ */
+
 :root {
-  --surface-0: #0c0d0f;
-  --surface-1: #14161a;
-  --surface-2: #1c1f26;
-  --border: #2a2f3a;
-  --text: #e8eaef;
-  --text-muted: #8b93a7;
-  --accent: #d4894a;
-  --accent-2: #f0b429;
-  --danger: #e85d4c;
-  --warn: #e0a106;
-  --success: #3dbe7b;
-  --info: #5b8def;
-  --diff-add: #1f6f4a;
-  --diff-del: #8b2e2e;
-  --diff-chg: #8a6a1f;
-  --font-sans: "Sora", "Segoe UI", sans-serif;
-  --font-mono: "IBM Plex Mono", "Consolas", monospace;
+  /* Surfaces */
+  --surface-0: #f6f8fa;
+  --surface-1: #ffffff;
+  --surface-2: #eef1f4;
+  --surface-inset: #eaeef2;
+
+  /* Ink */
+  --text: #1f2328;
+  --text-muted: #636c76;
+  --text-subtle: #8b949e;
+
+  /* Lines */
+  --border: #d0d7de;
+  --border-muted: #e6eaef;
+  --border-strong: #afb8c1;
+
+  /* Brand */
+  --accent: #0f766e;
+  --accent-hover: #0d9488;
+  --accent-muted: #ccfbf1;
+  --accent-fg: #ffffff;
+  --accent-2: #115e59;
+
+  /* Status */
+  --danger: #cf222e;
+  --warn: #9a6700;
+  --success: #1a7f37;
+  --info: #0969da;
+
+  /* Diff (schematic / review) */
+  --diff-add: #dafbe1;
+  --diff-add-fg: #116329;
+  --diff-del: #ffebe9;
+  --diff-del-fg: #82071e;
+  --diff-chg: #fff8c5;
+  --diff-chg-fg: #7d4e00;
+
+  /* Type */
+  --font-sans: var(--font-plex-sans), "IBM Plex Sans", "Segoe UI", sans-serif;
+  --font-mono: var(--font-plex-mono), "IBM Plex Mono", "Consolas", monospace;
+
+  /* Shape */
   --radius: 6px;
+  --radius-sm: 4px;
+  --shadow-sm: 0 1px 0 rgba(31, 35, 40, 0.04);
 }
 
 * {
@@ -30,4 +71,6 @@ body {
   background: var(--surface-0);
   color: var(--text);
   font-family: var(--font-sans);
+  font-feature-settings: "ss01" on, "cv11" on;
+  -webkit-font-smoothing: antialiased;
 }

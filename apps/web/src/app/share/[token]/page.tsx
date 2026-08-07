@@ -51,7 +51,7 @@ export default async function SharePage({
   return (
     <div className="mx-auto max-w-3xl space-y-6 px-5 py-10">
       <div>
-        <p className="text-xs uppercase tracking-[0.2em] text-[var(--text-muted)]">
+        <p className="text-xs font-medium text-[var(--text-muted)]">
           Scoped release share
         </p>
         <h1 className="mt-1 text-2xl font-semibold">
