@@ -6,6 +6,6 @@
   "bscVersion": "1.0.0",
   "format": "c",
   "pulledAt": "2026-08-06T21:30:21.905Z",
-  "registryDir": "D:\\Github for Hardware\\fixtures\\corpus\\bsc",
+  "registryDir": "",
   "lockedBscRel": ".bsc/locked.bsc.json"
 }

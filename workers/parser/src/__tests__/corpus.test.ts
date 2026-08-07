@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseKicadProjectDir } from "../index.ts";
+import { countProjectInstances } from "../instance-count.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../../../../");
@@ -15,7 +16,10 @@ interface ManifestRev {
   status: string;
   path: string;
   componentCount: number;
+  instanceCount?: number;
+  instanceCountNonPower?: number;
   sheetCount: number;
+  oracle?: string;
 }
 
 interface ManifestProject {
@@ -30,8 +34,11 @@ function pickRevision(p: ManifestProject): ManifestRev | null {
   return p.revisions.find((r) => r.status === "ok") ?? null;
 }
 
-test("corpus hierarchical parse report + assertions", async () => {
-  assert.ok(fs.existsSync(manifestPath), "manifest.json missing — run corpus:fetch");
+test("corpus hierarchical parse vs instance oracle", async (t) => {
+  if (!fs.existsSync(manifestPath)) {
+    t.skip("manifest.json missing — run npm run corpus:fetch");
+    return;
+  }
   const manifest = JSON.parse(
     fs.readFileSync(manifestPath, "utf8"),
   ) as { projects: ManifestProject[] };
@@ -39,14 +46,12 @@ test("corpus hierarchical parse report + assertions", async () => {
   type Row = {
     project: string;
     components: number;
+    oracle: number;
     nets: number;
     sheets: number;
     parseMs: number;
-    unresolvedLibs: number;
     nullUuid: number;
     pinsMissingNet: number;
-    manifestComps: number;
-    deltaPct: string;
     ok: boolean;
     note: string;
   };
@@ -58,94 +63,99 @@ test("corpus hierarchical parse report + assertions", async () => {
       rows.push({
         project: p.id,
         components: 0,
+        oracle: 0,
         nets: 0,
         sheets: 0,
         parseMs: 0,
-        unresolvedLibs: 0,
         nullUuid: 0,
         pinsMissingNet: 0,
-        manifestComps: 0,
-        deltaPct: "n/a",
         ok: false,
         note: "no ok revision",
       });
       continue;
     }
     const abs = path.resolve(repoRoot, rev.path);
-    const t0 = performance.now();
-    let snap;
-    let err = "";
-    try {
-      snap = parseKicadProjectDir(abs);
-    } catch (e) {
-      err = String((e as Error).message ?? e);
+    if (!fs.existsSync(abs)) {
       rows.push({
         project: p.id,
         components: 0,
+        oracle: rev.instanceCount ?? rev.componentCount,
+        nets: 0,
+        sheets: 0,
+        parseMs: 0,
+        nullUuid: 0,
+        pinsMissingNet: 0,
+        ok: false,
+        note: "path missing — run corpus:fetch",
+      });
+      continue;
+    }
+    const t0 = performance.now();
+    let snap;
+    try {
+      snap = parseKicadProjectDir(abs);
+    } catch (e) {
+      rows.push({
+        project: p.id,
+        components: 0,
+        oracle: rev.instanceCount ?? rev.componentCount,
         nets: 0,
         sheets: 0,
         parseMs: Math.round(performance.now() - t0),
-        unresolvedLibs: 0,
         nullUuid: 0,
         pinsMissingNet: 0,
-        manifestComps: rev.componentCount,
-        deltaPct: "fail",
         ok: false,
-        note: err,
+        note: String((e as Error).message ?? e),
       });
       continue;
     }
     const parseMs = Math.round(performance.now() - t0);
+    const ind = countProjectInstances(abs);
+    const oracle = ind.total;
     const nullUuid = snap.components.filter((c) => !c.uuid).length;
     let pinsMissingNet = 0;
-    let pinTotal = 0;
     for (const c of snap.components) {
       for (const pin of c.pins ?? []) {
-        pinTotal++;
         if (!pin.net) pinsMissingNet++;
       }
     }
-    // If connectivity produced no pins for a BOM-ish part, count as weakness
     const bare = snap.components.filter(
       (c) => !c.refdes.startsWith("#") && !(c.pins && c.pins.length),
     ).length;
 
-    const man = rev.componentCount;
-    const delta = man ? ((snap.components.length - man) / man) * 100 : 0;
-    const within2 = Math.abs(delta) <= 2;
     rows.push({
       project: p.id,
       components: snap.components.length,
+      oracle,
       nets: snap.nets.length,
       sheets: snap.sheets.length,
       parseMs,
-      unresolvedLibs: snap.meta.unresolvedLibs?.length ?? 0,
       nullUuid,
       pinsMissingNet: pinsMissingNet + bare,
-      manifestComps: man,
-      deltaPct: `${delta.toFixed(1)}%`,
-      ok: within2 && nullUuid === 0 && pinsMissingNet === 0 && bare === 0,
+      ok:
+        snap.components.length === oracle &&
+        nullUuid === 0 &&
+        pinsMissingNet === 0 &&
+        bare === 0,
       note: snap.meta.projectRoot ?? "",
     });
   }
 
-  // Weakness report — always printed
   console.log(
-    "\nproject                          comps   nets sheets   ms  unresLibs nullUuid pinGap  Δ%manifest  ok  root",
+    "\nproject                          comps oracle   nets sheets   ms nullUuid pinGap  ok  root",
   );
-  console.log("-".repeat(120));
+  console.log("-".repeat(110));
   for (const r of rows) {
     console.log(
       [
         r.project.padEnd(32),
         String(r.components).padStart(5),
+        String(r.oracle).padStart(6),
         String(r.nets).padStart(6),
         String(r.sheets).padStart(6),
         String(r.parseMs).padStart(5),
-        String(r.unresolvedLibs).padStart(10),
         String(r.nullUuid).padStart(8),
         String(r.pinsMissingNet).padStart(6),
-        r.deltaPct.padStart(10),
         r.ok ? " ✓" : " ✗",
         r.note,
       ].join(" "),
@@ -154,19 +164,21 @@ test("corpus hierarchical parse report + assertions", async () => {
   console.log("");
 
   for (const r of rows) {
-    assert.notEqual(r.note, "no ok revision", `${r.project}: missing revision`);
-    assert.notEqual(r.deltaPct, "fail", `${r.project}: parse failed — ${r.note}`);
+    if (r.note.includes("path missing") || r.note === "no ok revision") {
+      // Soft-skip unfetched boards so `npm test` works without 2.3GB corpus
+      continue;
+    }
+    assert.notEqual(r.note.includes("fail") && r.components === 0, true, `${r.project}: ${r.note}`);
     assert.equal(r.nullUuid, 0, `${r.project}: components with null UUID`);
     assert.equal(
       r.pinsMissingNet,
       0,
       `${r.project}: pins without net (or bare components)`,
     );
-    const man = r.manifestComps;
-    const delta = man ? Math.abs((r.components - man) / man) : 1;
-    assert.ok(
-      delta <= 0.02,
-      `${r.project}: component count ${r.components} vs manifest ${man} (Δ=${r.deltaPct}) — refresh manifest after hierarchical parse if counts intentionally changed`,
+    assert.equal(
+      r.components,
+      r.oracle,
+      `${r.project}: parser ${r.components} != hierarchical instance oracle ${r.oracle}`,
     );
   }
 });

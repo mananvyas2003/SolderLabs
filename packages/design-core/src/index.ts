@@ -29,6 +29,30 @@ export * from "./bom-reconcile";
 export * from "./bom-history";
 export * from "./mfg-lint";
 
+/** Power flags / #PWR* — noise for BOM and format-migration diffs. */
+export function isPowerSymbol(c: {
+  refdes: string;
+  libId?: string;
+}): boolean {
+  if (c.refdes.startsWith("#")) return true;
+  if (/^PWR\d/i.test(c.refdes)) return true;
+  const lib = (c.libId ?? "").toLowerCase();
+  return (
+    lib.includes("power:") ||
+    lib.includes("power_flag") ||
+    lib.startsWith("power/") ||
+    /\/power[_-]flag/.test(lib)
+  );
+}
+
+export interface SnapshotDiffOptions extends DiffConfig {
+  /**
+   * When false (default), exclude power symbols from component/BOM diffs.
+   * Pass true to include #PWR / power: flags.
+   */
+  includePowerSymbols?: boolean;
+}
+
 export interface DiffBundleData {
   baseRevisionId: string;
   headRevisionId: string;
@@ -80,6 +104,7 @@ export function snapshotToBom(snapshot: DesignSnapshot): BomLineLike[] {
     mpn: c.mpn,
     manufacturer: c.manufacturer,
     qty: 1,
+    uuid: c.uuid,
   }));
 }
 
@@ -124,20 +149,61 @@ function pinSetKey(nodes: string[]): string {
     .join("|");
 }
 
+/** Pin-set key ignoring power-flag endpoints — improves rename match across CAD versions. */
+function signalPinSetKey(nodes: string[]): string {
+  return pinSetKey(
+    nodes.filter((n) => {
+      const ref = n.split(".")[0] ?? "";
+      return !ref.startsWith("#") && !/^PWR\d/i.test(ref);
+    }),
+  );
+}
+
 export function diffSnapshots(
   base: DesignSnapshot,
   head: DesignSnapshot,
   ids: { baseRevisionId: string; headRevisionId: string },
-  cfg?: DiffConfig,
+  cfg?: SnapshotDiffOptions,
 ): DiffBundleData {
-  const identity = resolveIdentity(base.components, head.components);
+  const includePower = cfg?.includePowerSymbols === true;
+  const baseComps = includePower
+    ? base.components
+    : base.components.filter((c) => !isPowerSymbol(c));
+  const headComps = includePower
+    ? head.components
+    : head.components.filter((c) => !isPowerSymbol(c));
+
+  const identity = resolveIdentity(baseComps, headComps);
   // Tier coverage is the product metric the prompt asked for — keep visible in logs.
   // Use stderr so JSON CLI output on stdout stays machine-parseable.
   console.warn(`[diffSnapshots] ${formatIdentityCoverage(identity)}`);
 
   const components: ComponentDiff[] = [];
   for (const m of identity.matched) {
-    components.push(classifyMatchedComponent(m));
+    const row = classifyMatchedComponent(m);
+    // Format-migration churn: UUID-stable parts whose CAD lib_id string changed
+    // (KiCad 8→9 etc.) with no BOM change. Real refdes renames / sheet moves kept.
+    if (m.tier === "uuid" && row.kind !== "unchanged") {
+      const fields = row.fields ?? [];
+      const noiseFields = new Set(["libId", "refdes", "sheetId"]);
+      const onlyNoise =
+        fields.length > 0 && fields.every((f) => noiseFields.has(f));
+      const touchesLibId = fields.includes("libId");
+      const sameBom =
+        (m.base.value ?? "") === (m.head.value ?? "") &&
+        (m.base.footprint ?? "") === (m.head.footprint ?? "") &&
+        (m.base.mpn ?? "") === (m.head.mpn ?? "");
+      if (onlyNoise && sameBom && touchesLibId) continue;
+    }
+    // libId-only tweaks on matched parts
+    if (
+      row.kind === "changed" &&
+      row.fields?.length === 1 &&
+      row.fields[0] === "libId"
+    ) {
+      continue;
+    }
+    components.push(row);
   }
   for (const before of identity.baseOnly) {
     components.push({ refdes: before.refdes, kind: "removed", before });
@@ -149,7 +215,10 @@ export function diffSnapshots(
     a.refdes.localeCompare(b.refdes, undefined, { numeric: true }),
   );
 
-  const bom = diffBom(snapshotToBom(base), snapshotToBom(head));
+  const bom = diffBom(
+    snapshotToBom({ ...base, components: baseComps }),
+    snapshotToBom({ ...head, components: headComps }),
+  );
 
   const baseNets = [...base.nets];
   const headNets = [...head.nets];
@@ -158,7 +227,7 @@ export function diffSnapshots(
 
   const headByPins = new Map<string, number[]>();
   headNets.forEach((n, i) => {
-    const k = pinSetKey(n.nodes);
+    const k = signalPinSetKey(n.nodes);
     if (!k) return;
     const list = headByPins.get(k) ?? [];
     list.push(i);
@@ -167,7 +236,7 @@ export function diffSnapshots(
 
   const baseUsed = new Set<number>();
   baseNets.forEach((b, bi) => {
-    const k = pinSetKey(b.nodes);
+    const k = signalPinSetKey(b.nodes);
     if (!k) return;
     const candidates = headByPins.get(k);
     if (!candidates?.length) return;
@@ -204,7 +273,7 @@ export function diffSnapshots(
       headNetUsed.add(hSameName);
       baseUsed.add(bi);
       const h = headNets[hSameName]!;
-      const same = pinSetKey(b.nodes) === pinSetKey(h.nodes);
+      const same = signalPinSetKey(b.nodes) === signalPinSetKey(h.nodes);
       nets.push({
         name: b.name,
         kind: same ? "unchanged" : "changed",
@@ -227,7 +296,11 @@ export function diffSnapshots(
 
   const significant = components.filter((c) => c.kind !== "unchanged");
   const netSig = nets.filter((n) => n.kind !== "unchanged");
-  const electrical = semanticDiff(base, head, cfg);
+  const electrical = semanticDiff(
+    { ...base, components: baseComps },
+    { ...head, components: headComps },
+    cfg,
+  );
 
   return {
     baseRevisionId: ids.baseRevisionId,
@@ -259,34 +332,74 @@ export function diffSnapshots(
 }
 
 export function diffBom(base: BomLineLike[], head: BomLineLike[]): BomDiffRow[] {
-  const baseMap = new Map(base.map((b) => [b.refdes, b]));
-  const headMap = new Map(head.map((b) => [b.refdes, b]));
-  const all = new Set([...baseMap.keys(), ...headMap.keys()]);
   const rows: BomDiffRow[] = [];
+  const headUsed = new Set<number>();
+  const baseUsed = new Set<number>();
 
-  for (const refdes of [...all].sort()) {
-    const before = baseMap.get(refdes);
-    const after = headMap.get(refdes);
-    if (before && !after) {
-      rows.push({ refdes, kind: "removed", before });
-    } else if (!before && after) {
-      rows.push({ refdes, kind: "added", after });
-    } else if (before && after) {
-      const fields = changedFields(
-        before as unknown as Record<string, unknown>,
-        after as unknown as Record<string, unknown>,
-        ["value", "footprint", "mpn", "manufacturer"],
-      );
-      rows.push({
-        refdes,
-        kind: fields.length ? "changed" : "unchanged",
-        before,
-        after,
-        fields: fields.length ? fields : undefined,
-      });
+  // Prefer UUID identity so refdes renames are not delete+add
+  const headByUuid = new Map<string, number>();
+  head.forEach((h, i) => {
+    if (h.uuid) headByUuid.set(h.uuid, i);
+  });
+  base.forEach((b, bi) => {
+    if (!b.uuid) return;
+    const hi = headByUuid.get(b.uuid);
+    if (hi == null) return;
+    baseUsed.add(bi);
+    headUsed.add(hi);
+    const after = head[hi]!;
+    const fields = changedFields(
+      b as unknown as Record<string, unknown>,
+      after as unknown as Record<string, unknown>,
+      ["value", "footprint", "mpn", "manufacturer", "refdes"],
+    );
+    // Format noise: ignore refdes-only BOM rows when UUID matched
+    const meaningful = fields.filter((f) => f !== "refdes");
+    rows.push({
+      refdes: after.refdes,
+      kind: meaningful.length ? "changed" : "unchanged",
+      before: b,
+      after,
+      fields: meaningful.length ? meaningful : undefined,
+    });
+  });
+
+  const headByRef = new Map<string, number>();
+  head.forEach((h, i) => {
+    if (headUsed.has(i)) return;
+    headByRef.set(h.refdes, i);
+  });
+  base.forEach((b, bi) => {
+    if (baseUsed.has(bi)) return;
+    const hi = headByRef.get(b.refdes);
+    if (hi == null) {
+      rows.push({ refdes: b.refdes, kind: "removed", before: b });
+      return;
     }
-  }
-  return rows;
+    baseUsed.add(bi);
+    headUsed.add(hi);
+    const after = head[hi]!;
+    const fields = changedFields(
+      b as unknown as Record<string, unknown>,
+      after as unknown as Record<string, unknown>,
+      ["value", "footprint", "mpn", "manufacturer"],
+    );
+    rows.push({
+      refdes: b.refdes,
+      kind: fields.length ? "changed" : "unchanged",
+      before: b,
+      after,
+      fields: fields.length ? fields : undefined,
+    });
+  });
+  head.forEach((h, hi) => {
+    if (headUsed.has(hi)) return;
+    rows.push({ refdes: h.refdes, kind: "added", after: h });
+  });
+
+  return rows.sort((a, b) =>
+    a.refdes.localeCompare(b.refdes, undefined, { numeric: true }),
+  );
 }
 
 export function diffPcbSnapshots(

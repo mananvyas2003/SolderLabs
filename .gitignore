@@ -12,3 +12,10 @@ data/
 apps/web/public/uploads
 .vercel
 coverage
+
+# Real KiCad corpus (fetched locally / in CI when needed). Keep goldens + manifest.
+fixtures/corpus/**
+!fixtures/corpus/README.md
+!fixtures/corpus/manifest.json
+!fixtures/corpus/bsc/
+!fixtures/corpus/bsc/**

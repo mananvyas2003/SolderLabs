@@ -1,10 +1,12 @@
 /**
- * Refresh fixtures/corpus/manifest.json component/sheet counts using the
- * hierarchical parser — replaces the inflated Reference-property heuristic.
+ * Refresh fixtures/corpus/manifest.json with hierarchical instance counts.
+ * Oracle = symbols reachable from the project root (same rule as the parser),
+ * NOT raw lib_id greps across every .kicad_sch in the tree.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { parseKicadProjectDir } from "../workers/parser/src/index.ts";
+import { countProjectInstances } from "../workers/parser/src/instance-count.ts";
 
 const manifestPath = "fixtures/corpus/manifest.json";
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
@@ -19,13 +21,21 @@ for (const project of manifest.projects) {
     }
     try {
       const snap = parseKicadProjectDir(abs);
-      const prev = rev.componentCount;
+      const ind = countProjectInstances(abs);
+      if (ind.total !== snap.components.length) {
+        console.warn(
+          `${project.id}/${rev.label}: oracle ${ind.total} != parser ${snap.components.length}`,
+        );
+      }
       rev.componentCount = snap.components.length;
+      rev.instanceCount = ind.total;
+      rev.instanceCountNonPower = ind.nonPower;
       rev.sheetCount = snap.sheets.length;
       rev.parserProjectRoot = snap.meta.projectRoot;
       rev.unresolvedLibCount = snap.meta.unresolvedLibs?.length ?? 0;
+      rev.oracle = "hierarchical-instance";
       console.log(
-        `${project.id}/${rev.label}: comps ${prev} → ${rev.componentCount}, sheets ${rev.sheetCount}, root=${rev.parserProjectRoot}`,
+        `${project.id}/${rev.label}: instances=${ind.total} (non-power ${ind.nonPower}, power ${ind.power}) sheets=${rev.sheetCount}`,
       );
     } catch (e) {
       console.error(`${project.id}/${rev.label}:`, e.message || e);
@@ -36,6 +46,7 @@ for (const project of manifest.projects) {
     project.revisions.find((r) => r.status === "ok");
   if (primary && project.primary) {
     project.primary.componentCount = primary.componentCount;
+    project.primary.instanceCount = primary.instanceCount;
     project.primary.sheetCount = primary.sheetCount;
   }
 }

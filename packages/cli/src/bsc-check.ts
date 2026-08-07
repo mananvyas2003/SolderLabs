@@ -8,10 +8,10 @@ import {
 import { track } from "@solderlab/analytics";
 import { arg } from "./args";
 import {
-  defaultRegistryDir,
-  loadBoardBsc,
-  loadLockedBsc,
+  loadBoardBscWithHash,
+  loadLockedBscWithHash,
   readLockfile,
+  resolveRegistryDir,
 } from "./registry";
 import { scanCallSites } from "./scan";
 
@@ -28,26 +28,38 @@ export async function cmdBscCheck(argv: string[], cwd: string): Promise<number> 
     return 1;
   }
 
-  const registryDir = path.resolve(
-    registryOverride ?? lock.registryDir ?? defaultRegistryDir(cwd),
-  );
+  const registryDir = resolveRegistryDir(cwd, {
+    override: registryOverride,
+    lockRegistryDir: lock.registryDir || undefined,
+  });
 
-  const locked = loadLockedBsc(cwd, lock);
-  const current = loadBoardBsc(registryDir, lock.board, "latest");
+  const locked = loadLockedBscWithHash(cwd, lock);
+  const current = loadBoardBscWithHash(registryDir, lock.board, "latest");
 
-  const changes = diffBSC(locked, current);
+  const changes = diffBSC(locked.bsc, current.bsc);
   const breaking = changes.filter((c) => c.severity === "breaking");
   const suggested = nextBscVersion(lock.bscVersion || "1.0.0", changes);
 
+  // Integrity: hash of the registry file bytes (recomputed now), vs hash stored at pull.
+  // Never trust generatedFrom.sha256 inside the JSON.
+  const lockedClaim = lock.sha256;
+  const currentHash = current.sha256;
+
   if (!changes.length) {
-    console.log(
-      `OK  board=${lock.board}  sha256 unchanged (${lock.sha256.slice(0, 12)}…)`,
-    );
+    if (lockedClaim === currentHash) {
+      console.log(
+        `OK  board=${lock.board}  sha256 unchanged (${currentHash.slice(0, 12)}…)`,
+      );
+    } else {
+      console.log(
+        `OK  board=${lock.board}  no structural changes  locked=${lockedClaim.slice(0, 12)}…  current=${currentHash.slice(0, 12)}…`,
+      );
+    }
     return 0;
   }
 
   console.log(
-    `BSC diff  board=${lock.board}  locked=${lock.sha256.slice(0, 12)}…  current=${current.generatedFrom.sha256.slice(0, 12)}…`,
+    `BSC diff  board=${lock.board}  locked=${lockedClaim.slice(0, 12)}…  current=${currentHash.slice(0, 12)}…`,
   );
   console.log(
     `changes=${changes.length}  breaking=${breaking.length}  suggestedSemver=${suggested}`,

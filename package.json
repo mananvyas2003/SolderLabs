@@ -12,7 +12,7 @@
     "db:push": "npm run push -w @solderlab/db",
     "db:seed": "npm run seed -w @solderlab/db",
     "lint": "npm run lint -w @solderlab/web",
-    "test": "npm run test -w @solderlab/design-core && npm run test -w @solderlab/parser && npm run test -w @solderlab/bsc && npm run test -w @solderlab/analytics && npm run test -w @solderlab/cli",
+    "test": "node scripts/run-tests.mjs",
     "solderlab": "node packages/cli/bin/solderlab.mjs",
     "corpus:fetch": "node scripts/fetch-corpus.mjs",
     "corpus:uuid": "node --import tsx scripts/uuid-coverage.mjs",

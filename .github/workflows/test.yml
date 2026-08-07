@@ -1,0 +1,35 @@
+name: Tests
+
+on:
+  push:
+    paths:
+      - "packages/**"
+      - "workers/**"
+      - "scripts/run-tests.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/test.yml"
+  pull_request:
+    paths:
+      - "packages/**"
+      - "workers/**"
+      - "scripts/run-tests.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/test.yml"
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install workspace
+        run: npm install
+      - name: Run all package tests
+        run: npm test
+        env:
+          # Font downloads are not required for unit tests.
+          NEXT_TELEMETRY_DISABLED: "1"

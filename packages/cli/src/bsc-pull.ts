@@ -4,13 +4,13 @@ import {
   emitBSC,
   emitExtension,
   type EmitFormat,
-  type BoardSupportContract,
 } from "@solderlab/bsc";
 import { track } from "@solderlab/analytics";
 import { arg } from "./args";
 import {
   defaultRegistryDir,
-  loadBoardBsc,
+  loadBoardBscWithHash,
+  portableRegistryDir,
   writeLockfile,
   type BscLockfile,
 } from "./registry";
@@ -37,7 +37,7 @@ export async function cmdBscPull(argv: string[], cwd: string): Promise<number> {
     return 1;
   }
 
-  const bsc: BoardSupportContract = loadBoardBsc(registryDir, board, rev);
+  const { bsc, sha256 } = loadBoardBscWithHash(registryDir, board, rev);
   fs.mkdirSync(outDir, { recursive: true });
 
   const ext = emitExtension(format);
@@ -48,20 +48,19 @@ export async function cmdBscPull(argv: string[], cwd: string): Promise<number> {
   const bscStoreDir = path.join(cwd, ".bsc");
   fs.mkdirSync(bscStoreDir, { recursive: true });
   const lockedRel = path.join(".bsc", "locked.bsc.json");
-  fs.writeFileSync(
-    path.join(cwd, lockedRel),
-    JSON.stringify(bsc, null, 2) + "\n",
-  );
+  const lockedAbs = path.join(cwd, lockedRel);
+  fs.writeFileSync(lockedAbs, JSON.stringify(bsc, null, 2) + "\n");
 
   const lock: BscLockfile = {
     board,
     revision: rev === "latest" ? (bsc.revision ?? "latest") : rev,
     schemaVersion: bsc.schemaVersion,
-    sha256: bsc.generatedFrom.sha256,
+    // File hash of the pulled registry artifact (recomputed over locked copy)
+    sha256,
     bscVersion: "1.0.0",
     format,
     pulledAt: new Date().toISOString(),
-    registryDir,
+    registryDir: portableRegistryDir(cwd, registryDir),
     lockedBscRel: lockedRel.replace(/\\/g, "/"),
   };
   writeLockfile(cwd, lock);

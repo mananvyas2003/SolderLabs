@@ -72,6 +72,8 @@ export interface BomLineLike {
   mpn?: string;
   manufacturer?: string;
   qty?: number;
+  /** Present when derived from a UUID-bearing schematic component */
+  uuid?: string;
 }
 
 export type DiffChangeKind =

@@ -53,7 +53,10 @@
             "Zynq_SoM.kicad_sch"
           ],
           "parserProjectRoot": "Zynq_SoM.kicad_pro",
-          "unresolvedLibCount": 1
+          "unresolvedLibCount": 1,
+          "instanceCount": 494,
+          "instanceCountNonPower": 298,
+          "oracle": "hierarchical-instance"
         },
         {
           "label": "newer",
@@ -91,7 +94,10 @@
             "Zynq_SoM.kicad_sch"
           ],
           "parserProjectRoot": "Zynq_SoM.kicad_pro",
-          "unresolvedLibCount": 1
+          "unresolvedLibCount": 1,
+          "instanceCount": 494,
+          "instanceCountNonPower": 298,
+          "oracle": "hierarchical-instance"
         }
       ],
       "failed": false,
@@ -105,7 +111,8 @@
         "kicadFileVersions": [
           "20231120",
           "20250114"
-        ]
+        ],
+        "instanceCount": 494
       }
     },
     {
@@ -152,7 +159,10 @@
             "User - LED Indicators.kicad_sch"
           ],
           "parserProjectRoot": "amulet_controller.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 476,
+          "instanceCountNonPower": 367,
+          "oracle": "hierarchical-instance"
         },
         {
           "label": "newer",
@@ -193,7 +203,10 @@
             "User - LED Indicators.kicad_sch"
           ],
           "parserProjectRoot": "amulet_controller.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 476,
+          "instanceCountNonPower": 367,
+          "oracle": "hierarchical-instance"
         }
       ],
       "failed": false,
@@ -206,7 +219,8 @@
         "kicadMajorGuess": 8,
         "kicadFileVersions": [
           "20231120"
-        ]
+        ],
+        "instanceCount": 476
       }
     },
     {
@@ -234,7 +248,10 @@
             "xc7k160t.kicad_sch"
           ],
           "parserProjectRoot": "kintex-pcie.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 294,
+          "instanceCountNonPower": 173,
+          "oracle": "hierarchical-instance"
         },
         {
           "label": "newer",
@@ -256,7 +273,10 @@
             "xc7k160t.kicad_sch"
           ],
           "parserProjectRoot": "kintex-pcie.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 294,
+          "instanceCountNonPower": 173,
+          "oracle": "hierarchical-instance"
         }
       ],
       "failed": false,
@@ -269,7 +289,8 @@
         "kicadMajorGuess": 6,
         "kicadFileVersions": [
           "20211123"
-        ]
+        ],
+        "instanceCount": 294
       }
     },
     {
@@ -296,7 +317,10 @@
             "upsy-desky.kicad_sch"
           ],
           "parserProjectRoot": "upsy-desky.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 82,
+          "instanceCountNonPower": 44,
+          "oracle": "hierarchical-instance"
         }
       ],
       "failed": false,
@@ -309,7 +333,8 @@
         "kicadMajorGuess": 8,
         "kicadFileVersions": [
           "20231120"
-        ]
+        ],
+        "instanceCount": 82
       }
     },
     {
@@ -337,7 +362,10 @@
             "right/keyboard_pcb.kicad_sch"
           ],
           "parserProjectRoot": "left/keyboard_pcb.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 68,
+          "instanceCountNonPower": 33,
+          "oracle": "hierarchical-instance"
         },
         {
           "label": "newer",
@@ -359,7 +387,10 @@
             "right/keyboard_pcb.kicad_sch"
           ],
           "parserProjectRoot": "left/keyboard_pcb.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 68,
+          "instanceCountNonPower": 33,
+          "oracle": "hierarchical-instance"
         }
       ],
       "failed": false,
@@ -372,7 +403,8 @@
         "kicadMajorGuess": 6,
         "kicadFileVersions": [
           "20211123"
-        ]
+        ],
+        "instanceCount": 68
       }
     },
     {
@@ -405,7 +437,10 @@
             "stm32mod.kicad_sch"
           ],
           "parserProjectRoot": "PCB.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 540,
+          "instanceCountNonPower": 308,
+          "oracle": "hierarchical-instance"
         },
         {
           "label": "newer",
@@ -433,7 +468,10 @@
             "stm32mod.kicad_sch"
           ],
           "parserProjectRoot": "PCB.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 540,
+          "instanceCountNonPower": 308,
+          "oracle": "hierarchical-instance"
         }
       ],
       "failed": false,
@@ -447,7 +485,8 @@
         "kicadFileVersions": [
           "20230121",
           "20231120"
-        ]
+        ],
+        "instanceCount": 540
       }
     },
     {
@@ -476,7 +515,10 @@
             "boards/glasgow/io_buffer.kicad_sch"
           ],
           "parserProjectRoot": "boards/glasgow/glasgow.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 474,
+          "instanceCountNonPower": 261,
+          "oracle": "hierarchical-instance"
         },
         {
           "label": "newer",
@@ -499,7 +541,10 @@
             "boards/glasgow/io_buffer.kicad_sch"
           ],
           "parserProjectRoot": "boards/glasgow/glasgow.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 474,
+          "instanceCountNonPower": 261,
+          "oracle": "hierarchical-instance"
         }
       ],
       "failed": false,
@@ -512,7 +557,8 @@
         "kicadMajorGuess": 8,
         "kicadFileVersions": [
           "20231120"
-        ]
+        ],
+        "instanceCount": 474
       }
     },
     {
@@ -544,7 +590,10 @@
             "production/ethersweep405/ethersweep.kicad_sch"
           ],
           "parserProjectRoot": "production/ethersweep405/ethersweep.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 227,
+          "instanceCountNonPower": 109,
+          "oracle": "hierarchical-instance"
         },
         {
           "label": "newer",
@@ -570,7 +619,10 @@
             "production/ethersweep405/ethersweep.kicad_sch"
           ],
           "parserProjectRoot": "production/ethersweep405/ethersweep.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 227,
+          "instanceCountNonPower": 109,
+          "oracle": "hierarchical-instance"
         }
       ],
       "failed": false,
@@ -584,7 +636,8 @@
         "kicadFileVersions": [
           "20211123",
           "20230121"
-        ]
+        ],
+        "instanceCount": 227
       }
     },
     {
@@ -612,7 +665,10 @@
             "complex_hierarchy.kicad_sch"
           ],
           "parserProjectRoot": "complex_hierarchy.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 119,
+          "instanceCountNonPower": 70,
+          "oracle": "hierarchical-instance"
         },
         {
           "label": "newer",
@@ -634,7 +690,10 @@
             "complex_hierarchy.kicad_sch"
           ],
           "parserProjectRoot": "complex_hierarchy.kicad_pro",
-          "unresolvedLibCount": 0
+          "unresolvedLibCount": 0,
+          "instanceCount": 119,
+          "instanceCountNonPower": 70,
+          "oracle": "hierarchical-instance"
         }
       ],
       "failed": false,
@@ -647,7 +706,8 @@
         "kicadMajorGuess": 9,
         "kicadFileVersions": [
           "20250114"
-        ]
+        ],
+        "instanceCount": 119
       }
     },
     {
@@ -711,7 +771,10 @@
             "vme_p1_p2.kicad_sch"
           ],
           "parserProjectRoot": "vme-wren.kicad_pro",
-          "unresolvedLibCount": 2
+          "unresolvedLibCount": 2,
+          "instanceCount": 2876,
+          "instanceCountNonPower": 1580,
+          "oracle": "hierarchical-instance"
         }
       ],
       "failed": false,
@@ -725,7 +788,8 @@
         "kicadFileVersions": [
           "20230819",
           "20250114"
-        ]
+        ],
+        "instanceCount": 2876
       }
     }
   ],
