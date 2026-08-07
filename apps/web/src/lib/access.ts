@@ -1,4 +1,4 @@
-import { getDb } from "@flux/db";
+import { getDb } from "@solderlab/db";
 import { ensureDb } from "@/lib/ensure-db";
 
 ensureDb();

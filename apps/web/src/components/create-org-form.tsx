@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Input } from "@flux/ui";
+import { Button, Input } from "@solderlab/ui";
 
 export function CreateOrgForm() {
   const router = useRouter();

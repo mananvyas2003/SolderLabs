@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDb } from "@flux/db";
+import { getDb } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
 import { CompareWorkspace } from "@/components/compare-workspace";
 import { ReviewActions } from "@/components/review-actions";
 import { CommentForm } from "@/components/comment-form";
-import { Badge } from "@flux/ui";
+import { Badge } from "@solderlab/ui";
 
 export default async function ReviewDetailPage({
   params,
@@ -28,12 +28,38 @@ export default async function ReviewDetailPage({
     (r) => r.id === reviewId && r.projectId === project.id,
   );
   if (!review) notFound();
+
+  // Resolve UUID anchors to current head refdes so comments survive renumbers
+  let uuidToRefdes = new Map<string, string>();
+  const headSnap = db.designSnapshots.find(
+    (s) => s.revisionId === review.headRevisionId,
+  );
+  if (headSnap) {
+    try {
+      const snap = JSON.parse(headSnap.dataJson) as {
+        components: Array<{ refdes: string; uuid?: string }>;
+      };
+      uuidToRefdes = new Map(
+        snap.components
+          .filter((c) => c.uuid)
+          .map((c) => [c.uuid!, c.refdes] as const),
+      );
+    } catch {
+      /* ignore */
+    }
+  }
+
   const thread = db.comments
     .filter((c) => c.reviewId === reviewId)
-    .map((c) => ({
-      ...c,
-      authorName: db.users.find((u) => u.id === c.authorId)?.name ?? "Unknown",
-    }));
+    .map((c) => {
+      const liveRef =
+        (c.anchorUuid && uuidToRefdes.get(c.anchorUuid)) || c.anchorRef;
+      return {
+        ...c,
+        liveAnchorRef: liveRef,
+        authorName: db.users.find((u) => u.id === c.authorId)?.name ?? "Unknown",
+      };
+    });
 
   return (
     <div className="mx-auto max-w-6xl space-y-6">
@@ -67,6 +93,7 @@ export default async function ReviewDetailPage({
         base={review.baseRevisionId}
         head={review.headRevisionId}
         reviewId={review.id}
+        orgId={org.id}
       />
 
       <section className="border border-[var(--border)] p-4">
@@ -79,9 +106,15 @@ export default async function ReviewDetailPage({
               <span className="text-[var(--text-muted)]">
                 {new Date(c.createdAt).toLocaleString()}
               </span>
-              {c.anchorRef ? (
+              {c.liveAnchorRef || c.anchorRef ? (
                 <span className="ml-2 font-mono text-xs text-[var(--accent)]">
-                  @{c.anchorKind}:{c.anchorRef}
+                  @{c.anchorKind}:{c.liveAnchorRef ?? c.anchorRef}
+                  {c.anchorUuid ? (
+                    <span className="text-[var(--text-muted)]">
+                      {" "}
+                      (uuid {c.anchorUuid.slice(0, 8)}…)
+                    </span>
+                  ) : null}
                 </span>
               ) : null}
               <p className="mt-1">{c.body}</p>

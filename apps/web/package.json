@@ -1,5 +1,5 @@
 {
-  "name": "@flux/web",
+  "name": "@solderlab/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@flux/db": "*",
-    "@flux/design-core": "*",
-    "@flux/parser": "*",
-    "@flux/ui": "*",
+    "@solderlab/analytics": "*",
+    "@solderlab/db": "*",
+    "@solderlab/design-core": "*",
+    "@solderlab/parser": "*",
+    "@solderlab/ui": "*",
+    "@solderlab/bsc": "*",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.7.0",
     "adm-zip": "^0.5.16",

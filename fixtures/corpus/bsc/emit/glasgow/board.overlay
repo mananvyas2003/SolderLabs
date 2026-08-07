@@ -1,0 +1,85 @@
+/*
+ * generated-by: @solderlab/bsc (zephyr)
+ * board: glasgow
+ * source-revision: 06201dd31888e1af3ebefaaf6dc8b1d2babbbca9
+ * bsc-schema-version: 1.0
+ * source-sha256: e582ed0cc7eb0f6e7795cb5c9253ce748d7d47a8b56267382507108323697b5b
+ * DO NOT EDIT
+ */
+
+/* Board: glasgow — Zephyr overlay (stub pinctrl from BSC nets) */
+
+/ {
+	chosen {
+		/* Primary MCU from BSC: U1 (CY7C68013A-56LTXC) */
+	};
+
+	solderlab_bsc_pins {
+		compatible = "solderlab,bsc-pins";
+		status = "okay";
+		cy_reset {
+			mcu = "U1";
+			pad = <8>;
+			net = "~{CY_RESET}";
+			pin-name = "D+";
+		};
+		fpga_done {
+			mcu = "U1";
+			pad = <24>;
+			net = "FPGA_DONE";
+			pin-name = "PB6/FD6";
+		};
+		led_err {
+			mcu = "U1";
+			pad = <29>;
+			net = "LED_ERR";
+			pin-name = "CTL0/FLAGA";
+		};
+		led_act {
+			mcu = "U1";
+			pad = <30>;
+			net = "LED_ACT";
+			pin-name = "CTL1/FLAGB";
+		};
+		led_fpga {
+			mcu = "U1";
+			pad = <31>;
+			net = "LED_FPGA";
+			pin-name = "CTL2/FLAGC";
+		};
+		enva {
+			mcu = "U1";
+			pad = <34>;
+			net = "ENVA";
+			pin-name = "PA1/~{INT1}";
+		};
+		fpga_reset {
+			mcu = "U1";
+			pad = <45>;
+			net = "~{FPGA_RESET}";
+			pin-name = "PD0/FD8";
+		};
+		alert {
+			mcu = "U1";
+			pad = <46>;
+			net = "~{ALERT}";
+			pin-name = "PD1/FD9";
+		};
+	};
+
+	pinctrl {
+		solderlab_default: solderlab_default {
+			group1 {
+				/* Pads with named nets — assign SoC pins in board DTS */
+				/* U1.8 <-> ~{CY_RESET} */
+				/* U1.24 <-> FPGA_DONE */
+				/* U1.29 <-> LED_ERR */
+				/* U1.30 <-> LED_ACT */
+				/* U1.31 <-> LED_FPGA */
+				/* U1.34 <-> ENVA */
+				/* U1.45 <-> ~{FPGA_RESET} */
+				/* U1.46 <-> ~{ALERT} */
+			};
+		};
+	};
+};

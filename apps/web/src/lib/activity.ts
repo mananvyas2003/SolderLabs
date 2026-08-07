@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { getDb, persist, nowIso } from "@flux/db";
+import { getDb, persist, nowIso } from "@solderlab/db";
 import { dispatchWebhooks } from "@/lib/webhooks";
 
 export function logActivity(opts: {

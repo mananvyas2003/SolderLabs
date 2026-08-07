@@ -1,0 +1,16 @@
+# * generated-by: @solderlab/bsc (kconfig)
+# * board: piantor
+# * source-revision: cd847afb4f9a86e8c1c8e36f243140644013afb2
+# * bsc-schema-version: 1.0
+# * source-sha256: a4d43d685c7af4751259e24042d51514e96e2ea5d8b21a4678e0ef003de50f2b
+# * DO NOT EDIT
+
+config SOLDERLAB_BOARD_PIANTOR
+	bool "SolderLab board piantor"
+	default y
+	help
+	  Auto-generated from Board Support Contract.
+
+config SOLDERLAB_BOARD_REV_NEWER
+	bool "Board revision newer"
+	default y

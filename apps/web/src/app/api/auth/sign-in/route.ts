@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { getDb, persist, nowIso } from "@flux/db";
+import { getDb, persist, nowIso } from "@solderlab/db";
 import { ensureDb } from "@/lib/ensure-db";
 import { COOKIE } from "@/lib/auth";
 
@@ -19,49 +19,45 @@ export async function POST(req: Request) {
   const db = getDb();
   let user = db.users.find((u) => u.email === email);
 
-  if (!user && email === "demo@flux.dev" && password === "demo") {
+  if (
+    !user &&
+    (email === "demo@solderlab.dev" || email === "demo@solderlab.dev") &&
+    password === "demo"
+  ) {
     const now = nowIso();
     const userId = nanoid();
     const orgId = nanoid();
     const projectId = nanoid();
     db.users.push({
       id: userId,
-      email: "demo@flux.dev",
+      email: "demo@solderlab.dev",
       name: "Demo Engineer",
       passwordHash: "demo",
       avatarUrl: null,
-      ssoProvider: null,
       createdAt: now,
     });
     db.organizations.push({
       id: orgId,
-      name: "Flux Labs",
-      slug: "flux-labs",
-      dataRegion: "local",
-      ssoEnabled: false,
-      ssoEntityId: null,
-      ssoEntryUrl: null,
-      ssoCertificate: null,
-      ssoDomain: null,
+      name: "SolderLab Labs",
+      slug: "solderlab",
       createdAt: now,
     });
     db.memberships.push({
       id: nanoid(),
       orgId,
       userId,
-      role: "owner",
+      role: "admin",
     });
     db.projects.push({
       id: projectId,
       orgId,
       name: "Blinky Board",
       slug: "blinky",
-      description: "Sample KiCad project for Flux demos",
+      description: "Sample KiCad project for SolderLab demos",
       visibility: "private",
       defaultBranch: "main",
       requireGreenChecks: true,
       requireApproval: false,
-      starCount: 0,
       createdAt: now,
     });
     db.branches.push({

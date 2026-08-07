@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@flux/ui", "@flux/design-core", "@flux/db", "@flux/parser"],
+  transpilePackages: ["@solderlab/ui", "@solderlab/design-core", "@solderlab/db", "@solderlab/parser"],
 };
 
 export default nextConfig;

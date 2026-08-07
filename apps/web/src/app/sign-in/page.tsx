@@ -3,11 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Button, Input } from "@flux/ui";
+import { Button, Input } from "@solderlab/ui";
 
 export default function SignInPage() {
   const router = useRouter();
-  const [email, setEmail] = useState("demo@flux.dev");
+  const [email, setEmail] = useState("demo@solderlab.dev");
   const [password, setPassword] = useState("demo");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,12 +34,12 @@ export default function SignInPage() {
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-6">
       <Link href="/" className="mb-8 text-sm tracking-[0.2em] text-[var(--accent)]">
-        FLUX
+        SOLDERLAB
       </Link>
       <h1 className="text-2xl font-semibold">Sign in</h1>
       <p className="mt-2 text-sm text-[var(--text-muted)]">
         Demo auth for local Phase 0/1. Use{" "}
-        <span className="font-mono text-[var(--text)]">demo@flux.dev</span> /{" "}
+        <span className="font-mono text-[var(--text)]">demo@solderlab.dev</span> /{" "}
         <span className="font-mono text-[var(--text)]">demo</span>.
       </p>
       <form onSubmit={onSubmit} className="mt-8 space-y-4">

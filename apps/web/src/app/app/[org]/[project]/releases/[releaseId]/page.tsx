@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDb } from "@flux/db";
+import { getDb } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
-import { Badge } from "@flux/ui";
+import { Badge } from "@solderlab/ui";
 import { DownloadReleaseButton } from "@/components/download-release-button";
+import { CreateReleaseShare } from "@/components/create-release-share";
 
 export default async function ReleaseDetailPage({
   params,
@@ -75,6 +76,12 @@ export default async function ReleaseDetailPage({
           </div>
         ) : null}
       </section>
+
+      <CreateReleaseShare
+        orgSlug={orgSlug}
+        projectSlug={projectSlug}
+        releaseId={release.id}
+      />
 
       <section>
         <h2 className="mb-2 text-sm text-[var(--text-muted)]">Download audit</h2>

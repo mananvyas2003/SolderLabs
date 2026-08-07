@@ -1,0 +1,16 @@
+# * generated-by: @solderlab/bsc (kconfig)
+# * board: kicad-demo-complex-hierarchy
+# * source-revision: d4248d8a874d3fa9a3a395b471588bd6ecef34e3
+# * bsc-schema-version: 1.0
+# * source-sha256: 63ee42bb54c9e78e0286db0f4774a936198bc75a120873bbf2487f5143ef07d1
+# * DO NOT EDIT
+
+config SOLDERLAB_BOARD_KICAD_DEMO_COMPLEX_HIERARCHY
+	bool "SolderLab board kicad-demo-complex-hierarchy"
+	default y
+	help
+	  Auto-generated from Board Support Contract.
+
+config SOLDERLAB_BOARD_REV_NEWER
+	bool "Board revision newer"
+	default y

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Input } from "@flux/ui";
+import { Button, Input } from "@solderlab/ui";
 
 export function CommentForm({
   orgSlug,
@@ -42,7 +42,7 @@ export function CommentForm({
   return (
     <form onSubmit={submit} className="mt-4 space-y-2 border-t border-[var(--border)] pt-4">
       <p className="text-xs text-[var(--text-muted)]">
-        Anchor to part / net / region (optional)
+        Anchor by refdes or UUID — stored as KiCad UUID so it survives renumbers
       </p>
       <div className="flex flex-wrap gap-2">
         <select

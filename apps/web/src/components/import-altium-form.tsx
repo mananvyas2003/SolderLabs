@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@flux/ui";
+import { Button } from "@solderlab/ui";
 
 export function ImportAltiumForm({
   orgSlug,

@@ -1,13 +1,14 @@
 import { nanoid } from "nanoid";
-import { getDb, persist, nowIso } from "@flux/db";
+import { getDb, persist, nowIso } from "@solderlab/db";
 import {
   parseKicadProjectDir,
   parseKicadPcbProjectDir,
-} from "@flux/parser";
-import { snapshotToBom, semanticDiff, type DesignSnapshot } from "@flux/design-core";
+} from "@solderlab/parser";
+import { snapshotToBom, semanticDiff, diffSnapshots, findUnintendedConnectivity, reconcileBom, lintManufacturingPackage, type DesignSnapshot } from "@solderlab/design-core";
+import { generateBSC } from "@solderlab/bsc";
+import { track } from "@solderlab/analytics";
 import { sha256, writeStorage, storagePath } from "@/lib/storage";
 import { logActivity } from "@/lib/activity";
-import { storageKeyFor } from "@/lib/residency";
 import fs from "node:fs";
 import path from "node:path";
 import AdmZip from "adm-zip";
@@ -162,8 +163,6 @@ export async function createRevisionFromZip(opts: {
   const db = getDb();
   const project = db.projects.find((p) => p.id === opts.projectId);
   const orgId = opts.orgId ?? project?.orgId ?? "";
-  const org = orgId ? db.organizations.find((o) => o.id === orgId) : null;
-  const region = org?.dataRegion ?? "local";
   const revisionId = nanoid();
   const now = nowIso();
 
@@ -178,12 +177,7 @@ export async function createRevisionFromZip(opts: {
     createdAt: now,
   });
 
-  const zipKey = storageKeyFor(
-    region,
-    opts.projectId,
-    revisionId,
-    "source.zip",
-  );
+  const zipKey = `${opts.projectId}/${revisionId}/source.zip`;
   writeStorage(zipKey, opts.zipBuffer);
   db.artifacts.push({
     id: nanoid(),
@@ -207,7 +201,9 @@ export async function createRevisionFromZip(opts: {
   }
 
   try {
+    const parseStarted = Date.now();
     const snapshot = parseKicadProjectDir(parseRoot);
+    const parseDurationMs = Date.now() - parseStarted;
     const snapJson = JSON.stringify(snapshot);
     writeStorage(`${opts.projectId}/${revisionId}/snapshot.json`, snapJson);
     db.designSnapshots.push({
@@ -216,6 +212,37 @@ export async function createRevisionFromZip(opts: {
       schemaVersion: 1,
       dataJson: snapJson,
     });
+
+    try {
+      const bsc = generateBSC(snapshot, {
+        boardName: project?.slug ?? opts.projectId,
+        revisionId,
+      });
+      const nullFieldCount = countBscNulls(bsc);
+      track(
+        "bsc_generated",
+        {
+          boardId: project?.slug ?? opts.projectId,
+          pinCount: bsc.pins.length,
+          nullFieldCount,
+        },
+        { orgId: orgId || null },
+      );
+    } catch {
+      /* BSC generation must never fail the parse */
+    }
+
+    track(
+      "parse_completed",
+      {
+        projectId: opts.projectId,
+        componentCount: snapshot.components.length,
+        durationMs: parseDurationMs,
+        success: true,
+        unresolvedLibs: snapshot.meta.unresolvedLibs?.length ?? 0,
+      },
+      { orgId: orgId || null },
+    );
 
     const pcb = parseKicadPcbProjectDir(parseRoot);
     if (pcb) {
@@ -309,6 +336,28 @@ export async function createRevisionFromZip(opts: {
             detailsJson: JSON.stringify(elec),
             createdAt: now,
           });
+
+          const bundle = diffSnapshots(parentSnap, snapshot, {
+            baseRevisionId: opts.parentRevisionId,
+            headRevisionId: revisionId,
+          });
+          const unintended = findUnintendedConnectivity(
+            bundle,
+            opts.message,
+          );
+          db.checkRuns.push({
+            id: nanoid(),
+            projectId: opts.projectId,
+            revisionId,
+            reviewId: null,
+            name: "unintended-connectivity",
+            status: unintended.length ? "fail" : "pass",
+            summary: unintended.length
+              ? `${unintended.length} net change(s) not acknowledged in revision message`
+              : "All net membership changes acknowledged in message",
+            detailsJson: JSON.stringify({ findings: unintended }),
+            createdAt: now,
+          });
         } catch {
           /* ignore bad parent snapshot */
         }
@@ -327,12 +376,115 @@ export async function createRevisionFromZip(opts: {
       });
     }
 
+    // BOM reconciliation — platform metadata vs schematic (never write CAD)
+    const platform = db.bomPlatformLines
+      .filter((p) => p.projectId === opts.projectId)
+      .map((p) => ({
+        uuid: p.uuid ?? undefined,
+        refdes: p.refdes,
+        mpn: p.mpn,
+        manufacturer: p.manufacturer,
+        alternateMpns: p.alternateMpnsJson
+          ? (JSON.parse(p.alternateMpnsJson) as string[])
+          : [],
+        dnp: p.dnp,
+        notes: p.notes,
+        lockedValue: p.lockedValue,
+        lockedFootprint: p.lockedFootprint,
+      }));
+    const drift = reconcileBom(snapshot.components, platform);
+    const driftErrors = drift.filter(
+      (d) =>
+        d.kind === "value_changed_mpn_stale" ||
+        d.kind === "footprint_changed_mpn_stale",
+    );
+    db.checkRuns.push({
+      id: nanoid(),
+      projectId: opts.projectId,
+      revisionId,
+      reviewId: null,
+      name: "bom-reconcile",
+      status: driftErrors.length ? "fail" : "pass",
+      summary: driftErrors.length
+        ? `${driftErrors.length} BOM drift finding(s) (stale MPN vs CAD)`
+        : drift.length
+          ? `${drift.length} soft BOM note(s); no stale-MPN failures`
+          : "BOM metadata in sync with schematic",
+      detailsJson: JSON.stringify({ findings: drift }),
+      createdAt: now,
+    });
+
+    // Manufacturing package linter
+    const pcbRow = db.pcbSnapshots.find((p) => p.revisionId === revisionId);
+    let placement: Array<{ refdes: string }> = [];
+    if (pcbRow) {
+      try {
+        const pcb = JSON.parse(pcbRow.dataJson) as {
+          footprints?: Array<{ refdes: string }>;
+        };
+        placement = (pcb.footprints ?? []).map((f) => ({ refdes: f.refdes }));
+      } catch {
+        /* ignore */
+      }
+    }
+    const gerberLayers = db.artifacts
+      .filter(
+        (a) =>
+          a.revisionId === revisionId &&
+          /\.(gbr|gerber)$/i.test(a.path),
+      )
+      .map((a) => ({ name: path.basename(a.path) }));
+    const mfg = lintManufacturingPackage({
+      bom: bom.map((b) => ({
+        refdes: b.refdes,
+        mpn: b.mpn,
+        value: b.value,
+        footprint: b.footprint,
+      })),
+      placement,
+      gerberLayers: gerberLayers.length ? gerberLayers : undefined,
+      declaredStackup: gerberLayers.length
+        ? [
+            { name: "F.Cu", type: "copper" },
+            { name: "B.Cu", type: "copper" },
+          ]
+        : undefined,
+    });
+    db.checkRuns.push({
+      id: nanoid(),
+      projectId: opts.projectId,
+      revisionId,
+      reviewId: null,
+      name: "mfg-package-lint",
+      status: mfg.findings.some(
+        (f) =>
+          f.severity === "error" &&
+          f.code !== "bom_missing_mpn", // covered by bom-mpn check
+      )
+        ? "fail"
+        : "pass",
+      summary: mfg.summary,
+      detailsJson: JSON.stringify(mfg),
+      createdAt: now,
+    });
+
     const rev = db.revisions.find((r) => r.id === revisionId)!;
     rev.parseStatus = "succeeded";
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Parse failed";
     const rev = db.revisions.find((r) => r.id === revisionId)!;
     rev.parseStatus = "failed";
+    track(
+      "parse_completed",
+      {
+        projectId: opts.projectId,
+        componentCount: 0,
+        durationMs: 0,
+        success: false,
+        unresolvedLibs: 0,
+      },
+      { orgId: orgId || null },
+    );
     db.checkRuns.push({
       id: nanoid(),
       projectId: opts.projectId,
@@ -402,4 +554,18 @@ export function revisionChecksPassing(projectId: string, revisionId: string) {
     return { ok: false as const, failing: hardFails };
   }
   return { ok: true as const, failing: [], required };
+}
+
+function countBscNulls(value: unknown): number {
+  if (value === null) return 1;
+  if (Array.isArray(value)) {
+    return value.reduce<number>((n, v) => n + countBscNulls(v), 0);
+  }
+  if (value && typeof value === "object") {
+    return Object.values(value as Record<string, unknown>).reduce<number>(
+      (n, v) => n + countBscNulls(v),
+      0,
+    );
+  }
+  return 0;
 }

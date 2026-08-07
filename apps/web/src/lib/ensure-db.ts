@@ -1,4 +1,4 @@
-import { getDb, persist, resetDbCache } from "@flux/db";
+import { getDb, persist, resetDbCache } from "@solderlab/db";
 import { dbFilePath } from "@/lib/paths";
 
 let ready = false;

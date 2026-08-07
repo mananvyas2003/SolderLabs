@@ -1,0 +1,44 @@
+# * generated-by: @solderlab/bsc (kconfig)
+# * board: amulet-controller
+# * source-revision: 01574e7261474919fe5bfa7e24bd05a05f188a86
+# * bsc-schema-version: 1.0
+# * source-sha256: 47b6179c4e5e42c1ee6ba4c2671ae7ab70a674b7e64e79c8eecb2e00e1c82145
+# * DO NOT EDIT
+
+config SOLDERLAB_BOARD_AMULET_CONTROLLER
+	bool "SolderLab board amulet-controller"
+	default y
+	help
+	  Auto-generated from Board Support Contract.
+
+config SOLDERLAB_BOARD_REV_NEWER
+	bool "Board revision newer"
+	default y
+
+config SOLDERLAB_RAIL_N12V_MV
+	int "Rail +12V millivolts"
+	default 12000
+
+config SOLDERLAB_RAIL_N3V3_MV
+	int "Rail +3V3 millivolts"
+	default 3300
+
+config SOLDERLAB_RAIL_N5V_MV
+	int "Rail +5V millivolts"
+	default 5000
+
+config SOLDERLAB_RAIL_A3V3_MV
+	int "Rail +A3V3 millivolts"
+	default 3300
+
+config SOLDERLAB_RAIL_GND_MV
+	int "Rail GND millivolts"
+	default 0
+
+config SOLDERLAB_RAIL_VCC_12V_MV
+	int "Rail VCC_12V millivolts"
+	default 12000
+
+config SOLDERLAB_RAIL_VCC_5V_MV
+	int "Rail VCC_5V millivolts"
+	default 5000

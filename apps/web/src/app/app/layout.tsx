@@ -18,18 +18,18 @@ export default async function AppLayout({
             href="/app"
             className="text-xs font-semibold tracking-[0.22em] text-[var(--accent)]"
           >
-            FLUX
+            SOLDERLAB
           </Link>
           <span className="hidden text-xs text-[var(--text-muted)] md:inline">
-            GitHub for Hardware
+            Hardware collaboration
           </span>
         </div>
         <div className="flex items-center gap-3 text-sm">
           <Link
-            href="/explore"
+            href="/admin/metrics"
             className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]"
           >
-            Explore
+            Metrics
           </Link>
           <span className="text-[var(--text-muted)]">{user.name}</span>
           <form action="/api/auth/sign-out" method="POST">

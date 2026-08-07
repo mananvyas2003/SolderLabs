@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDb } from "@flux/db";
+import { getDb } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
-import { Badge } from "@flux/ui";
+import { Badge } from "@solderlab/ui";
 import { SeedFixturesButton } from "@/components/seed-fixtures-button";
 import { UploadRevisionForm } from "@/components/upload-revision-form";
 
@@ -60,7 +60,6 @@ export default async function ProjectPage({
           <NavChip href={`/app/${orgSlug}/${projectSlug}/pinout`}>Pinout</NavChip>
           <NavChip href={`/app/${orgSlug}/${projectSlug}/reviews`}>Reviews</NavChip>
           <NavChip href={`/app/${orgSlug}/${projectSlug}/releases`}>Releases</NavChip>
-          <NavChip href={`/app/${orgSlug}/${projectSlug}/dfm`}>DFM</NavChip>
           <NavChip href={`/app/${orgSlug}/${projectSlug}/settings`}>Settings</NavChip>
           {base && head ? (
             <NavChip

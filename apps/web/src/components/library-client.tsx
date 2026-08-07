@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Badge, Button, Input } from "@flux/ui";
+import { Badge, Button, Input } from "@solderlab/ui";
 
 type Part = {
   id: string;

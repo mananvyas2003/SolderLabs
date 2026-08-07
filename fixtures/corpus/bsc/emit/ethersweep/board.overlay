@@ -1,0 +1,141 @@
+/*
+ * generated-by: @solderlab/bsc (zephyr)
+ * board: ethersweep
+ * source-revision: 67f2547e582de59cb77d4b3c2a25c8a6326ed864
+ * bsc-schema-version: 1.0
+ * source-sha256: 5789253170e0a85498799caa7342eb537daa990b6b654e4b2fa8d2b06d109cda
+ * DO NOT EDIT
+ */
+
+/* Board: ethersweep — Zephyr overlay (stub pinctrl from BSC nets) */
+
+/ {
+	chosen {
+		/* Primary MCU from BSC: U3 (STM32F103C8Tx) */
+	};
+
+	solderlab_bsc_pins {
+		compatible = "solderlab,bsc-pins";
+		status = "okay";
+		mot_enable {
+			mcu = "U3";
+			pad = <2>;
+			net = "MOT_ENABLE";
+			pin-name = "PC13-TAMPER-RTC";
+		};
+		sda {
+			mcu = "U3";
+			pad = <3>;
+			net = "SDA";
+			pin-name = "PC14-OSC32_IN";
+		};
+		scl {
+			mcu = "U3";
+			pad = <4>;
+			net = "SCL";
+			pin-name = "PC15-OSC32_OUT";
+		};
+		mot_uart_tx {
+			mcu = "U3";
+			pad = <5>;
+			net = "MOT_UART_TX";
+			pin-name = "PD0-OSC_IN";
+		};
+		mot_uart_rx {
+			mcu = "U3";
+			pad = <6>;
+			net = "MOT_UART_RX";
+			pin-name = "PD0-OSC_OUT";
+		};
+		mot_step {
+			mcu = "U3";
+			pad = <7>;
+			net = "MOT_STEP";
+			pin-name = "NRST";
+		};
+		estop {
+			mcu = "U3";
+			pad = <10>;
+			net = "ESTOP";
+			pin-name = "PA0-WKUP";
+		};
+		endstop {
+			mcu = "U3";
+			pad = <11>;
+			net = "ENDSTOP";
+			pin-name = "PA1";
+		};
+		rst_ethernet {
+			mcu = "U3";
+			pad = <13>;
+			net = "RST_ETHERNET";
+			pin-name = "PA3";
+		};
+		mot_m0 {
+			mcu = "U3";
+			pad = <18>;
+			net = "MOT_M0";
+			pin-name = "PB0";
+		};
+		mot_m1 {
+			mcu = "U3";
+			pad = <19>;
+			net = "MOT_M1";
+			pin-name = "PB1";
+		};
+		boot_1 {
+			mcu = "U3";
+			pad = <20>;
+			net = "BOOT_1";
+			pin-name = "PB2";
+		};
+		boot_0 {
+			mcu = "U3";
+			pad = <26>;
+			net = "BOOT_0";
+			pin-name = "PB13";
+		};
+		rst {
+			mcu = "U3";
+			pad = <28>;
+			net = "rst";
+			pin-name = "PB15";
+		};
+		voltage_detect {
+			mcu = "U3";
+			pad = <39>;
+			net = "voltage_detect";
+			pin-name = "PB3";
+		};
+		eth_int {
+			mcu = "U3";
+			pad = <40>;
+			net = "ETH_INT";
+			pin-name = "PB4";
+		};
+	};
+
+	pinctrl {
+		solderlab_default: solderlab_default {
+			group1 {
+				/* Pads with named nets — assign SoC pins in board DTS */
+				/* U3.2 <-> MOT_ENABLE */
+				/* U3.3 <-> SDA */
+				/* U3.4 <-> SCL */
+				/* U3.5 <-> MOT_UART_TX */
+				/* U3.6 <-> MOT_UART_RX */
+				/* U3.7 <-> MOT_STEP */
+				/* U3.10 <-> ESTOP */
+				/* U3.11 <-> ENDSTOP */
+				/* U3.13 <-> RST_ETHERNET */
+				/* U3.18 <-> MOT_M0 */
+				/* U3.19 <-> MOT_M1 */
+				/* U3.20 <-> BOOT_1 */
+				/* U3.26 <-> BOOT_0 */
+				/* U3.28 <-> rst */
+				/* U3.39 <-> voltage_detect */
+				/* U3.40 <-> ETH_INT */
+			};
+		};
+	};
+};

@@ -3,7 +3,7 @@ import type {
   SnapshotComponent,
   SnapshotNet,
   SnapshotPin,
-} from "@flux/design-core";
+} from "@solderlab/design-core";
 
 const TOL = 0.05;
 
@@ -139,6 +139,43 @@ function extractLibSymbolsPins(src: string): Map<
   return map;
 }
 
+function lookupLibPins(
+  libPins: Map<
+    string,
+    Array<{ number: string; name: string; x: number; y: number }>
+  >,
+  libId: string,
+): Array<{ number: string; name: string; x: number; y: number }> | undefined {
+  if (!libId) return undefined;
+  const direct = libPins.get(libId);
+  if (direct?.length) return direct;
+
+  // KiCad unit sub-symbols are often "Part_1_1" without the "Lib:" nickname
+  const short = libId.includes(":") ? libId.slice(libId.indexOf(":") + 1) : libId;
+  const merged: Array<{
+    number: string;
+    name: string;
+    x: number;
+    y: number;
+  }> = [];
+  const seen = new Set<string>();
+  for (const [k, pins] of libPins) {
+    if (
+      k === libId ||
+      k === short ||
+      k.startsWith(`${libId}_`) ||
+      k.startsWith(`${short}_`)
+    ) {
+      for (const p of pins) {
+        if (seen.has(p.number)) continue;
+        seen.add(p.number);
+        merged.push(p);
+      }
+    }
+  }
+  return merged.length ? merged : undefined;
+}
+
 class UnionFind {
   parent = new Map<string, string>();
   find(x: string): string {
@@ -215,6 +252,42 @@ export function resolveConnectivity(
       namedPoints.push({ key, name });
     }
   }
+  // Hierarchical labels (child → parent sheet pin of same name)
+  for (const lab of extractBlocks(src, "hierarchical_label")) {
+    const name =
+      extractQuoted(lab, "hierarchical_label") ??
+      lab.match(/\(hierarchical_label\s+"([^"]+)"/)?.[1];
+    const at = parseAt(lab);
+    if (name && at) {
+      const key = `p:${roundKey(at)}`;
+      uf.find(key);
+      namedPoints.push({ key, name });
+    }
+  }
+  // Sheet box pins on the parent (KiCad 7+ `(pin "N" …)` inside `(sheet …)`)
+  for (const sheet of extractBlocks(src, "sheet")) {
+    if (sheet.startsWith("(sheet_instances") || sheet.startsWith("(sheet_pin")) {
+      continue;
+    }
+    for (const m of sheet.matchAll(
+      /\(pin\s+"([^"]+)"\s+\w+[\s\S]*?\(at\s+([-\d.]+)\s+([-\d.]+)/g,
+    )) {
+      const key = `p:${roundKey({ x: Number(m[2]), y: Number(m[3]) })}`;
+      uf.find(key);
+      namedPoints.push({ key, name: m[1]! });
+    }
+    for (const sp of extractBlocks(sheet, "sheet_pin")) {
+      const pname =
+        extractQuoted(sp, "sheet_pin") ??
+        sp.match(/\(sheet_pin\s+"([^"]+)"/)?.[1];
+      const at = parseAt(sp);
+      if (pname && at) {
+        const key = `p:${roundKey(at)}`;
+        uf.find(key);
+        namedPoints.push({ key, name: pname });
+      }
+    }
+  }
 
   const pinPoints: Array<{
     pinId: string;
@@ -226,9 +299,7 @@ export function resolveConnectivity(
 
   for (const c of components) {
     const libId = c.libId ?? "";
-    let pins =
-      libPins.get(libId) ??
-      [...libPins.entries()].find(([k]) => k.startsWith(`${libId}_`))?.[1];
+    let pins = lookupLibPins(libPins, libId);
     if (!pins?.length) pins = heuristicPins(libId || "Device:R");
 
     const ax = c.x ?? 0;

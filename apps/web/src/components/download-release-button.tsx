@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@flux/ui";
+import { Button } from "@solderlab/ui";
 
 export function DownloadReleaseButton({
   orgSlug,
@@ -27,7 +27,7 @@ export function DownloadReleaseButton({
     setBusy(false);
     if (!res.ok) return;
     const blob = await res.blob();
-    const sha = res.headers.get("X-Flux-SHA256");
+    const sha = res.headers.get("X-SolderLab-SHA256");
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;

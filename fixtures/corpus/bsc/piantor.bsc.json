@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "1.0",
+  "boardName": "piantor",
+  "revision": "newer",
+  "generatedFrom": {
+    "revisionId": "cd847afb4f9a86e8c1c8e36f243140644013afb2",
+    "sha256": "a4d43d685c7af4751259e24042d51514e96e2ea5d8b21a4678e0ef003de50f2b"
+  },
+  "mcus": [],
+  "pins": [],
+  "revStraps": [],
+  "busDevices": [],
+  "powerRails": [
+    {
+      "name": "vbus_sense",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"vbus_sense\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    }
+  ],
+  "connectors": [
+    {
+      "refdes": "J1",
+      "description": "TRRS",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J1-Pad1)",
+          "signal": "SLEEVE",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J1-Pad2)",
+          "signal": "TIP",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J1-Pad3)",
+          "signal": "RING1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J1-Pad4)",
+          "signal": "RING2",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    }
+  ],
+  "testPoints": [],
+  "confidenceNotes": [
+    {
+      "field": "mcus",
+      "reason": "No component matched MCU rule (pin count > 20 + known MCU lib/MPN)"
+    }
+  ]
+}

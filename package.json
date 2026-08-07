@@ -1,5 +1,5 @@
 {
-  "name": "flux",
+  "name": "solderlab",
   "private": true,
   "workspaces": [
     "apps/*",
@@ -7,13 +7,18 @@
     "workers/*"
   ],
   "scripts": {
-    "dev": "npm run dev -w @flux/web",
-    "build": "npm run build -w @flux/web",
-    "db:push": "npm run push -w @flux/db",
-    "db:seed": "npm run seed -w @flux/db",
-    "lint": "npm run lint -w @flux/web",
-    "test": "npm run test -w @flux/design-core && npm run test -w @flux/parser",
-    "flux": "node packages/cli/bin/flux.mjs"
+    "dev": "npm run dev -w @solderlab/web",
+    "build": "npm run build -w @solderlab/web",
+    "db:push": "npm run push -w @solderlab/db",
+    "db:seed": "npm run seed -w @solderlab/db",
+    "lint": "npm run lint -w @solderlab/web",
+    "test": "npm run test -w @solderlab/design-core && npm run test -w @solderlab/parser && npm run test -w @solderlab/bsc && npm run test -w @solderlab/analytics && npm run test -w @solderlab/cli",
+    "solderlab": "node packages/cli/bin/solderlab.mjs",
+    "corpus:fetch": "node scripts/fetch-corpus.mjs",
+    "corpus:uuid": "node --import tsx scripts/uuid-coverage.mjs",
+    "corpus:refresh": "node --import tsx scripts/refresh-manifest-counts.mjs",
+    "bsc:golden": "npm run golden -w @solderlab/bsc",
+    "bsc:golden:emit": "npm run golden:emit -w @solderlab/bsc"
   },
   "engines": {
     "node": ">=20"

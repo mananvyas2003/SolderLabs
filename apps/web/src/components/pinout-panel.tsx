@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Badge, Button, Input } from "@flux/ui";
+import { Badge, Button, Input } from "@solderlab/ui";
 
 type Pin = { pin: string; name: string; net: string };
 type PinoutRow = {

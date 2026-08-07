@@ -1,0 +1,25 @@
+/*
+ * generated-by: @solderlab/bsc (zephyr)
+ * board: amulet-controller
+ * source-revision: 01574e7261474919fe5bfa7e24bd05a05f188a86
+ * bsc-schema-version: 1.0
+ * source-sha256: 47b6179c4e5e42c1ee6ba4c2671ae7ab70a674b7e64e79c8eecb2e00e1c82145
+ * DO NOT EDIT
+ */
+
+/* Board: amulet-controller — Zephyr overlay (stub pinctrl from BSC nets) */
+
+/ {
+	chosen {
+		/* Primary MCU from BSC: U1 (STM32G474RET3) */
+	};
+
+	solderlab_bsc_pins {
+		compatible = "solderlab,bsc-pins";
+		status = "okay";
+	};
+
+	pinctrl {
+		/* No named nets to map into pinctrl */
+	};
+};

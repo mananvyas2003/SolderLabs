@@ -1,0 +1,16 @@
+# * generated-by: @solderlab/bsc (kconfig)
+# * board: ethersweep
+# * source-revision: 67f2547e582de59cb77d4b3c2a25c8a6326ed864
+# * bsc-schema-version: 1.0
+# * source-sha256: 5789253170e0a85498799caa7342eb537daa990b6b654e4b2fa8d2b06d109cda
+# * DO NOT EDIT
+
+config SOLDERLAB_BOARD_ETHERSWEEP
+	bool "SolderLab board ethersweep"
+	default y
+	help
+	  Auto-generated from Board Support Contract.
+
+config SOLDERLAB_BOARD_REV_NEWER
+	bool "Board revision newer"
+	default y

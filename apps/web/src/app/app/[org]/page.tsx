@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDb } from "@flux/db";
+import { getDb } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
@@ -43,12 +43,6 @@ export default async function OrgPage({
             className="rounded-[6px] border border-[var(--border)] px-3 py-1.5 hover:border-[var(--accent)]"
           >
             Webhooks
-          </Link>
-          <Link
-            href={`/app/${org.slug}/settings`}
-            className="rounded-[6px] border border-[var(--border)] px-3 py-1.5 hover:border-[var(--accent)]"
-          >
-            Enterprise
           </Link>
         </div>
       </div>

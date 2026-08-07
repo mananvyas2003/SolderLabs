@@ -1,0 +1,16 @@
+# * generated-by: @solderlab/bsc (kconfig)
+# * board: upsy-desky
+# * source-revision: 3fe1e14ff6250c9321da221a03aa932919f4842d
+# * bsc-schema-version: 1.0
+# * source-sha256: a6be1fa23a4f1b504e3d526249a8c9e84e06842851dbb829d3a0b05bd76de452
+# * DO NOT EDIT
+
+config SOLDERLAB_BOARD_UPSY_DESKY
+	bool "SolderLab board upsy-desky"
+	default y
+	help
+	  Auto-generated from Board Support Contract.
+
+config SOLDERLAB_BOARD_REV_NEWER
+	bool "Board revision newer"
+	default y

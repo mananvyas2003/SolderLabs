@@ -1,0 +1,39 @@
+name: Firmware consumer BSC check
+
+on:
+  push:
+    paths:
+      - "examples/firmware-consumer/**"
+      - "fixtures/corpus/bsc/glasgow.bsc.json"
+      - "packages/cli/**"
+      - "packages/bsc/**"
+      - ".github/actions/bsc-check/**"
+  pull_request:
+    paths:
+      - "examples/firmware-consumer/**"
+      - "fixtures/corpus/bsc/glasgow.bsc.json"
+      - "packages/cli/**"
+      - "packages/bsc/**"
+      - ".github/actions/bsc-check/**"
+
+jobs:
+  bsc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install workspace
+        run: npm install
+      - name: Pull Glasgow BSC into example
+        working-directory: examples/firmware-consumer
+        run: |
+          node ../../packages/cli/bin/solderlab.mjs bsc pull \
+            --board glasgow --rev newer --out include --format c
+      - name: BSC check with call-site scan
+        uses: ./.github/actions/bsc-check
+        with:
+          cwd: examples/firmware-consumer
+          scan-dir: src
+          registry: fixtures/corpus/bsc

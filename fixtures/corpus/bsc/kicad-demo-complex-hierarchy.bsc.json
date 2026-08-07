@@ -1,0 +1,173 @@
+{
+  "schemaVersion": "1.0",
+  "boardName": "kicad-demo-complex-hierarchy",
+  "revision": "newer",
+  "generatedFrom": {
+    "revisionId": "d4248d8a874d3fa9a3a395b471588bd6ecef34e3",
+    "sha256": "63ee42bb54c9e78e0286db0f4774a936198bc75a120873bbf2487f5143ef07d1"
+  },
+  "mcus": [],
+  "pins": [],
+  "revStraps": [],
+  "busDevices": [],
+  "powerRails": [
+    {
+      "name": "12Vext",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"12Vext\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    }
+  ],
+  "connectors": [
+    {
+      "refdes": "P101",
+      "description": "CONN_2",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(P101-Pad1)",
+          "signal": "P1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(P101-Pad2)",
+          "signal": "PM",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "P102",
+      "description": "CONN_2",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(P102-Pad1)",
+          "signal": "P1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(P102-Pad2)",
+          "signal": "PM",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "P201",
+      "description": "CONN_2",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(P201-Pad1)",
+          "signal": "P1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(P201-Pad2)",
+          "signal": "PM",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "P202",
+      "description": "CONN_2",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(#PWR0209-Pad1)",
+          "signal": "P1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(R206-Pad1)",
+          "signal": "PM",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "P301",
+      "description": "CONN_2",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(P301-Pad1)",
+          "signal": "P1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(P301-Pad2)",
+          "signal": "PM",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "P302",
+      "description": "CONN_2",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(#PWR0309-Pad1)",
+          "signal": "P1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(R306-Pad1)",
+          "signal": "PM",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    }
+  ],
+  "testPoints": [],
+  "confidenceNotes": [
+    {
+      "field": "mcus",
+      "reason": "No component matched MCU rule (pin count > 20 + known MCU lib/MPN)"
+    }
+  ]
+}

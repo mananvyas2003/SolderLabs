@@ -1,0 +1,16 @@
+# * generated-by: @solderlab/bsc (kconfig)
+# * board: kicad-demo-vme-wren
+# * source-revision: d4248d8a874d3fa9a3a395b471588bd6ecef34e3
+# * bsc-schema-version: 1.0
+# * source-sha256: 285030d3ae0598e0d6ea5bbefdd5ddcef5b6c2749d6e58e309e3acb322883343
+# * DO NOT EDIT
+
+config SOLDERLAB_BOARD_KICAD_DEMO_VME_WREN
+	bool "SolderLab board kicad-demo-vme-wren"
+	default y
+	help
+	  Auto-generated from Board Support Contract.
+
+config SOLDERLAB_BOARD_REV_NEWER
+	bool "Board revision newer"
+	default y

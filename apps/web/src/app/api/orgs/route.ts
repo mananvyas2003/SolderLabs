@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { getDb, persist, nowIso } from "@flux/db";
+import { getDb, persist, nowIso } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
 import { ensureDb } from "@/lib/ensure-db";
 
@@ -18,8 +18,6 @@ export async function GET() {
         name: org.name,
         slug: org.slug,
         role: m.role,
-        dataRegion: org.dataRegion,
-        ssoEnabled: org.ssoEnabled,
       };
     });
   return NextResponse.json({ orgs });
@@ -32,7 +30,6 @@ export async function POST(req: Request) {
   const body = (await req.json()) as {
     name?: string;
     slug?: string;
-    dataRegion?: string;
   };
   if (!body.name || !body.slug) {
     return NextResponse.json({ error: "name and slug required" }, { status: 400 });
@@ -47,19 +44,13 @@ export async function POST(req: Request) {
     id,
     name: body.name,
     slug,
-    dataRegion: body.dataRegion ?? "local",
-    ssoEnabled: false,
-    ssoEntityId: null,
-    ssoEntryUrl: null,
-    ssoCertificate: null,
-    ssoDomain: null,
     createdAt: nowIso(),
   });
   db.memberships.push({
     id: nanoid(),
     orgId: id,
     userId: user.id,
-    role: "owner",
+    role: "admin",
   });
   persist();
   return NextResponse.json({ id, slug, name: body.name });

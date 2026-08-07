@@ -1,0 +1,176 @@
+/*
+ * generated-by: @solderlab/bsc (zephyr)
+ * board: zynq-som
+ * source-revision: ad96951a225fbf9f263b555ef070a536b09ff710
+ * bsc-schema-version: 1.0
+ * source-sha256: 60e7f93961f901fb92c3a7fcd36ea09f0b5a118d4fb4292ab16b5c5f065f36d1
+ * DO NOT EDIT
+ */
+
+/* Board: zynq-som — Zephyr overlay (stub pinctrl from BSC nets) */
+
+/ {
+	chosen {
+		/* Primary MCU from BSC: U9 (STM32G431CBUx) */
+	};
+
+	solderlab_bsc_pins {
+		compatible = "solderlab,bsc-pins";
+		status = "okay";
+		stm32_usb_cc1 {
+			mcu = "U9";
+			pad = <2>;
+			net = "STM32_USB_CC1";
+			pin-name = "PC13";
+		};
+		stm32_gpio2 {
+			mcu = "U9";
+			pad = <3>;
+			net = "STM32_GPIO2";
+			pin-name = "PC14";
+		};
+		stm32_usb_cc2 {
+			mcu = "U9";
+			pad = <4>;
+			net = "STM32_USB_CC2";
+			pin-name = "PC15";
+		};
+		zynq_ps_srst {
+			mcu = "U9";
+			pad = <5>;
+			net = "ZYNQ_PS_SRST";
+			pin-name = "PF0";
+		};
+		zynq_ps_por {
+			mcu = "U9";
+			pad = <6>;
+			net = "ZYNQ_PS_POR";
+			pin-name = "PF1";
+		};
+		stm32_gpio7 {
+			mcu = "U9";
+			pad = <16>;
+			net = "STM32_GPIO7";
+			pin-name = "PC4";
+		};
+		zynq_bmode_0 {
+			mcu = "U9";
+			pad = <17>;
+			net = "ZYNQ_BMODE_0";
+			pin-name = "PB0";
+		};
+		sense_1v8 {
+			mcu = "U9";
+			pad = <18>;
+			net = "SENSE_1V8";
+			pin-name = "PB1";
+		};
+		sense_1v35 {
+			mcu = "U9";
+			pad = <19>;
+			net = "SENSE_1V35";
+			pin-name = "PB2";
+		};
+		emmc_rst {
+			mcu = "U9";
+			pad = <22>;
+			net = "eMMC_~{RST}";
+			pin-name = "PB10";
+		};
+		n1v35_pg {
+			mcu = "U9";
+			pad = <25>;
+			net = "1V35_PG";
+			pin-name = "PB12";
+		};
+		n1v0_en {
+			mcu = "U9";
+			pad = <26>;
+			net = "1V0_EN";
+			pin-name = "PB13";
+		};
+		stm32_nrst {
+			mcu = "U9";
+			pad = <28>;
+			net = "STM32_NRST";
+			pin-name = "PB15";
+		};
+		n1v8_en {
+			mcu = "U9";
+			pad = <29>;
+			net = "1V8_EN";
+			pin-name = "PC6";
+		};
+		stm32_boot0 {
+			mcu = "U9";
+			pad = <39>;
+			net = "STM32_BOOT0";
+			pin-name = "PC10";
+		};
+		n1v8_pg {
+			mcu = "U9";
+			pad = <42>;
+			net = "1V8_PG";
+			pin-name = "PB4";
+		};
+		n3v3_en {
+			mcu = "U9";
+			pad = <43>;
+			net = "3V3_EN";
+			pin-name = "PB5";
+		};
+		n1v0_pg {
+			mcu = "U9";
+			pad = <44>;
+			net = "1V0_PG";
+			pin-name = "PB6";
+		};
+		stm32_gpio1 {
+			mcu = "U9";
+			pad = <45>;
+			net = "STM32_GPIO1";
+			pin-name = "PB7";
+		};
+		stm32_gpio3 {
+			mcu = "U9";
+			pad = <46>;
+			net = "STM32_GPIO3";
+			pin-name = "PB8";
+		};
+		usb_phy_rst {
+			mcu = "U9";
+			pad = <47>;
+			net = "USB_PHY_RST";
+			pin-name = "PB9";
+		};
+	};
+
+	pinctrl {
+		solderlab_default: solderlab_default {
+			group1 {
+				/* Pads with named nets — assign SoC pins in board DTS */
+				/* U9.2 <-> STM32_USB_CC1 */
+				/* U9.3 <-> STM32_GPIO2 */
+				/* U9.4 <-> STM32_USB_CC2 */
+				/* U9.5 <-> ZYNQ_PS_SRST */
+				/* U9.6 <-> ZYNQ_PS_POR */
+				/* U9.16 <-> STM32_GPIO7 */
+				/* U9.17 <-> ZYNQ_BMODE_0 */
+				/* U9.18 <-> SENSE_1V8 */
+				/* U9.19 <-> SENSE_1V35 */
+				/* U9.22 <-> eMMC_~{RST} */
+				/* U9.25 <-> 1V35_PG */
+				/* U9.26 <-> 1V0_EN */
+				/* U9.28 <-> STM32_NRST */
+				/* U9.29 <-> 1V8_EN */
+				/* U9.39 <-> STM32_BOOT0 */
+				/* U9.42 <-> 1V8_PG */
+				/* U9.43 <-> 3V3_EN */
+				/* U9.44 <-> 1V0_PG */
+				/* U9.45 <-> STM32_GPIO1 */
+				/* U9.46 <-> STM32_GPIO3 */
+				/* U9.47 <-> USB_PHY_RST */
+			};
+		};
+	};
+};

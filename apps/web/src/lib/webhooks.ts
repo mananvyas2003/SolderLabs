@@ -1,4 +1,4 @@
-import { getDb } from "@flux/db";
+import { getDb } from "@solderlab/db";
 
 /** Fire-and-forget webhook delivery (best effort, no retry queue in MVP) */
 export async function dispatchWebhooks(
@@ -16,8 +16,8 @@ export async function dispatchWebhooks(
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Flux-Event": event,
-            ...(hook.secret ? { "X-Flux-Secret": hook.secret } : {}),
+            "X-SolderLab-Event": event,
+            ...(hook.secret ? { "X-SolderLab-Secret": hook.secret } : {}),
           },
           body: JSON.stringify({
             event,

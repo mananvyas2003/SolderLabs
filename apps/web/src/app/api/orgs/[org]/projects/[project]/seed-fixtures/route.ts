@@ -5,7 +5,7 @@ import { assertOrgAccess, getProject, getMainBranch } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
 import { createRevisionFromDir } from "@/lib/revisions";
 import { monorepoRoot } from "@/lib/paths";
-import { getDb, persist } from "@flux/db";
+import { getDb, persist } from "@solderlab/db";
 
 export async function POST(
   req: Request,

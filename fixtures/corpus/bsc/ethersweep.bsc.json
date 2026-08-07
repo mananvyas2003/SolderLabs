@@ -1,0 +1,1957 @@
+{
+  "schemaVersion": "1.0",
+  "boardName": "ethersweep",
+  "revision": "newer",
+  "generatedFrom": {
+    "revisionId": "67f2547e582de59cb77d4b3c2a25c8a6326ed864",
+    "sha256": "5789253170e0a85498799caa7342eb537daa990b6b654e4b2fa8d2b06d109cda"
+  },
+  "mcus": [
+    {
+      "refdes": "U3",
+      "mpn": "STM32F103C8Tx",
+      "package": "Package_QFP:LQFP-48_7x7mm_P0.5mm",
+      "confidenceNotes": [
+        {
+          "field": "mpn",
+          "reason": "Using Value field; dedicated MPN property absent"
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "1",
+      "pinName": "VBAT",
+      "net": "Net-(U3-Pad1)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "U3",
+          "pin": "24"
+        },
+        {
+          "refdes": "U3",
+          "pin": "36"
+        },
+        {
+          "refdes": "U3",
+          "pin": "48"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "2",
+      "pinName": "PC13-TAMPER-RTC",
+      "net": "MOT_ENABLE",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "3",
+      "pinName": "PC14-OSC32_IN",
+      "net": "SDA",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R27",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "4",
+      "pinName": "PC15-OSC32_OUT",
+      "net": "SCL",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R24",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "5",
+      "pinName": "PD0-OSC_IN",
+      "net": "MOT_UART_TX",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R30",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "6",
+      "pinName": "PD0-OSC_OUT",
+      "net": "MOT_UART_RX",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R30",
+          "pin": "2"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "7",
+      "pinName": "NRST",
+      "net": "MOT_STEP",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "8",
+      "pinName": "VSSA",
+      "net": "Net-(#PWR0101-Pad1)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "U3",
+          "pin": "35"
+        },
+        {
+          "refdes": "U3",
+          "pin": "47"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "9",
+      "pinName": "VDDA",
+      "net": "Net-(U3-Pad9)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "10",
+      "pinName": "PA0-WKUP",
+      "net": "ESTOP",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J5",
+          "pin": "1"
+        },
+        {
+          "refdes": "R2",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "11",
+      "pinName": "PA1",
+      "net": "ENDSTOP",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J4",
+          "pin": "1"
+        },
+        {
+          "refdes": "R1",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "12",
+      "pinName": "PA2",
+      "net": "Net-(U3-Pad12)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "13",
+      "pinName": "PA3",
+      "net": "RST_ETHERNET",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "U6",
+          "pin": "39"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "14",
+      "pinName": "PA4",
+      "net": "Net-(U3-Pad14)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "15",
+      "pinName": "PA5",
+      "net": "Net-(U3-Pad15)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "16",
+      "pinName": "PA6",
+      "net": "Net-(U3-Pad16)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "17",
+      "pinName": "PA7",
+      "net": "Net-(U3-Pad17)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "18",
+      "pinName": "PB0",
+      "net": "MOT_M0",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "19",
+      "pinName": "PB1",
+      "net": "MOT_M1",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "20",
+      "pinName": "PB2",
+      "net": "BOOT_1",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R28",
+          "pin": "1"
+        },
+        {
+          "refdes": "TP5",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "21",
+      "pinName": "PB10",
+      "net": "Net-(Y3-Pad1)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "C8",
+          "pin": "2"
+        },
+        {
+          "refdes": "R14",
+          "pin": "1"
+        },
+        {
+          "refdes": "Y3",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "22",
+      "pinName": "PB11",
+      "net": "Net-(Y3-Pad2)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "C10",
+          "pin": "1"
+        },
+        {
+          "refdes": "R14",
+          "pin": "2"
+        },
+        {
+          "refdes": "Y3",
+          "pin": "2"
+        },
+        {
+          "refdes": "Y3",
+          "pin": "3"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "23",
+      "pinName": "VSS",
+      "net": "Net-(U3-Pad23)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "24",
+      "pinName": "VDD",
+      "net": "Net-(U3-Pad1)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "U3",
+          "pin": "1"
+        },
+        {
+          "refdes": "U3",
+          "pin": "36"
+        },
+        {
+          "refdes": "U3",
+          "pin": "48"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "25",
+      "pinName": "PB12",
+      "net": "Net-(U3-Pad25)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "26",
+      "pinName": "PB13",
+      "net": "BOOT_0",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R29",
+          "pin": "1"
+        },
+        {
+          "refdes": "TP6",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "27",
+      "pinName": "PB14",
+      "net": "Net-(U3-Pad27)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "28",
+      "pinName": "PB15",
+      "net": "rst",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "C22",
+          "pin": "1"
+        },
+        {
+          "refdes": "C42",
+          "pin": "1"
+        },
+        {
+          "refdes": "R3",
+          "pin": "1"
+        },
+        {
+          "refdes": "SW1",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "29",
+      "pinName": "PA8",
+      "net": "Net-(U3-Pad29)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "30",
+      "pinName": "PA9",
+      "net": "Net-(U3-Pad30)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "31",
+      "pinName": "PA10",
+      "net": "Net-(U3-Pad31)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "32",
+      "pinName": "PA11",
+      "net": "Net-(U3-Pad32)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "33",
+      "pinName": "PA12",
+      "net": "Net-(U3-Pad33)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "34",
+      "pinName": "PA13",
+      "net": "Net-(U3-Pad34)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "35",
+      "pinName": "VSS",
+      "net": "Net-(#PWR0101-Pad1)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "U3",
+          "pin": "8"
+        },
+        {
+          "refdes": "U3",
+          "pin": "47"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "36",
+      "pinName": "VDD",
+      "net": "Net-(U3-Pad1)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "U3",
+          "pin": "1"
+        },
+        {
+          "refdes": "U3",
+          "pin": "24"
+        },
+        {
+          "refdes": "U3",
+          "pin": "48"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "37",
+      "pinName": "PA14",
+      "net": "Net-(U3-Pad37)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "38",
+      "pinName": "PA15",
+      "net": "Net-(U3-Pad38)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "39",
+      "pinName": "PB3",
+      "net": "voltage_detect",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R16",
+          "pin": "1"
+        },
+        {
+          "refdes": "R17",
+          "pin": "2"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "40",
+      "pinName": "PB4",
+      "net": "ETH_INT",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "U6",
+          "pin": "40"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "41",
+      "pinName": "PB5",
+      "net": "Net-(U3-Pad41)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "42",
+      "pinName": "PB6",
+      "net": "Net-(U3-Pad42)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "43",
+      "pinName": "PB7",
+      "net": "Net-(U3-Pad43)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "44",
+      "pinName": "BOOT0",
+      "net": "Net-(U3-Pad44)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "45",
+      "pinName": "PB8",
+      "net": "Net-(R15-Pad2)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R15",
+          "pin": "2"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "46",
+      "pinName": "PB9",
+      "net": "Net-(U3-Pad46)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "47",
+      "pinName": "VSS",
+      "net": "Net-(#PWR0101-Pad1)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "U3",
+          "pin": "8"
+        },
+        {
+          "refdes": "U3",
+          "pin": "35"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U3",
+      "pinNumber": "48",
+      "pinName": "VDD",
+      "net": "Net-(U3-Pad1)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "U3",
+          "pin": "1"
+        },
+        {
+          "refdes": "U3",
+          "pin": "24"
+        },
+        {
+          "refdes": "U3",
+          "pin": "36"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    }
+  ],
+  "revStraps": [],
+  "busDevices": [
+    {
+      "bus": "spi",
+      "address": null,
+      "chipSelect": "CS",
+      "refdes": "U6",
+      "mpn": "W5500",
+      "description": "W5500",
+      "confidenceNotes": []
+    }
+  ],
+  "powerRails": [],
+  "connectors": [
+    {
+      "refdes": "J1",
+      "description": "AVR-ISP-6",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J1-Pad1)",
+          "signal": "MISO",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J1-Pad2)",
+          "signal": "VCC",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J1-Pad3)",
+          "signal": "SCK",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J1-Pad4)",
+          "signal": "MOSI",
+          "confidenceNotes": []
+        },
+        {
+          "number": "5",
+          "net": "Net-(J1-Pad5)",
+          "signal": "~{RST}",
+          "confidenceNotes": []
+        },
+        {
+          "number": "6",
+          "net": "Net-(J1-Pad6)",
+          "signal": "GND",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J2",
+      "description": "Conn_01x02_Male",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J2-Pad1)",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J2-Pad2)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J3",
+      "description": "Conn_01x04_Female",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J3-Pad1)",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J3-Pad2)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J3-Pad3)",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J3-Pad4)",
+          "signal": "Pin_4",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J4",
+      "description": "Conn_01x03_Male",
+      "pins": [
+        {
+          "number": "1",
+          "net": "ENDSTOP",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(#PWR0169-Pad1)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(#PWR0172-Pad1)",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J5",
+      "description": "Conn_01x03_Male",
+      "pins": [
+        {
+          "number": "1",
+          "net": "ESTOP",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J5-Pad2)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J5-Pad3)",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J6",
+      "description": "Conn_01x07_Female",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J6-Pad1)",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J6-Pad2)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J6-Pad3)",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J6-Pad4)",
+          "signal": "Pin_4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "5",
+          "net": "Net-(J6-Pad5)",
+          "signal": "Pin_5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "6",
+          "net": "Net-(J6-Pad6)",
+          "signal": "Pin_6",
+          "confidenceNotes": []
+        },
+        {
+          "number": "7",
+          "net": "Net-(J6-Pad7)",
+          "signal": "Pin_7",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J7",
+      "description": "Conn_01x07_Male",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J7-Pad1)",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J7-Pad2)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J7-Pad3)",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J7-Pad4)",
+          "signal": "Pin_4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "5",
+          "net": "Net-(J7-Pad5)",
+          "signal": "Pin_5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "6",
+          "net": "Net-(J7-Pad6)",
+          "signal": "Pin_6",
+          "confidenceNotes": []
+        },
+        {
+          "number": "7",
+          "net": "Net-(J7-Pad7)",
+          "signal": "Pin_7",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J8",
+      "description": "AVR-ISP-6",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J8-Pad1)",
+          "signal": "MISO",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J8-Pad2)",
+          "signal": "VCC",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J8-Pad3)",
+          "signal": "SCK",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J8-Pad4)",
+          "signal": "MOSI",
+          "confidenceNotes": []
+        },
+        {
+          "number": "5",
+          "net": "Net-(J8-Pad5)",
+          "signal": "~{RST}",
+          "confidenceNotes": []
+        },
+        {
+          "number": "6",
+          "net": "Net-(J8-Pad6)",
+          "signal": "GND",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J9",
+      "description": "Conn_01x04_Female",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J9-Pad1)",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J9-Pad2)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(U7-Pad1)",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J9-Pad4)",
+          "signal": "Pin_4",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J10",
+      "description": "HR911105A",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J10-Pad1)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J10-Pad2)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J10-Pad3)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J10-Pad4)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "5",
+          "net": "Net-(J10-Pad5)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "6",
+          "net": "Net-(J10-Pad6)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "8",
+          "net": "Net-(J10-Pad8)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "9",
+          "net": "Net-(J10-Pad9)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "10",
+          "net": "Net-(J10-Pad10)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "11",
+          "net": "Net-(J10-Pad11)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "12",
+          "net": "Net-(J10-Pad12)",
+          "signal": null,
+          "confidenceNotes": []
+        },
+        {
+          "number": "15",
+          "net": "Net-(J10-Pad15)",
+          "signal": "SHIELD",
+          "confidenceNotes": []
+        },
+        {
+          "number": "16",
+          "net": "Net-(J10-Pad15)",
+          "signal": "SHIELD",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J11",
+      "description": "USB_B_Micro",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J11-Pad1)",
+          "signal": "VBUS",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J11-Pad2)",
+          "signal": "D-",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J11-Pad3)",
+          "signal": "D+",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J11-Pad4)",
+          "signal": "ID",
+          "confidenceNotes": []
+        },
+        {
+          "number": "5",
+          "net": "Net-(J11-Pad5)",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "6",
+          "net": "Net-(J11-Pad6)",
+          "signal": "Shield",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP1",
+      "description": "3.3V",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(TP1-Pad1)",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP2",
+      "description": "GND",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(TP2-Pad1)",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP3",
+      "description": "RX",
+      "pins": [
+        {
+          "number": "1",
+          "net": "uC_RX",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP4",
+      "description": "TX",
+      "pins": [
+        {
+          "number": "1",
+          "net": "uC_TX",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP5",
+      "description": "BOOT_1",
+      "pins": [
+        {
+          "number": "1",
+          "net": "BOOT_1",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP6",
+      "description": "BOOT_0",
+      "pins": [
+        {
+          "number": "1",
+          "net": "BOOT_0",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    }
+  ],
+  "testPoints": [
+    {
+      "refdes": "TP1",
+      "net": "Net-(TP1-Pad1)",
+      "description": "3.3V",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP2",
+      "net": "Net-(TP2-Pad1)",
+      "description": "GND",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP3",
+      "net": "uC_RX",
+      "description": "RX",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP4",
+      "net": "uC_TX",
+      "description": "TX",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP5",
+      "net": "BOOT_1",
+      "description": "BOOT_1",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP6",
+      "net": "BOOT_0",
+      "description": "BOOT_0",
+      "confidenceNotes": []
+    }
+  ],
+  "confidenceNotes": []
+}

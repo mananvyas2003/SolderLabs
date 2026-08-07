@@ -1,0 +1,16 @@
+# * generated-by: @solderlab/bsc (kconfig)
+# * board: angloxx
+# * source-revision: 4c0d316fb844ea3e6e4d162ae49918d5c09a722f
+# * bsc-schema-version: 1.0
+# * source-sha256: b397345d20e75b44a42312df288ff2c696ac7c6b8e6ef211cbf34cada13d51fa
+# * DO NOT EDIT
+
+config SOLDERLAB_BOARD_ANGLOXX
+	bool "SolderLab board angloxx"
+	default y
+	help
+	  Auto-generated from Board Support Contract.
+
+config SOLDERLAB_BOARD_REV_NEWER
+	bool "Board revision newer"
+	default y

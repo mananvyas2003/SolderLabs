@@ -8,17 +8,11 @@ export default function LandingPage() {
     <div className="min-h-screen">
       <header className="flex items-center justify-between px-6 py-5 md:px-10">
         <span className="text-sm font-semibold tracking-[0.2em] text-[var(--accent)]">
-          FLUX
+          SOLDERLAB
         </span>
         <nav className="flex items-center gap-4 text-sm text-[var(--text-muted)]">
-          <Link href="/explore" className="hover:text-[var(--text)]">
-            Explore
-          </Link>
           <Link href="/docs" className="hover:text-[var(--text)]">
             Docs
-          </Link>
-          <Link href="/sso" className="hover:text-[var(--text)]">
-            SSO
           </Link>
           <Link
             href="/sign-in"
@@ -32,14 +26,14 @@ export default function LandingPage() {
       <main className="relative mx-auto grid min-h-[calc(100vh-80px)] max-w-6xl items-center gap-10 px-6 pb-16 pt-6 md:grid-cols-2 md:px-10">
         <div className="relative z-10 space-y-6">
           <p className="font-mono text-xs uppercase tracking-[0.25em] text-[var(--accent)]">
-            GitHub for Hardware
+            Collaboration for electronics teams
           </p>
           <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight md:text-5xl lg:text-6xl">
-            Flux
+            SolderLab
           </h1>
           <p className="max-w-md text-lg text-[var(--text-muted)]">
-            Version, review, and release electronics with AI that understands
-            your schematic — not just your filenames.
+            Version, review, and release boards — with evidence-linked review that
+            understands your schematic, not just your filenames.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
@@ -98,22 +92,7 @@ function BoardDiffVisual() {
           stroke="var(--accent)"
           strokeWidth="2"
         />
-        <circle cx="120" cy="80" r="5" fill="var(--accent-2)" />
-        <circle cx="210" cy="160" r="5" fill="var(--accent-2)" />
-        <rect
-          x="300"
-          y="145"
-          width="48"
-          height="30"
-          fill="none"
-          stroke="var(--accent)"
-          strokeWidth="1.5"
-        />
       </svg>
-      <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-        <span>Schematic overlay · r1 → r2</span>
-        <span className="text-[var(--accent)]">Live diff</span>
-      </div>
     </div>
   );
 }

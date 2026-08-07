@@ -1,0 +1,25 @@
+/*
+ * generated-by: @solderlab/bsc (zephyr)
+ * board: kicad-demo-vme-wren
+ * source-revision: d4248d8a874d3fa9a3a395b471588bd6ecef34e3
+ * bsc-schema-version: 1.0
+ * source-sha256: 285030d3ae0598e0d6ea5bbefdd5ddcef5b6c2749d6e58e309e3acb322883343
+ * DO NOT EDIT
+ */
+
+/* Board: kicad-demo-vme-wren — Zephyr overlay (stub pinctrl from BSC nets) */
+
+/ {
+	chosen {
+		/* No MCU detected in BSC */
+	};
+
+	solderlab_bsc_pins {
+		compatible = "solderlab,bsc-pins";
+		status = "okay";
+	};
+
+	pinctrl {
+		/* No named nets to map into pinctrl */
+	};
+};

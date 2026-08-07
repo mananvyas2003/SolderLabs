@@ -1,0 +1,1432 @@
+// * generated-by: @solderlab/bsc (json)
+// * board: angloxx
+// * source-revision: 4c0d316fb844ea3e6e4d162ae49918d5c09a722f
+// * bsc-schema-version: 1.0
+// * source-sha256: b397345d20e75b44a42312df288ff2c696ac7c6b8e6ef211cbf34cada13d51fa
+// * DO NOT EDIT
+{
+  "schemaVersion": "1.0",
+  "boardName": "angloxx",
+  "revision": "newer",
+  "generatedFrom": {
+    "revisionId": "4c0d316fb844ea3e6e4d162ae49918d5c09a722f",
+    "sha256": "b397345d20e75b44a42312df288ff2c696ac7c6b8e6ef211cbf34cada13d51fa"
+  },
+  "mcus": [
+    {
+      "refdes": "STM55001",
+      "mpn": "STM32F103C8Tx",
+      "package": "Package_QFP:LQFP-48_7x7mm_P0.5mm",
+      "confidenceNotes": [
+        {
+          "field": "mpn",
+          "reason": "Using Value field; dedicated MPN property absent"
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "1",
+      "pinName": "VBAT",
+      "net": "Net-(STM55001-Pad1)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "2",
+      "pinName": "PC13",
+      "net": "I2C2_SCL",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J60003",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "3",
+      "pinName": "PC14",
+      "net": "PB9",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "4",
+      "pinName": "PC15",
+      "net": "PB8",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "5",
+      "pinName": "PD0",
+      "net": "PB13",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "6",
+      "pinName": "PD1",
+      "net": "I2C2_SMBAI",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "7",
+      "pinName": "NRST",
+      "net": "Net-(STM55001-Pad7)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "8",
+      "pinName": "VSSA",
+      "net": "Net-(STM55001-Pad8)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "9",
+      "pinName": "VDDA",
+      "net": "Net-(STM55001-Pad9)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "10",
+      "pinName": "PA0",
+      "net": "Net-(STM55001-Pad10)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "11",
+      "pinName": "PA1",
+      "net": "Net-(STM55001-Pad11)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "12",
+      "pinName": "PA2",
+      "net": "Net-(STM55001-Pad12)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "13",
+      "pinName": "PA3",
+      "net": "Net-(STM55001-Pad13)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "14",
+      "pinName": "PA4",
+      "net": "Net-(STM55001-Pad14)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "15",
+      "pinName": "PA5",
+      "net": "Net-(STM55001-Pad15)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "16",
+      "pinName": "PA6",
+      "net": "Net-(STM55001-Pad16)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "17",
+      "pinName": "PA7",
+      "net": "Net-(STM55001-Pad17)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "18",
+      "pinName": "PB0",
+      "net": "I2C1_SCL",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "19",
+      "pinName": "PB1",
+      "net": "I2C1_SMBAI",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "20",
+      "pinName": "PB2",
+      "net": "PB4",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "21",
+      "pinName": "PB10",
+      "net": "Net-(STM55001-Pad21)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "22",
+      "pinName": "PB11",
+      "net": "Net-(STM55001-Pad22)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "23",
+      "pinName": "VSS",
+      "net": "Net-(STM55001-Pad23)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "STM55001",
+          "pin": "35"
+        },
+        {
+          "refdes": "STM55001",
+          "pin": "47"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "24",
+      "pinName": "VDD",
+      "net": "Net-(#PWR055011-Pad1)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "25",
+      "pinName": "PB12",
+      "net": "Net-(X55001-Pad3)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "C55002",
+          "pin": "2"
+        },
+        {
+          "refdes": "X55001",
+          "pin": "3"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "26",
+      "pinName": "PB13",
+      "net": "Net-(X55001-Pad1)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "C55001",
+          "pin": "2"
+        },
+        {
+          "refdes": "X55001",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "27",
+      "pinName": "PB14",
+      "net": "Net-(STM55001-Pad27)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "28",
+      "pinName": "PB15",
+      "net": "BOOT0",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R55003",
+          "pin": "2"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "29",
+      "pinName": "PA8",
+      "net": "Net-(STM55001-Pad29)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "30",
+      "pinName": "PA9",
+      "net": "Net-(STM55001-Pad30)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "31",
+      "pinName": "PA10",
+      "net": "Net-(STM55001-Pad31)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "32",
+      "pinName": "PA11",
+      "net": "Net-(STM55001-Pad32)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "33",
+      "pinName": "PA12",
+      "net": "Net-(STM55001-Pad33)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "34",
+      "pinName": "PA13",
+      "net": "PA15",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "35",
+      "pinName": "VSS",
+      "net": "Net-(STM55001-Pad23)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "STM55001",
+          "pin": "23"
+        },
+        {
+          "refdes": "STM55001",
+          "pin": "47"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "36",
+      "pinName": "VDD",
+      "net": "Net-(STM55001-Pad36)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "37",
+      "pinName": "PA14",
+      "net": "Net-(STM55001-Pad37)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J55001",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "38",
+      "pinName": "PA15",
+      "net": "Net-(STM55001-Pad38)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J55001",
+          "pin": "2"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "39",
+      "pinName": "PB3",
+      "net": "PB3",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "40",
+      "pinName": "PB4",
+      "net": "BOOT1",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R55001",
+          "pin": "2"
+        },
+        {
+          "refdes": "R55002",
+          "pin": "2"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "41",
+      "pinName": "PB5",
+      "net": "Net-(STM55001-Pad41)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "42",
+      "pinName": "PB6",
+      "net": "Net-(STM55001-Pad42)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "43",
+      "pinName": "PB7",
+      "net": "Net-(STM55001-Pad43)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "44",
+      "pinName": "BOOT0",
+      "net": "PB15",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "45",
+      "pinName": "PB8",
+      "net": "Net-(STM55001-Pad45)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "46",
+      "pinName": "PB9",
+      "net": "Net-(STM55001-Pad46)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "47",
+      "pinName": "VSS",
+      "net": "Net-(STM55001-Pad23)",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "STM55001",
+          "pin": "23"
+        },
+        {
+          "refdes": "STM55001",
+          "pin": "35"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "STM55001",
+      "pinNumber": "48",
+      "pinName": "VDD",
+      "net": "Net-(STM55001-Pad48)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    }
+  ],
+  "revStraps": [],
+  "busDevices": [
+    {
+      "bus": "i2c",
+      "address": null,
+      "chipSelect": null,
+      "refdes": "J60003",
+      "mpn": "I2C",
+      "description": "I2C",
+      "confidenceNotes": [
+        {
+          "field": "address",
+          "reason": "I2C address is not encoded in the schematic snapshot; refuse to guess"
+        }
+      ]
+    }
+  ],
+  "powerRails": [
+    {
+      "name": "VBUS",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"VBUS\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    }
+  ],
+  "connectors": [
+    {
+      "refdes": "J55001",
+      "description": "Debug",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(STM55001-Pad37)",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(STM55001-Pad38)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J55001-Pad3)",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J55001-Pad4)",
+          "signal": "Pin_4",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J60001",
+      "description": "ALS",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(#PWR060001-Pad1)",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "ADC12_IN4",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J60001-Pad3)",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J60003",
+      "description": "I2C",
+      "pins": [
+        {
+          "number": "1",
+          "net": "I2C2_SCL",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "I2C2_SDA",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "VBUS",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J60003-Pad4)",
+          "signal": "Pin_4",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "X55001",
+      "description": "Crystal",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(X55001-Pad1)",
+          "signal": "1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(X55001-Pad2)",
+          "signal": "2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(X55001-Pad3)",
+          "signal": "3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(X55001-Pad4)",
+          "signal": "4",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    }
+  ],
+  "testPoints": [],
+  "confidenceNotes": []
+}

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { getDb, persist, nowIso } from "@flux/db";
+import { getDb, persist, nowIso } from "@solderlab/db";
+import { track } from "@solderlab/analytics";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
@@ -68,6 +69,32 @@ export async function POST(
     if (!body.body) {
       return NextResponse.json({ error: "body required" }, { status: 400 });
     }
+    // Prefer KiCad UUID so comments survive refdes renumbers
+    let anchorUuid: string | null = null;
+    let anchorRef = body.anchorRef ?? null;
+    if (body.anchorKind === "component" && body.anchorRef) {
+      const headSnap = db.designSnapshots.find(
+        (s) => s.revisionId === review.headRevisionId,
+      );
+      if (headSnap) {
+        try {
+          const snap = JSON.parse(headSnap.dataJson) as {
+            components: Array<{ refdes: string; uuid?: string }>;
+          };
+          const hit = snap.components.find(
+            (c) =>
+              c.refdes === body.anchorRef ||
+              c.uuid === body.anchorRef,
+          );
+          if (hit) {
+            anchorUuid = hit.uuid ?? null;
+            anchorRef = hit.refdes;
+          }
+        } catch {
+          /* ignore */
+        }
+      }
+    }
     const id = nanoid();
     db.comments.push({
       id,
@@ -76,7 +103,8 @@ export async function POST(
       body: body.body,
       parentId: null,
       anchorKind: body.anchorKind ?? null,
-      anchorRef: body.anchorRef ?? null,
+      anchorRef,
+      anchorUuid,
       anchorMetaJson: body.anchorMeta ? JSON.stringify(body.anchorMeta) : null,
       createdAt: nowIso(),
     });
@@ -87,9 +115,9 @@ export async function POST(
       actorId: user.id,
       action: "review.commented",
       summary: `Comment on DR #${review.number}`,
-      meta: { reviewId, anchorRef: body.anchorRef },
+      meta: { reviewId, anchorRef, anchorUuid },
     });
-    return NextResponse.json({ id });
+    return NextResponse.json({ id, anchorUuid });
   }
 
   if (body.action === "approve") {
@@ -147,6 +175,19 @@ export async function POST(
       b.headRevisionId = review.headRevisionId;
     }
     persist();
+    const opened = new Date(review.createdAt).getTime();
+    const merged = new Date(review.mergedAt).getTime();
+    const commentCount = db.comments.filter((c) => c.reviewId === reviewId)
+      .length;
+    track(
+      "review_merged",
+      {
+        reviewId,
+        timeOpenToMergeMs: Math.max(0, merged - opened),
+        commentCount,
+      },
+      { orgId: org.id },
+    );
     logActivity({
       orgId: org.id,
       projectId: project.id,

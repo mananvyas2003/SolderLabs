@@ -1,12 +1,24 @@
 {
-  "name": "@flux/cli",
+  "name": "@solderlab/cli",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "bin": {
-    "flux": "./bin/flux.mjs"
+    "solderlab": "./bin/solderlab.mjs"
   },
   "scripts": {
-    "build": "node -e \"process.exit(0)\""
+    "build": "node -e \"process.exit(0)\"",
+    "test": "node --import tsx --test src/__tests__/bsc-cli.e2e.test.ts src/__tests__/diff-cli.e2e.test.ts"
+  },
+  "dependencies": {
+    "@solderlab/bsc": "*",
+    "@solderlab/analytics": "*",
+    "@solderlab/design-core": "*",
+    "@solderlab/parser": "*",
+    "tsx": "^4.19.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "typescript": "^5.8.2"
   }
 }

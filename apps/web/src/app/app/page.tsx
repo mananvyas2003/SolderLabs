@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { getDb } from "@flux/db";
+import { getDb } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
 import { ensureDb } from "@/lib/ensure-db";
-import { EmptyState } from "@flux/ui";
+import { EmptyState } from "@solderlab/ui";
 import { CreateOrgForm } from "@/components/create-org-form";
 
 export default async function AppHome() {

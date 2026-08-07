@@ -1,5 +1,5 @@
 {
-  "name": "@flux/parser",
+  "name": "@solderlab/parser",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,10 +10,10 @@
   },
   "scripts": {
     "build": "tsc --noEmit",
-    "test": "node --import tsx --test src/connectivity.test.ts"
+    "test": "node --import tsx --test src/connectivity.test.ts src/__tests__/corpus.test.ts"
   },
   "dependencies": {
-    "@flux/design-core": "*"
+    "@solderlab/design-core": "*"
   },
   "devDependencies": {
     "@types/node": "^22.13.9",

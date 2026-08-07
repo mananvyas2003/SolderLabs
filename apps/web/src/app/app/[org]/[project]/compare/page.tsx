@@ -52,6 +52,7 @@ export default async function ComparePage({
         projectSlug={projectSlug}
         base={base}
         head={head}
+        orgId={org.id}
       />
     </div>
   );

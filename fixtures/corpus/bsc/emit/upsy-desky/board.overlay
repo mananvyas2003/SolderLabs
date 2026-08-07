@@ -1,0 +1,92 @@
+/*
+ * generated-by: @solderlab/bsc (zephyr)
+ * board: upsy-desky
+ * source-revision: 3fe1e14ff6250c9321da221a03aa932919f4842d
+ * bsc-schema-version: 1.0
+ * source-sha256: a6be1fa23a4f1b504e3d526249a8c9e84e06842851dbb829d3a0b05bd76de452
+ * DO NOT EDIT
+ */
+
+/* Board: upsy-desky — Zephyr overlay (stub pinctrl from BSC nets) */
+
+/ {
+	chosen {
+		/* Primary MCU from BSC: U3 (ESP32-WROOM-32) */
+	};
+
+	solderlab_bsc_pins {
+		compatible = "solderlab,bsc-pins";
+		status = "okay";
+		esp_tx {
+			mcu = "U3";
+			pad = <7>;
+			net = "ESP_TX";
+			pin-name = "IO35";
+		};
+		esp_rx {
+			mcu = "U3";
+			pad = <9>;
+			net = "ESP_RX";
+			pin-name = "IO33";
+		};
+		gpio23 {
+			mcu = "U3";
+			pad = <13>;
+			net = "GPIO23";
+			pin-name = "IO14";
+		};
+		gpio22 {
+			mcu = "U3";
+			pad = <23>;
+			net = "GPIO22";
+			pin-name = "IO15";
+		};
+		gpio21 {
+			mcu = "U3";
+			pad = <27>;
+			net = "GPIO21";
+			pin-name = "IO16";
+		};
+		gpio19 {
+			mcu = "U3";
+			pad = <28>;
+			net = "GPIO19";
+			pin-name = "IO17";
+		};
+		gpio18 {
+			mcu = "U3";
+			pad = <30>;
+			net = "GPIO18";
+			pin-name = "IO18";
+		};
+		gpio17 {
+			mcu = "U3";
+			pad = <31>;
+			net = "GPIO17";
+			pin-name = "IO19";
+		};
+		gpio16 {
+			mcu = "U3";
+			pad = <33>;
+			net = "GPIO16";
+			pin-name = "IO21";
+		};
+	};
+
+	pinctrl {
+		solderlab_default: solderlab_default {
+			group1 {
+				/* Pads with named nets — assign SoC pins in board DTS */
+				/* U3.7 <-> ESP_TX */
+				/* U3.9 <-> ESP_RX */
+				/* U3.13 <-> GPIO23 */
+				/* U3.23 <-> GPIO22 */
+				/* U3.27 <-> GPIO21 */
+				/* U3.28 <-> GPIO19 */
+				/* U3.30 <-> GPIO18 */
+				/* U3.31 <-> GPIO17 */
+				/* U3.33 <-> GPIO16 */
+			};
+		};
+	};
+};

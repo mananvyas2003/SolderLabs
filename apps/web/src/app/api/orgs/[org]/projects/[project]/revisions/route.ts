@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@flux/db";
+import { getDb } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject, getMainBranch } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";

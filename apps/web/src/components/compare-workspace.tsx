@@ -1,11 +1,29 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import type { DiffBundleData, CopilotFinding } from "@flux/design-core";
-import { Badge, Button, Input } from "@flux/ui";
+import type { DiffBundleData, CopilotFinding, ImpactReport } from "@solderlab/design-core";
+import { Badge, Button, Input } from "@solderlab/ui";
 import Link from "next/link";
 import { PcbDiffViewer } from "@/components/pcb-diff-viewer";
+import { ImpactPanel } from "@/components/impact-panel";
+
+async function trackClient(
+  name: "diff_viewed" | "ai_finding_action",
+  props: Record<string, unknown>,
+  orgId?: string,
+) {
+  try {
+    await fetch("/api/analytics/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, orgId: orgId ?? null, props }),
+      keepalive: true,
+    });
+  } catch {
+    /* ignore */
+  }
+}
 
 export function CompareWorkspace({
   orgSlug,
@@ -13,16 +31,18 @@ export function CompareWorkspace({
   base,
   head,
   reviewId,
+  orgId,
 }: {
   orgSlug: string;
   projectSlug: string;
   base: string;
   head: string;
   reviewId?: string;
+  orgId?: string;
 }) {
   const [diff, setDiff] = useState<DiffBundleData | null>(null);
   const [tab, setTab] = useState<
-    "schematic" | "electrical" | "pcb" | "bom" | "copilot"
+    "schematic" | "electrical" | "pcb" | "bom" | "impact" | "review"
   >("schematic");
   const [overlay, setOverlay] = useState(0.55);
   const [markdown, setMarkdown] = useState("");
@@ -30,21 +50,71 @@ export function CompareWorkspace({
   const [command, setCommand] = useState("/summarize");
   const [highlight, setHighlight] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
+  const [impact, setImpact] = useState<ImpactReport | null>(null);
+  const [impactLoading, setImpactLoading] = useState(false);
+  const viewedAt = useRef(Date.now());
+  const diffRef = useRef<DiffBundleData | null>(null);
 
   useEffect(() => {
     fetch(
       `/api/orgs/${orgSlug}/projects/${projectSlug}/compare?base=${base}&head=${head}`,
     )
       .then((r) => r.json())
-      .then((j) => setDiff(j.data as DiffBundleData));
+      .then((j) => {
+        const data = j.data as DiffBundleData;
+        setDiff(data);
+        diffRef.current = data;
+      });
   }, [orgSlug, projectSlug, base, head]);
+
+  useEffect(() => {
+    viewedAt.current = Date.now();
+    return () => {
+      const d = diffRef.current;
+      if (!d) return;
+      const changeCount =
+        (d.components?.length ?? 0) +
+        (d.nets?.length ?? 0) +
+        (d.bom?.length ?? 0) +
+        (d.electrical?.changes?.length ?? 0);
+      void trackClient(
+        "diff_viewed",
+        {
+          reviewId: reviewId ?? `${base}..${head}`,
+          changeCount,
+          timeOnViewMs: Math.max(0, Date.now() - viewedAt.current),
+        },
+        orgId,
+      );
+    };
+  }, [base, head, reviewId, orgId]);
+
+  useEffect(() => {
+    if (tab !== "impact" || impact || impactLoading) return;
+    setImpactLoading(true);
+    fetch(`/api/orgs/${orgSlug}/projects/${projectSlug}/impact`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        baseRevisionId: base,
+        headRevisionId: head,
+      }),
+    })
+      .then(async (r) => {
+        if (!r.ok) throw new Error(await r.text());
+        return r.json();
+      })
+      .then((j) => setImpact(j.data as ImpactReport))
+      .catch(() => setImpact(null))
+      .finally(() => setImpactLoading(false));
+  }, [tab, impact, impactLoading, orgSlug, projectSlug, base, head]);
 
   const components = useMemo(() => diff?.components ?? [], [diff]);
 
   async function runCopilot(cmd: string) {
     setMarkdown("");
     setFindings([]);
-    setTab("copilot");
+    setTab("review");
     const res = await fetch(
       `/api/orgs/${orgSlug}/projects/${projectSlug}/copilot`,
       {
@@ -74,6 +144,27 @@ export function CompareWorkspace({
         } catch {
           /* wait */
         }
+      }
+    }
+  }
+
+  function findingAction(
+    finding: CopilotFinding,
+    action: "dismissed" | "converted" | "ignored",
+  ) {
+    void trackClient(
+      "ai_finding_action",
+      { findingId: finding.id, action },
+      orgId,
+    );
+    if (action === "dismissed" || action === "ignored") {
+      setFindings((prev) => prev.filter((f) => f.id !== finding.id));
+    }
+    if (action === "converted") {
+      const ref = finding.evidence[0]?.ref;
+      if (ref) {
+        setHighlight(ref);
+        setTab("schematic");
       }
     }
   }
@@ -161,7 +252,7 @@ export function CompareWorkspace({
 
       <div className="flex gap-2 border-b border-[var(--border)] pb-2 text-sm">
         {(
-          ["schematic", "electrical", "pcb", "bom", "copilot"] as const
+          ["schematic", "electrical", "pcb", "bom", "impact", "review"] as const
         ).map((t) => (
           <button
             key={t}
@@ -328,7 +419,23 @@ export function CompareWorkspace({
         </div>
       )}
 
-      {tab === "copilot" && (
+      {tab === "impact" && (
+        <div>
+          {impactLoading ? (
+            <p className="text-sm text-[var(--text-muted)]">
+              Analyzing impact…
+            </p>
+          ) : impact ? (
+            <ImpactPanel report={impact} />
+          ) : (
+            <p className="text-sm text-[var(--text-muted)]">
+              Impact analysis unavailable for this pair.
+            </p>
+          )}
+        </div>
+      )}
+
+      {tab === "review" && (
         <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
           <div className="space-y-3 border border-[var(--border)] p-4">
             <form
@@ -347,7 +454,7 @@ export function CompareWorkspace({
               <Button type="submit">Run</Button>
             </form>
             <pre className="whitespace-pre-wrap font-sans text-sm leading-relaxed text-[var(--text)]">
-              {markdown || "Ask Flux Copilot about this diff."}
+              {markdown || "Ask SolderLab Review about this diff."}
             </pre>
           </div>
           <div className="space-y-2">
@@ -355,36 +462,50 @@ export function CompareWorkspace({
               Findings
             </p>
             {findings.map((f) => (
-              <motion.button
+              <div
                 key={f.id}
-                type="button"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                onClick={() => {
-                  const ref = f.evidence[0]?.ref;
-                  if (ref) {
-                    setHighlight(ref);
-                    setTab("schematic");
-                  }
-                }}
-                className="w-full border border-[var(--border)] p-3 text-left hover:border-[var(--accent)]"
+                className="border border-[var(--border)] p-3"
               >
-                <div className="mb-1 flex items-center gap-2">
-                  <Badge
-                    tone={
-                      f.severity === "critical" || f.severity === "high"
-                        ? "danger"
-                        : f.severity === "medium"
-                          ? "warn"
-                          : "info"
-                    }
+                <motion.button
+                  type="button"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onClick={() => findingAction(f, "converted")}
+                  className="w-full text-left hover:border-[var(--accent)]"
+                >
+                  <div className="mb-1 flex items-center gap-2">
+                    <Badge
+                      tone={
+                        f.severity === "critical" || f.severity === "high"
+                          ? "danger"
+                          : f.severity === "medium"
+                            ? "warn"
+                            : "info"
+                      }
+                    >
+                      {f.severity}
+                    </Badge>
+                    <span className="text-sm font-medium">{f.title}</span>
+                  </div>
+                  <p className="text-xs text-[var(--text-muted)]">{f.body}</p>
+                </motion.button>
+                <div className="mt-2 flex gap-2">
+                  <button
+                    type="button"
+                    className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]"
+                    onClick={() => findingAction(f, "dismissed")}
                   >
-                    {f.severity}
-                  </Badge>
-                  <span className="text-sm font-medium">{f.title}</span>
+                    Dismiss
+                  </button>
+                  <button
+                    type="button"
+                    className="text-xs text-[var(--text-muted)] hover:text-[var(--text)]"
+                    onClick={() => findingAction(f, "ignored")}
+                  >
+                    Ignore
+                  </button>
                 </div>
-                <p className="text-xs text-[var(--text-muted)]">{f.body}</p>
-              </motion.button>
+              </div>
             ))}
           </div>
         </div>

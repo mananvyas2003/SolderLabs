@@ -1,0 +1,26 @@
+{
+  "name": "@solderlab/bsc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema.json": "./schema/board-support-contract.schema.json"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "test": "node --import tsx --test src/__tests__/rules.test.ts src/__tests__/generate.test.ts src/__tests__/emit-diff.test.ts src/__tests__/emit-goldens.test.ts src/__tests__/symbols.test.ts",
+    "golden": "node --import tsx scripts/generate-corpus-goldens.mjs",
+    "golden:emit": "node --import tsx scripts/generate-emit-goldens.mjs"
+  },
+  "dependencies": {
+    "@solderlab/design-core": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}

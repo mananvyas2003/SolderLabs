@@ -1,16 +1,12 @@
-export type Role =
+export type Role = "admin" | "contributor" | "viewer";
+
+/** Legacy roles still accepted on read and normalized in migrate(). */
+export type LegacyRole =
   | "owner"
-  | "admin"
   | "engineer"
   | "reviewer"
-  | "viewer"
-  | "procurement";
-
-export type DataRegion =
-  | "us-east"
-  | "eu-west"
-  | "ap-south"
-  | "local";
+  | "procurement"
+  | Role;
 
 export interface User {
   id: string;
@@ -18,7 +14,6 @@ export interface User {
   name: string;
   passwordHash: string | null;
   avatarUrl: string | null;
-  ssoProvider: string | null;
   createdAt: string;
 }
 
@@ -26,13 +21,6 @@ export interface Organization {
   id: string;
   name: string;
   slug: string;
-  /** Data residency region for storage prefixing */
-  dataRegion: DataRegion | string;
-  ssoEnabled: boolean;
-  ssoEntityId: string | null;
-  ssoEntryUrl: string | null;
-  ssoCertificate: string | null;
-  ssoDomain: string | null;
   createdAt: string;
 }
 
@@ -49,11 +37,10 @@ export interface Project {
   name: string;
   slug: string;
   description: string | null;
-  visibility: string; // private | internal | public
+  visibility: string; // private | internal
   defaultBranch: string;
   requireGreenChecks: boolean;
   requireApproval: boolean;
-  starCount: number;
   createdAt: string;
 }
 
@@ -111,6 +98,23 @@ export interface BomLineRow {
   attrsJson: string | null;
 }
 
+/** Platform-owned BOM metadata — never written back to CAD. */
+export interface BomPlatformLine {
+  id: string;
+  projectId: string;
+  uuid: string | null;
+  refdes: string;
+  mpn: string | null;
+  manufacturer: string | null;
+  alternateMpnsJson: string | null;
+  dnp: boolean;
+  notes: string | null;
+  lockedValue: string | null;
+  lockedFootprint: string | null;
+  updatedAt: string;
+  updatedBy: string | null;
+}
+
 export interface DiffBundleRow {
   id: string;
   projectId: string;
@@ -142,6 +146,8 @@ export interface Comment {
   parentId: string | null;
   anchorKind: string | null;
   anchorRef: string | null;
+  /** KiCad UUID — survives refdes renumbers across revisions */
+  anchorUuid: string | null;
   anchorMetaJson: string | null;
   createdAt: string;
 }
@@ -198,6 +204,43 @@ export interface DownloadAudit {
   createdAt: string;
 }
 
+/**
+ * Scoped, expiring share for CM / fab / supplier —
+ * Gerbers + BOM only, never CAD source by default.
+ */
+export interface ReleaseShare {
+  id: string;
+  releaseId: string;
+  token: string;
+  label: string;
+  allowGerbers: boolean;
+  allowBom: boolean;
+  allowCad: boolean;
+  watermark: string | null;
+  expiresAt: string;
+  createdBy: string;
+  createdAt: string;
+  revokedAt: string | null;
+}
+
+export interface ReleaseShareAudit {
+  id: string;
+  shareId: string;
+  action: string;
+  metaJson: string | null;
+  createdAt: string;
+}
+
+/** Physical board unit for QR → digital twin. */
+export interface BoardUnit {
+  id: string;
+  projectId: string;
+  serial: string;
+  revisionId: string;
+  notes: string | null;
+  createdAt: string;
+}
+
 export interface ActivityEvent {
   id: string;
   orgId: string;
@@ -242,39 +285,7 @@ export interface FirmwarePinout {
   updatedAt: string;
 }
 
-export interface DfmPartner {
-  id: string;
-  key: string;
-  name: string;
-  description: string;
-  endpoint: string | null;
-  capabilities: string[];
-  active: boolean;
-}
-
-export interface DfmJob {
-  id: string;
-  orgId: string;
-  projectId: string;
-  releaseId: string;
-  partnerKey: string;
-  status: "queued" | "submitted" | "passed" | "failed" | "cancelled" | string;
-  summary: string | null;
-  detailsJson: string | null;
-  externalId: string | null;
-  createdBy: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ProjectStar {
-  id: string;
-  projectId: string;
-  userId: string;
-  createdAt: string;
-}
-
-export interface FluxDb {
+export interface SolderLabDb {
   users: User[];
   organizations: Organization[];
   memberships: Membership[];
@@ -285,6 +296,7 @@ export interface FluxDb {
   designSnapshots: DesignSnapshotRow[];
   pcbSnapshots: PcbSnapshotRow[];
   bomLines: BomLineRow[];
+  bomPlatformLines: BomPlatformLine[];
   diffBundles: DiffBundleRow[];
   designReviews: DesignReview[];
   comments: Comment[];
@@ -293,48 +305,19 @@ export interface FluxDb {
   releases: Release[];
   releaseArtifacts: ReleaseArtifact[];
   downloadAudits: DownloadAudit[];
+  releaseShares: ReleaseShare[];
+  releaseShareAudits: ReleaseShareAudit[];
+  boardUnits: BoardUnit[];
   activityEvents: ActivityEvent[];
   webhooks: Webhook[];
   auditEvents: AuditEvent[];
   firmwarePinouts: FirmwarePinout[];
-  dfmPartners: DfmPartner[];
-  dfmJobs: DfmJob[];
-  projectStars: ProjectStar[];
 }
 
-export function defaultDfmPartners(): DfmPartner[] {
-  return [
-    {
-      id: "dfm-jlc",
-      key: "jlcpcb",
-      name: "JLCPCB DFM",
-      description: "Fabrication DFM: min trace/space, drill, annular ring heuristics",
-      endpoint: null,
-      capabilities: ["pcb-dfm", "assembly-bom"],
-      active: true,
-    },
-    {
-      id: "dfm-pcbway",
-      key: "pcbway",
-      name: "PCBWay DFM",
-      description: "Board outline, copper-to-edge, silkscreen clearance checks",
-      endpoint: null,
-      capabilities: ["pcb-dfm"],
-      active: true,
-    },
-    {
-      id: "dfm-euro",
-      key: "eurocircuits",
-      name: "Eurocircuits DRC",
-      description: "EU-hosted DFM partner profile (residency-aware routing)",
-      endpoint: null,
-      capabilities: ["pcb-dfm", "impedance-notes"],
-      active: true,
-    },
-  ];
-}
+/** @deprecated Use SolderLabDb */
+export type FluxDb = SolderLabDb;
 
-export function emptyDb(): FluxDb {
+export function emptyDb(): SolderLabDb {
   return {
     users: [],
     organizations: [],
@@ -346,6 +329,7 @@ export function emptyDb(): FluxDb {
     designSnapshots: [],
     pcbSnapshots: [],
     bomLines: [],
+    bomPlatformLines: [],
     diffBundles: [],
     designReviews: [],
     comments: [],
@@ -354,12 +338,19 @@ export function emptyDb(): FluxDb {
     releases: [],
     releaseArtifacts: [],
     downloadAudits: [],
+    releaseShares: [],
+    releaseShareAudits: [],
+    boardUnits: [],
     activityEvents: [],
     webhooks: [],
     auditEvents: [],
     firmwarePinouts: [],
-    dfmPartners: defaultDfmPartners(),
-    dfmJobs: [],
-    projectStars: [],
   };
+}
+
+export function normalizeRole(role: string): Role {
+  if (role === "admin" || role === "owner") return "admin";
+  if (role === "viewer") return "viewer";
+  // engineer | reviewer | procurement | contributor → contributor
+  return "contributor";
 }

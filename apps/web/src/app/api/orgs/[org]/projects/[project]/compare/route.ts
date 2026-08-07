@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { getDb, persist, nowIso } from "@flux/db";
+import { getDb, persist, nowIso } from "@solderlab/db";
 import {
   attachPcbToDiff,
   diffSnapshots,
   type DesignSnapshot,
   type PcbSnapshot,
-} from "@flux/design-core";
+} from "@solderlab/design-core";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";

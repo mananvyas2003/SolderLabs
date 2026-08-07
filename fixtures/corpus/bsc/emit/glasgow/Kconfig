@@ -1,0 +1,16 @@
+# * generated-by: @solderlab/bsc (kconfig)
+# * board: glasgow
+# * source-revision: 06201dd31888e1af3ebefaaf6dc8b1d2babbbca9
+# * bsc-schema-version: 1.0
+# * source-sha256: e582ed0cc7eb0f6e7795cb5c9253ce748d7d47a8b56267382507108323697b5b
+# * DO NOT EDIT
+
+config SOLDERLAB_BOARD_GLASGOW
+	bool "SolderLab board glasgow"
+	default y
+	help
+	  Auto-generated from Board Support Contract.
+
+config SOLDERLAB_BOARD_REV_NEWER
+	bool "Board revision newer"
+	default y

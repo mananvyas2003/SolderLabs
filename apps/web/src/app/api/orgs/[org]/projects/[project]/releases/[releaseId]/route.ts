@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { getDb, persist, nowIso } from "@flux/db";
+import { getDb, persist, nowIso } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
@@ -90,7 +90,7 @@ export async function POST(
     headers: {
       "Content-Type": "application/zip",
       "Content-Disposition": `attachment; filename="${release.tag}-manufacturing.zip"`,
-      "X-Flux-SHA256": pkg.sha256,
+      "X-SolderLab-SHA256": pkg.sha256,
     },
   });
 }

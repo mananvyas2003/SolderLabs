@@ -14,6 +14,19 @@ export interface SnapshotComponent {
   manufacturer?: string;
   libId?: string;
   sheetId: string;
+  /**
+   * Hierarchical sheet path using KiCad sheet-instance UUIDs,
+   * e.g. `/rootUuid/childSheetUuid`. Used to disambiguate multi-instance
+   * subsheets that share a symbol UUID in the child file.
+   */
+  sheetPath?: string;
+  /**
+   * KiCad symbol instance UUID from the s-expression `(uuid …)`.
+   * Must be sourced from CAD — never minted by the parser.
+   */
+  uuid?: string;
+  /** Set when lib_id could not be resolved via sym-lib-table / embedded libs. */
+  libraryStatus?: "ok" | "unresolved";
   pins?: SnapshotPin[];
   /** Optional schematic symbol position for visual diff (mm or schematic units) */
   x?: number;
@@ -45,6 +58,10 @@ export interface DesignSnapshot {
     sheetCount: number;
     componentCount: number;
     netCount?: number;
+    /** lib_id nicknames that were not resolvable on disk */
+    unresolvedLibs?: string[];
+    /** Primary .kicad_pro used when multiple projects exist in the tree */
+    projectRoot?: string;
   };
 }
 
@@ -57,14 +74,26 @@ export interface BomLineLike {
   qty?: number;
 }
 
-export type DiffChangeKind = "added" | "removed" | "changed" | "unchanged";
+export type DiffChangeKind =
+  | "added"
+  | "removed"
+  | "changed"
+  | "unchanged"
+  | "refdes_renamed"
+  | "sheet_moved"
+  | "net_renamed";
+
+export type IdentityMatchTier = "uuid" | "sheet_refdes" | "refdes";
 
 export interface ComponentDiff {
+  /** Canonical (usually head) reference designator for display. */
   refdes: string;
   kind: DiffChangeKind;
   before?: SnapshotComponent;
   after?: SnapshotComponent;
   fields?: string[];
+  /** Which identity tier resolved this pair (matched comps only). */
+  matchTier?: IdentityMatchTier;
 }
 
 export interface BomDiffRow {
@@ -76,10 +105,13 @@ export interface BomDiffRow {
 }
 
 export interface NetDiff {
+  /** After rename: the new name; otherwise the net name. */
   name: string;
   kind: DiffChangeKind;
   beforeNodes?: string[];
   afterNodes?: string[];
+  beforeName?: string;
+  afterName?: string;
 }
 
 export interface PcbFootprint {

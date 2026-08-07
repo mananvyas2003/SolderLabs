@@ -1,0 +1,956 @@
+// * generated-by: @solderlab/bsc (json)
+// * board: kintex-pcie
+// * source-revision: 056792c009a8920d4ef11e76ba3284ee58376078
+// * bsc-schema-version: 1.0
+// * source-sha256: 7163b90302e2264fd0d17a43ec9ff7640c42c0b8fcd355b6678c22a646050323
+// * DO NOT EDIT
+{
+  "schemaVersion": "1.0",
+  "boardName": "kintex-pcie",
+  "revision": "newer",
+  "generatedFrom": {
+    "revisionId": "056792c009a8920d4ef11e76ba3284ee58376078",
+    "sha256": "7163b90302e2264fd0d17a43ec9ff7640c42c0b8fcd355b6678c22a646050323"
+  },
+  "mcus": [],
+  "pins": [],
+  "revStraps": [],
+  "busDevices": [
+    {
+      "bus": "spi",
+      "address": null,
+      "chipSelect": "SPI_CS",
+      "refdes": "U1",
+      "mpn": "XC7K160T-FFG676",
+      "description": "XC7K160T-FFG676",
+      "confidenceNotes": []
+    },
+    {
+      "bus": "spi",
+      "address": null,
+      "chipSelect": "SPI_CS",
+      "refdes": "U3",
+      "mpn": "W25Q128JVS",
+      "description": "W25Q128JVS",
+      "confidenceNotes": []
+    }
+  ],
+  "powerRails": [
+    {
+      "name": "1V_EN",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"1V_EN\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "1V_PG",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"1V_PG\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "3V3 AUX",
+      "nominalVolts": 3.3,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "3V3 PCIE",
+      "nominalVolts": 3.3,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    }
+  ],
+  "connectors": [
+    {
+      "refdes": "J1",
+      "description": "Bus_PCI_Express_x8",
+      "pins": [
+        {
+          "number": "A1",
+          "net": "SPI_CLK",
+          "signal": "~{PRSNT1}",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A2",
+          "net": "Net-(J1-PadA2)",
+          "signal": "+12V",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A3",
+          "net": "Net-(J1-PadA2)",
+          "signal": "+12V",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A4",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A5",
+          "net": "Net-(J1-PadA5)",
+          "signal": "JTAG2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A6",
+          "net": "Net-(C104-Pad1)",
+          "signal": "JTAG3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A7",
+          "net": "Net-(C103-Pad1)",
+          "signal": "JTAG4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A8",
+          "net": "Net-(C102-Pad1)",
+          "signal": "JTAG5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A9",
+          "net": "Net-(J1-PadA10)",
+          "signal": "+3.3V",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A10",
+          "net": "Net-(J1-PadA10)",
+          "signal": "+3.3V",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A11",
+          "net": "Net-(C108-Pad1)",
+          "signal": "~{PERST}",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A12",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A13",
+          "net": "PCIE_RX4_N",
+          "signal": "REFCLK+",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A14",
+          "net": "PCIE_RX4_P",
+          "signal": "REFCLK-",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A15",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A16",
+          "net": "Net-(C100-Pad1)",
+          "signal": "PERp0",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A17",
+          "net": "Net-(J1-PadA17)",
+          "signal": "PERn0",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A18",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A19",
+          "net": "Net-(C112-Pad1)",
+          "signal": "RSVD",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A20",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A21",
+          "net": "Net-(J1-PadA21)",
+          "signal": "PERp1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A22",
+          "net": "Net-(J1-PadA22)",
+          "signal": "PERn1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A23",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A24",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A25",
+          "net": "Net-(J1-PadA25)",
+          "signal": "PERp2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A26",
+          "net": "Net-(J1-PadA26)",
+          "signal": "PERn2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A27",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A28",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A29",
+          "net": "Net-(J1-PadA29)",
+          "signal": "PERp3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A30",
+          "net": "Net-(J1-PadA30)",
+          "signal": "PERn3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A31",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A32",
+          "net": "Net-(C113-Pad1)",
+          "signal": "RSVD",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A33",
+          "net": "Net-(C115-Pad1)",
+          "signal": "RSVD",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A34",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A35",
+          "net": "Net-(J1-PadA35)",
+          "signal": "PERp4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A36",
+          "net": "Net-(J1-PadA36)",
+          "signal": "PERn4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A37",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A38",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A39",
+          "net": "Net-(J1-PadA39)",
+          "signal": "PERp5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A40",
+          "net": "Net-(J1-PadA40)",
+          "signal": "PERn5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A41",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A42",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A43",
+          "net": "Net-(J1-PadA43)",
+          "signal": "PERp6",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A44",
+          "net": "Net-(J1-PadA44)",
+          "signal": "PERn6",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A45",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A46",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A47",
+          "net": "Net-(J1-PadA47)",
+          "signal": "PERp7",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A48",
+          "net": "Net-(J1-PadA48)",
+          "signal": "PERn7",
+          "confidenceNotes": []
+        },
+        {
+          "number": "A49",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B1",
+          "net": "Net-(J1-PadA2)",
+          "signal": "+12V",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B2",
+          "net": "Net-(J1-PadA2)",
+          "signal": "+12V",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B3",
+          "net": "Net-(J1-PadA2)",
+          "signal": "+12V",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B4",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B5",
+          "net": "PCIE_RX6_P",
+          "signal": "SMCLK",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B6",
+          "net": "PCIE_RX5_N",
+          "signal": "SMDAT",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B7",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B8",
+          "net": "Net-(J1-PadA10)",
+          "signal": "+3.3V",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B9",
+          "net": "Net-(C106-Pad1)",
+          "signal": "JTAG1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B10",
+          "net": "Net-(#PWR0101-Pad1)",
+          "signal": "3.3Vaux",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B11",
+          "net": "Net-(C109-Pad1)",
+          "signal": "~{WAKE}",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B12",
+          "net": "Net-(C111-Pad1)",
+          "signal": "RSVD",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B13",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B14",
+          "net": "PCIE_RX0_P",
+          "signal": "PETp0",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B15",
+          "net": "Net-(J1-PadB15)",
+          "signal": "PETn0",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B16",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B17",
+          "net": "SPI_CLK",
+          "signal": "~{PRSNT2}",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B18",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B19",
+          "net": "Net-(J1-PadB19)",
+          "signal": "PETp1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B20",
+          "net": "Net-(J1-PadB20)",
+          "signal": "PETn1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B21",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B22",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B23",
+          "net": "Net-(J1-PadB23)",
+          "signal": "PETp2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B24",
+          "net": "Net-(J1-PadB24)",
+          "signal": "PETn2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B25",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B26",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B27",
+          "net": "Net-(J1-PadB20)",
+          "signal": "PETp3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B28",
+          "net": "Net-(J1-PadB28)",
+          "signal": "PETn3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B29",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B30",
+          "net": "Net-(C114-Pad1)",
+          "signal": "RSVD",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B31",
+          "net": "SPI_CLK",
+          "signal": "~{PRSNT2}",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B32",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B33",
+          "net": "Net-(C121-Pad2)",
+          "signal": "PETp4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B34",
+          "net": "Net-(C120-Pad2)",
+          "signal": "PETn4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B35",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B36",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B37",
+          "net": "Net-(J1-PadB37)",
+          "signal": "PETp5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B38",
+          "net": "PCIE_SCK",
+          "signal": "PETn5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B39",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B40",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B41",
+          "net": "PCIE_SCK",
+          "signal": "PETp6",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B42",
+          "net": "Net-(J1-PadB42)",
+          "signal": "PETn6",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B43",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B44",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B45",
+          "net": "Net-(J1-PadB45)",
+          "signal": "PETp7",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B46",
+          "net": "Net-(J1-PadB46)",
+          "signal": "PETn7",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B47",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B48",
+          "net": "SPI_CLK",
+          "signal": "~{PRSNT2}",
+          "confidenceNotes": []
+        },
+        {
+          "number": "B49",
+          "net": "3V3 AUX",
+          "signal": "GND",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J3",
+      "description": "B2B_TX",
+      "pins": [
+        {
+          "number": "1",
+          "net": "B2B_TXC_N",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "B2B_TXD_P",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "B2B_TXD_N",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J3-Pad4)",
+          "signal": "Pin_4",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J4",
+      "description": "B2B_RX",
+      "pins": [
+        {
+          "number": "1",
+          "net": "B2B_RXD_N",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "B2B_RXC_P",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "B2B_RXC_N",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J4-Pad4)",
+          "signal": "Pin_4",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J5",
+      "description": "UART",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J5-Pad1)",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(R10-Pad2)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "UART_TX",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J6",
+      "description": "I2C_LINK",
+      "pins": [
+        {
+          "number": "1",
+          "net": "MPM_SCK",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J6-Pad2)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "PCIE_SCK",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "PCIE_SCK",
+          "signal": "Pin_4",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J7",
+      "description": "1V_EN",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J7-Pad1)",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J7-Pad2)",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "JP2",
+      "description": "JTAG",
+      "pins": [
+        {
+          "number": "1",
+          "net": "TDI",
+          "signal": "Pin_1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "TDO",
+          "signal": "Pin_2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "TMS",
+          "signal": "Pin_3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "SPI_CLK",
+          "signal": "Pin_4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "5",
+          "net": "Net-(#PWR0114-Pad1)",
+          "signal": "Pin_5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "6",
+          "net": "Net-(JP2-Pad6)",
+          "signal": "Pin_6",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    }
+  ],
+  "testPoints": [],
+  "confidenceNotes": [
+    {
+      "field": "mcus",
+      "reason": "No component matched MCU rule (pin count > 20 + known MCU lib/MPN)"
+    }
+  ]
+}

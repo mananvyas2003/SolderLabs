@@ -24,7 +24,7 @@ test("parse r1 resolves pin nets from wires", () => {
 });
 
 test("r1 vs r2 semantic rename LED_DRIVE → LED_ANODE", async () => {
-  const { semanticDiff } = await import("@flux/design-core");
+  const { semanticDiff } = await import("@solderlab/design-core");
   const a = parseKicadProjectDir(path.join(root, "r1"));
   const b = parseKicadProjectDir(path.join(root, "r2"));
   const d = semanticDiff(a, b);

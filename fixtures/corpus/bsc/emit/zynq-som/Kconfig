@@ -1,0 +1,16 @@
+# * generated-by: @solderlab/bsc (kconfig)
+# * board: zynq-som
+# * source-revision: ad96951a225fbf9f263b555ef070a536b09ff710
+# * bsc-schema-version: 1.0
+# * source-sha256: 60e7f93961f901fb92c3a7fcd36ea09f0b5a118d4fb4292ab16b5c5f065f36d1
+# * DO NOT EDIT
+
+config SOLDERLAB_BOARD_ZYNQ_SOM
+	bool "SolderLab board zynq-som"
+	default y
+	help
+	  Auto-generated from Board Support Contract.
+
+config SOLDERLAB_BOARD_REV_NEWER
+	bool "Board revision newer"
+	default y

@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solderlab.dev/schemas/board-support-contract-1.0.json",
+  "title": "BoardSupportContract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "boardName",
+    "revision",
+    "generatedFrom",
+    "mcus",
+    "pins",
+    "revStraps",
+    "busDevices",
+    "powerRails",
+    "connectors",
+    "testPoints",
+    "confidenceNotes"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "boardName": { "type": "string", "minLength": 1 },
+    "revision": { "type": ["string", "null"] },
+    "generatedFrom": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["revisionId", "sha256"],
+      "properties": {
+        "revisionId": { "type": ["string", "null"] },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "mcus": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/mcu" }
+    },
+    "pins": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/pin" }
+    },
+    "revStraps": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/revStrap" }
+    },
+    "busDevices": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/busDevice" }
+    },
+    "powerRails": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/powerRail" }
+    },
+    "connectors": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/connector" }
+    },
+    "testPoints": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/testPoint" }
+    },
+    "confidenceNotes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/confidenceNote" }
+    }
+  },
+  "$defs": {
+    "confidenceNote": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field", "reason"],
+      "properties": {
+        "field": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "mcu": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["refdes", "mpn", "package", "confidenceNotes"],
+      "properties": {
+        "refdes": { "type": "string" },
+        "mpn": { "type": ["string", "null"] },
+        "package": { "type": ["string", "null"] },
+        "confidenceNotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/confidenceNote" }
+        }
+      }
+    },
+    "pinConnection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["refdes", "pin"],
+      "properties": {
+        "refdes": { "type": "string" },
+        "pin": { "type": "string" }
+      }
+    },
+    "pin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mcuRefdes",
+        "pinNumber",
+        "pinName",
+        "net",
+        "function",
+        "connectedTo",
+        "direction",
+        "pullState",
+        "confidenceNotes"
+      ],
+      "properties": {
+        "mcuRefdes": { "type": "string" },
+        "pinNumber": { "type": "string" },
+        "pinName": { "type": ["string", "null"] },
+        "net": { "type": ["string", "null"] },
+        "function": { "type": ["string", "null"] },
+        "connectedTo": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/pinConnection" }
+        },
+        "direction": { "type": ["string", "null"] },
+        "pullState": { "type": ["string", "null"] },
+        "confidenceNotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/confidenceNote" }
+        }
+      }
+    },
+    "revStrap": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "gpio",
+        "expectedLevel",
+        "decodesToRevision",
+        "confidenceNotes"
+      ],
+      "properties": {
+        "gpio": { "type": ["string", "null"] },
+        "expectedLevel": { "type": ["string", "null"], "enum": ["high", "low", null] },
+        "decodesToRevision": { "type": ["string", "null"] },
+        "confidenceNotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/confidenceNote" }
+        }
+      }
+    },
+    "busDevice": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bus",
+        "address",
+        "chipSelect",
+        "refdes",
+        "mpn",
+        "description",
+        "confidenceNotes"
+      ],
+      "properties": {
+        "bus": { "type": "string", "enum": ["i2c", "spi"] },
+        "address": { "type": ["string", "null"] },
+        "chipSelect": { "type": ["string", "null"] },
+        "refdes": { "type": "string" },
+        "mpn": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"] },
+        "confidenceNotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/confidenceNote" }
+        }
+      }
+    },
+    "powerRail": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "nominalVolts",
+        "tolerancePct",
+        "sourceRefdes",
+        "enableNet",
+        "senseNet",
+        "sequenceIndex",
+        "confidenceNotes"
+      ],
+      "properties": {
+        "name": { "type": "string" },
+        "nominalVolts": { "type": ["number", "null"] },
+        "tolerancePct": { "type": ["number", "null"] },
+        "sourceRefdes": { "type": ["string", "null"] },
+        "enableNet": { "type": ["string", "null"] },
+        "senseNet": { "type": ["string", "null"] },
+        "sequenceIndex": { "type": ["integer", "null"] },
+        "confidenceNotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/confidenceNote" }
+        }
+      }
+    },
+    "connectorPin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["number", "net", "signal", "confidenceNotes"],
+      "properties": {
+        "number": { "type": "string" },
+        "net": { "type": ["string", "null"] },
+        "signal": { "type": ["string", "null"] },
+        "confidenceNotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/confidenceNote" }
+        }
+      }
+    },
+    "connector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["refdes", "description", "pins", "confidenceNotes"],
+      "properties": {
+        "refdes": { "type": "string" },
+        "description": { "type": ["string", "null"] },
+        "pins": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/connectorPin" }
+        },
+        "confidenceNotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/confidenceNote" }
+        }
+      }
+    },
+    "testPoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["refdes", "net", "description", "confidenceNotes"],
+      "properties": {
+        "refdes": { "type": "string" },
+        "net": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"] },
+        "confidenceNotes": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/confidenceNote" }
+        }
+      }
+    }
+  }
+}

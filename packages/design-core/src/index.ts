@@ -14,9 +14,20 @@ import {
   type DiffConfig,
   type SemanticDiffResult,
 } from "./semantic-diff";
+import {
+  formatIdentityCoverage,
+  resolveIdentity,
+  type IdentityMatch,
+} from "./identity";
 
 export * from "./types";
 export * from "./semantic-diff";
+export * from "./identity";
+export * from "./impact";
+export * from "./unintended-connectivity";
+export * from "./bom-reconcile";
+export * from "./bom-history";
+export * from "./mfg-lint";
 
 export interface DiffBundleData {
   baseRevisionId: string;
@@ -72,10 +83,6 @@ export function snapshotToBom(snapshot: DesignSnapshot): BomLineLike[] {
   }));
 }
 
-function componentKey(c: SnapshotComponent): string {
-  return c.refdes;
-}
-
 function changedFields(
   a: Record<string, unknown>,
   b: Record<string, unknown>,
@@ -84,65 +91,139 @@ function changedFields(
   return keys.filter((k) => String(a[k] ?? "") !== String(b[k] ?? ""));
 }
 
+function classifyMatchedComponent(m: IdentityMatch): ComponentDiff {
+  const { base: before, head: after, tier } = m;
+  const fields = changedFields(
+    before as unknown as Record<string, unknown>,
+    after as unknown as Record<string, unknown>,
+    ["value", "footprint", "mpn", "manufacturer", "sheetId", "libId", "refdes"],
+  );
+
+  let kind: DiffChangeKind = "unchanged";
+  if (before.sheetId !== after.sheetId) {
+    kind = "sheet_moved";
+  } else if (before.refdes !== after.refdes) {
+    kind = "refdes_renamed";
+  } else if (fields.length) {
+    kind = "changed";
+  }
+
+  return {
+    refdes: after.refdes,
+    kind,
+    before,
+    after,
+    fields: fields.length ? fields : undefined,
+    matchTier: tier,
+  };
+}
+
+function pinSetKey(nodes: string[]): string {
+  return [...new Set(nodes)]
+    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+    .join("|");
+}
+
 export function diffSnapshots(
   base: DesignSnapshot,
   head: DesignSnapshot,
   ids: { baseRevisionId: string; headRevisionId: string },
   cfg?: DiffConfig,
 ): DiffBundleData {
-  const baseMap = new Map(base.components.map((c) => [componentKey(c), c]));
-  const headMap = new Map(head.components.map((c) => [componentKey(c), c]));
-  const allRefdes = new Set([...baseMap.keys(), ...headMap.keys()]);
+  const identity = resolveIdentity(base.components, head.components);
+  // Tier coverage is the product metric the prompt asked for — keep visible in logs.
+  // Use stderr so JSON CLI output on stdout stays machine-parseable.
+  console.warn(`[diffSnapshots] ${formatIdentityCoverage(identity)}`);
 
   const components: ComponentDiff[] = [];
-  for (const refdes of [...allRefdes].sort()) {
-    const before = baseMap.get(refdes);
-    const after = headMap.get(refdes);
-    if (before && !after) {
-      components.push({ refdes, kind: "removed", before });
-    } else if (!before && after) {
-      components.push({ refdes, kind: "added", after });
-    } else if (before && after) {
-      const fields = changedFields(
-        before as unknown as Record<string, unknown>,
-        after as unknown as Record<string, unknown>,
-        ["value", "footprint", "mpn", "manufacturer", "sheetId", "libId"],
-      );
-      components.push({
-        refdes,
-        kind: fields.length ? "changed" : "unchanged",
-        before,
-        after,
-        fields: fields.length ? fields : undefined,
-      });
-    }
+  for (const m of identity.matched) {
+    components.push(classifyMatchedComponent(m));
   }
+  for (const before of identity.baseOnly) {
+    components.push({ refdes: before.refdes, kind: "removed", before });
+  }
+  for (const after of identity.headOnly) {
+    components.push({ refdes: after.refdes, kind: "added", after });
+  }
+  components.sort((a, b) =>
+    a.refdes.localeCompare(b.refdes, undefined, { numeric: true }),
+  );
 
   const bom = diffBom(snapshotToBom(base), snapshotToBom(head));
 
-  const baseNets = new Map(base.nets.map((n) => [n.name, n]));
-  const headNets = new Map(head.nets.map((n) => [n.name, n]));
-  const allNets = new Set([...baseNets.keys(), ...headNets.keys()]);
+  const baseNets = [...base.nets];
+  const headNets = [...head.nets];
+  const headNetUsed = new Set<number>();
   const nets: NetDiff[] = [];
-  for (const name of [...allNets].sort()) {
-    const b = baseNets.get(name);
-    const h = headNets.get(name);
-    if (b && !h) {
-      nets.push({ name, kind: "removed", beforeNodes: b.nodes });
-    } else if (!b && h) {
-      nets.push({ name, kind: "added", afterNodes: h.nodes });
-    } else if (b && h) {
-      const same =
-        JSON.stringify([...b.nodes].sort()) ===
-        JSON.stringify([...h.nodes].sort());
+
+  const headByPins = new Map<string, number[]>();
+  headNets.forEach((n, i) => {
+    const k = pinSetKey(n.nodes);
+    if (!k) return;
+    const list = headByPins.get(k) ?? [];
+    list.push(i);
+    headByPins.set(k, list);
+  });
+
+  const baseUsed = new Set<number>();
+  baseNets.forEach((b, bi) => {
+    const k = pinSetKey(b.nodes);
+    if (!k) return;
+    const candidates = headByPins.get(k);
+    if (!candidates?.length) return;
+    const hi = candidates.shift()!;
+    if (candidates.length === 0) headByPins.delete(k);
+    baseUsed.add(bi);
+    headNetUsed.add(hi);
+    const h = headNets[hi]!;
+    if (b.name !== h.name) {
       nets.push({
-        name,
+        name: h.name,
+        kind: "net_renamed",
+        beforeNodes: b.nodes,
+        afterNodes: h.nodes,
+        beforeName: b.name,
+        afterName: h.name,
+      });
+    } else {
+      nets.push({
+        name: h.name,
+        kind: "unchanged",
+        beforeNodes: b.nodes,
+        afterNodes: h.nodes,
+      });
+    }
+  });
+
+  baseNets.forEach((b, bi) => {
+    if (baseUsed.has(bi)) return;
+    const hSameName = headNets.findIndex(
+      (h, hi) => !headNetUsed.has(hi) && h.name === b.name,
+    );
+    if (hSameName >= 0) {
+      headNetUsed.add(hSameName);
+      baseUsed.add(bi);
+      const h = headNets[hSameName]!;
+      const same = pinSetKey(b.nodes) === pinSetKey(h.nodes);
+      nets.push({
+        name: b.name,
         kind: same ? "unchanged" : "changed",
         beforeNodes: b.nodes,
         afterNodes: h.nodes,
       });
     }
-  }
+  });
+
+  baseNets.forEach((b, bi) => {
+    if (baseUsed.has(bi)) return;
+    nets.push({ name: b.name, kind: "removed", beforeNodes: b.nodes });
+  });
+  headNets.forEach((h, hi) => {
+    if (headNetUsed.has(hi)) return;
+    nets.push({ name: h.name, kind: "added", afterNodes: h.nodes });
+  });
+
+  nets.sort((a, b) => a.name.localeCompare(b.name));
 
   const significant = components.filter((c) => c.kind !== "unchanged");
   const netSig = nets.filter((n) => n.kind !== "unchanged");
@@ -158,11 +239,18 @@ export function diffSnapshots(
     summary: {
       componentsAdded: significant.filter((c) => c.kind === "added").length,
       componentsRemoved: significant.filter((c) => c.kind === "removed").length,
-      componentsChanged: significant.filter((c) => c.kind === "changed").length,
+      componentsChanged: significant.filter(
+        (c) =>
+          c.kind === "changed" ||
+          c.kind === "refdes_renamed" ||
+          c.kind === "sheet_moved",
+      ).length,
       bomChanged: bom.filter((r) => r.kind !== "unchanged").length,
       netsAdded: netSig.filter((n) => n.kind === "added").length,
       netsRemoved: netSig.filter((n) => n.kind === "removed").length,
-      netsChanged: netSig.filter((n) => n.kind === "changed").length,
+      netsChanged: netSig.filter(
+        (n) => n.kind === "changed" || n.kind === "net_renamed",
+      ).length,
       significantElectrical: electrical.summary.significantCount,
       criticalElectrical: electrical.summary.criticalCount,
       electricalGate: electrical.summary.gate,

@@ -1,0 +1,24 @@
+# * generated-by: @solderlab/bsc (kconfig)
+# * board: kintex-pcie
+# * source-revision: 056792c009a8920d4ef11e76ba3284ee58376078
+# * bsc-schema-version: 1.0
+# * source-sha256: 7163b90302e2264fd0d17a43ec9ff7640c42c0b8fcd355b6678c22a646050323
+# * DO NOT EDIT
+
+config SOLDERLAB_BOARD_KINTEX_PCIE
+	bool "SolderLab board kintex-pcie"
+	default y
+	help
+	  Auto-generated from Board Support Contract.
+
+config SOLDERLAB_BOARD_REV_NEWER
+	bool "Board revision newer"
+	default y
+
+config SOLDERLAB_RAIL_N3V3_AUX_MV
+	int "Rail 3V3 AUX millivolts"
+	default 3300
+
+config SOLDERLAB_RAIL_N3V3_PCIE_MV
+	int "Rail 3V3 PCIE millivolts"
+	default 3300

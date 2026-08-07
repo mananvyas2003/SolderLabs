@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getDb } from "@flux/db";
+import { getDb } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
-import { Badge } from "@flux/ui";
+import { Badge } from "@solderlab/ui";
 import { CreateReviewForm } from "@/components/create-review-form";
 
 export default async function ReviewsPage({

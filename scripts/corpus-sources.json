@@ -1,0 +1,104 @@
+{
+  "projects": [
+    {
+      "id": "zynq-som",
+      "repo": "https://github.com/pinguz97/Zynq-SoM.git",
+      "subdir": ".",
+      "revisions": [
+        { "label": "older", "ref": "1e19ff0f5e8eb83f328ca2fea38d16b9d679e3c1" },
+        { "label": "newer", "ref": "ad96951a225fbf9f263b555ef070a536b09ff710" }
+      ],
+      "notes": "Zynq 7020 SoM — multi-sheet FPGA SoM"
+    },
+    {
+      "id": "amulet-controller",
+      "repo": "https://github.com/nguyen-v/amulet_controller_kibot.git",
+      "subdir": ".",
+      "revisions": [
+        { "label": "older", "ref": "1.1.1" },
+        { "label": "newer", "ref": "01574e7261474919fe5bfa7e24bd05a05f188a86" }
+      ],
+      "notes": "KiCad 8/9 industrial controller with hierarchical sheets"
+    },
+    {
+      "id": "kintex-pcie",
+      "repo": "https://github.com/piotr-binkowski/kintex-pcie-board.git",
+      "subdir": ".",
+      "revisions": [
+        { "label": "older", "ref": "f0ebc53a068b2590e0fc595952c7dd10bdc25d7c" },
+        { "label": "newer", "ref": "056792c009a8920d4ef11e76ba3284ee58376078" }
+      ],
+      "notes": "Kintex-7 PCIe board"
+    },
+    {
+      "id": "upsy-desky",
+      "repo": "https://github.com/tjhorner/upsy-desky.git",
+      "subdir": "pcb",
+      "revisions": [
+        { "label": "newer", "ref": "master" }
+      ],
+      "notes": "Upsy Desky sit/stand controller PCB"
+    },
+    {
+      "id": "piantor",
+      "repo": "https://github.com/beekeeb/piantor.git",
+      "subdir": "pcb",
+      "revisions": [
+        { "label": "older", "ref": "8df0eab0021e176a1e845e1a1a87114d46ad83ed" },
+        { "label": "newer", "ref": "cd847afb4f9a86e8c1c8e36f243140644013afb2" }
+      ],
+      "notes": "Piantor split keyboard PCBs"
+    },
+    {
+      "id": "angloxx",
+      "repo": "https://github.com/gauravmm/AngloDox.git",
+      "subdir": "PCB",
+      "revisions": [
+        { "label": "older", "ref": "525a636d6e12cb9df6d40b1ffad696f861428cb8" },
+        { "label": "newer", "ref": "4c0d316fb844ea3e6e4d162ae49918d5c09a722f" }
+      ],
+      "notes": "Hierarchical keyboard (AngloDox)"
+    },
+    {
+      "id": "glasgow",
+      "repo": "https://github.com/whitequark/Glasgow.git",
+      "subdir": "hardware",
+      "revisions": [
+        { "label": "older", "ref": "13f7c6983dab2a86051267393506c52f18b08790" },
+        { "label": "newer", "ref": "06201dd31888e1af3ebefaaf6dc8b1d2babbbca9" }
+      ],
+      "notes": "Glasgow Interface Explorer hardware"
+    },
+    {
+      "id": "ethersweep",
+      "repo": "https://github.com/Neumi/ethersweep.git",
+      "subdir": "electronic_design",
+      "revisions": [
+        { "label": "older", "ref": "cffb18c5f0fe1418a2e64802ec5be14e98b6a215" },
+        { "label": "newer", "ref": "67f2547e582de59cb77d4b3c2a25c8a6326ed864" }
+      ],
+      "notes": "Ethersweep stepper controller family"
+    },
+    {
+      "id": "kicad-demo-complex-hierarchy",
+      "repo": "https://github.com/KiCad/kicad-source-mirror.git",
+      "subdir": "demos/complex_hierarchy",
+      "sparsePaths": ["demos/complex_hierarchy"],
+      "revisions": [
+        { "label": "older", "ref": "7.0.11" },
+        { "label": "newer", "ref": "master" }
+      ],
+      "notes": "Official KiCad complex_hierarchy demo (KiCad 7 → current)"
+    },
+    {
+      "id": "kicad-demo-vme-wren",
+      "repo": "https://github.com/KiCad/kicad-source-mirror.git",
+      "subdir": "demos/vme-wren",
+      "sparsePaths": ["demos/vme-wren"],
+      "revisions": [
+        { "label": "newer", "ref": "master" }
+      ],
+      "notes": "Official KiCad vme-wren — large multi-sheet hierarchical demo"
+    }
+  ]
+}

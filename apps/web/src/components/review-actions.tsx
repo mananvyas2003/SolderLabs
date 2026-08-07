@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@flux/ui";
+import { Button } from "@solderlab/ui";
 
 export function ReviewActions({
   orgSlug,

@@ -1,12 +1,12 @@
-# Flux — Product Requirements Document
+# SolderLab — Product Requirements Document
 
-**Working name:** Flux  
+**Working name:** SolderLab  
 **Tagline:** GitHub for Hardware  
 **Elevator:** Version, review, and release electronics designs together — with AI that understands what actually changed on the board.  
 **Document status:** Implementation-ready (Cursor build bible)  
 **Stack:** Next.js (App Router) + TypeScript + React, browser-first  
 **Primary CAD (MVP):** KiCad  
-**Last updated:** 2026-08-05
+**Last updated:** 2026-08-07
 
 ---
 
@@ -15,7 +15,7 @@
 1. [Problem, vision, principles](#1-problem-vision-principles)
 2. [Personas & jobs-to-be-done](#2-personas--jobs-to-be-done)
 3. [Product pillars](#3-product-pillars)
-4. [AI verdict & Flux Copilot](#4-ai-verdict--flux-copilot)
+4. [AI verdict & SolderLab Review](#4-ai-verdict--solderlab-review)
 5. [Information architecture & UX](#5-information-architecture--ux)
 6. [Screen inventory & App Router map](#6-screen-inventory--app-router-map)
 7. [User journeys](#7-user-journeys)
@@ -50,16 +50,16 @@ Competitors exist in niches (visual diff, PLM, BOM tools). None own the full **d
 
 ### 1.2 Vision
 
-Flux is the home for hardware teams the way GitHub is for software teams.
+SolderLab is the home for hardware teams the way GitHub is for software teams.
 
-| Software analog | Flux equivalent |
+| Software analog | SolderLab equivalent |
 |---|---|
 | Git repository | Hardware project (schematic, PCB, libs, docs, pinouts) |
 | Diff / blame | Visual schematic + PCB + BOM + 3D diffs |
 | Pull request | Design Review (DR) |
 | CI checks | Hardware Checks (ERC/DRC, BOM policy, DFM gate) |
 | Releases | Manufacturing packages (Gerber, pick-place, BOM, fab notes) |
-| Copilot | Flux Copilot (design-aware, evidence-linked) |
+| Copilot | SolderLab Review (design-aware, evidence-linked) |
 | Packages | Org-approved component / footprint libraries |
 | Orgs / teams | Companies, projects, RBAC, audit trail |
 
@@ -67,8 +67,8 @@ Flux is the home for hardware teams the way GitHub is for software teams.
 
 ### 1.3 Principles
 
-1. **CAD remains the authoring truth.** Engineers draw in KiCad (later Altium, etc.). Flux does not replace the editor in v1.
-2. **Flux owns collaboration.** History, review, permissions, CI, release, AI narrative.
+1. **CAD remains the authoring truth.** Engineers draw in KiCad (later Altium, etc.). SolderLab does not replace the editor in v1.
+2. **SolderLab owns collaboration.** History, review, permissions, CI, release, AI narrative.
 3. **Structured identity over blob storage.** Parse into a normalized Design Context Graph; never pretend zip-of-binaries is version control.
 4. **AI must cite evidence.** Every Copilot finding links to a net, component, sheet region, BOM line, or check run.
 5. **Human-in-the-loop.** AI suggests; humans approve merges and releases.
@@ -164,7 +164,7 @@ Flux is the home for hardware teams the way GitHub is for software teams.
 - Downloadable zip + audit log of who downloaded when.
 - Immutable once published (supersede with new release, never silent overwrite).
 
-### Pillar G — Flux Copilot (AI-first)
+### Pillar G — SolderLab Review (AI-first)
 
 - Always-available rail on Design Review and revision compare views.
 - Slash commands and structured findings (see §4).
@@ -179,7 +179,7 @@ Flux is the home for hardware teams the way GitHub is for software teams.
 
 ---
 
-## 4. AI verdict & Flux Copilot
+## 4. AI verdict & SolderLab Review
 
 ### 4.1 Is AI useful?
 
@@ -204,7 +204,7 @@ CAD files (KiCad)
         → Design Context Graph / Design Snapshot
             → Visual Diff Engine
             → Hardware CI Checks
-            → Flux Copilot (RAG + tools)
+            → SolderLab Review (RAG + tools)
                 → Design Review UX
                     → Manufacturing Release
 ```
@@ -301,7 +301,7 @@ Light theme may ship later; dark is the primary craft surface for the app. Marke
 
 Hero must read as **one composition**:
 
-- Brand name **Flux** as hero-level signal (not nav-only).
+- Brand name **SolderLab** as hero-level signal (not nav-only).
 - One headline.
 - One short supporting sentence.
 - One CTA group (`Start free` / `Book demo`).
@@ -312,7 +312,7 @@ No stats strips, schedule cards, or promo chips on the hero media.
 ### 5.3 App shell
 
 ```
-Top bar: Flux mark · Org switcher · Search · Copilot · Notifications · Avatar
+Top bar: SolderLab mark · Org switcher · Search · Copilot · Notifications · Avatar
 Left nav (project context): Overview · History · Files · Reviews · Checks · BOM · Library · Releases · Settings
 Main canvas: context-dependent
 Right rail: Copilot (contextual) or Review details
@@ -433,7 +433,7 @@ Must implement as composition, not card soup:
 
 1. From `main` @ tag `v1.3.0`, create Release.
 2. Attach Gerbers / PnP / BOM / notes (or generate from artifacts).
-3. Flux writes checksums; publish immutable release.
+3. SolderLab writes checksums; publish immutable release.
 4. Procurement downloads package; audit records download.
 
 ### Journey D — New hire onboarding
@@ -495,7 +495,7 @@ Acceptance criteria use Given/When/Then where critical.
 | R3 | Approve / request changes / merge | State machine enforced; only permitted roles |
 | R4 | Merge updates `main` pointer | `main` HEAD becomes head revision |
 
-### 8.6 Flux Copilot — Must (Phase 1)
+### 8.6 SolderLab Review — Must (Phase 1)
 
 | ID | Requirement | Acceptance |
 |---|---|---|
@@ -543,7 +543,7 @@ Acceptance criteria use Given/When/Then where critical.
 | T1 | Activity feed | 2 |
 | T2 | Webhooks on DR/release events | 3 |
 | T3 | SSO/SAML | 4 |
-| T4 | CLI `flux push` | 3 |
+| T4 | CLI `solderlab push` | 3 |
 | T5 | Altium import best-effort | 3 |
 
 ### 8.12 Won’t (v1 product)
@@ -865,17 +865,21 @@ Handled by Clerk/Auth.js middleware.
 - Permissions polish, webhooks.
 - Parts enrichment / alternates.
 - Altium import best-effort.
-- Optional CLI `flux push`.
+- Optional CLI `solderlab push`.
 
 **Exit criteria:** Team can cut an immutable fab release from approved `main`.
 
-### Phase 4 — Scale
+### Phase 4 — Scale (revised)
 
-- SSO/SAML, advanced DFM partner integrations, firmware pinout sync, data residency, public/community features as warranted.
+Do **not** ship mocked SSO, DFM partners, residency prefixes, or public social explore.
+Deferred until a paying customer asks.
 
-**Implementation status (local platform):** Demo SSO ACS + org SAML settings, DFM partner jobs (JLCPCB/PCBWay/Eurocircuits heuristics), firmware pinout sync + `.h` export, org data-residency regions with storage prefixes, public explore/star/fork. Production IdP crypto, live fab APIs, and multi-cloud residency are integration next steps.
+Near-term product wedge (see feature spec): **Board Support Contract** derived from UUID-stable
+schematic parse — not enterprise surface area.
 
-**Electrical core status:** TypeScript KiCad connectivity resolve (wires/junctions/labels + pin heuristics, inspired by [parser_new](https://github.com/mananvyas2003/parser_new) / [NetDiff](https://github.com/mananvyas2003/NetDiff) engine), NetDiff-style semantic electrical diff in `@flux/design-core`, Compare electrical tab, Copilot `/nets`, and `connectivity-gate` check runs. Optional later: call native NetDiff CLI/WASM for oracle parity with `kicad-cli`.
+**Electrical core status:** TypeScript KiCad connectivity resolve, NetDiff-style semantic electrical
+diff in `@solderlab/design-core`, Compare electrical tab, SolderLab Review `/nets`, and
+`connectivity-gate` check runs. Parser UUID identity + corpus hardening is Phase B.
 
 ---
 
@@ -890,7 +894,7 @@ Handled by Clerk/Auth.js middleware.
 | Cycle time | DR open → merge | Qualitative improvement vs PDF review |
 | Release package adoption (P3) | Releases created / active projects | > 50% active projects |
 
-North-star qualitative: “We would not send a board to fab without a Flux review.”
+North-star qualitative: “We would not send a board to fab without a SolderLab review.”
 
 ---
 
@@ -982,7 +986,7 @@ INNGEST_SIGNING_KEY=
 | Design Review (DR) | Pull-request analog for hardware changes |
 | Hardware Check | CI-style gate (ERC/DRC/BOM/policy) |
 | Release | Immutable manufacturing package tied to a revision |
-| Flux Copilot | Design-aware AI assistant with evidence-linked findings |
+| SolderLab Review | Design-aware AI assistant with evidence-linked findings |
 | Refdes | Reference designator (e.g. `R12`, `U3`) |
 | MPN | Manufacturer part number |
 | ECO | Engineering change order |

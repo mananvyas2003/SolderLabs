@@ -1,8 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import type { DiffBundleData, PcbSnapshot } from "@flux/design-core";
-import { Badge } from "@flux/ui";
+import type { DiffBundleData, PcbSnapshot } from "@solderlab/design-core";
+import { Badge } from "@solderlab/ui";
 import { useMemo, useState } from "react";
 
 const Board3D = dynamic(() => import("./board-3d"), { ssr: false });

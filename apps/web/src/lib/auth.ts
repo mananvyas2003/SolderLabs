@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { getDb } from "@flux/db";
+import { getDb } from "@solderlab/db";
 import { ensureDb } from "@/lib/ensure-db";
 
 export type SessionUser = {
@@ -8,7 +8,7 @@ export type SessionUser = {
   name: string;
 };
 
-const COOKIE = "flux_session";
+const COOKIE = "solderlab_session";
 
 export async function getSessionUser(): Promise<SessionUser | null> {
   ensureDb();

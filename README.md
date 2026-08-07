@@ -1,6 +1,6 @@
-# Flux — GitHub for Hardware
+# SolderLab
 
-Version, review, and release electronics designs together — with AI that understands what actually changed on the board.
+Version, review, and release electronics designs — with evidence-linked review that understands the schematic.
 
 ## Local development
 
@@ -11,40 +11,46 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-**Demo login:** `demo@flux.dev` / `demo`
+**Demo login:** `demo@solderlab.dev` / `demo`
 
 ### Happy path
 
-1. Sign in → **flux-labs** → **Blinky Board**
-2. **Seed blinky fixtures** → Compare (**electrical** / schematic / PCB / BOM / Copilot)
+1. Sign in → **solderlab** → **Blinky Board**
+2. **Seed blinky fixtures** → Compare (**electrical** / schematic / PCB / BOM / SolderLab Review)
 3. Design Review → merge (checks-gated; **connectivity-gate** vs parent)
-4. Cut a **Release** → submit **DFM**
-5. **Pinout** sync for `U1` → download `.h` (pins from connectivity resolve)
-6. Org **Enterprise** → enable SSO + set data residency
-7. Project **Settings** → visibility `public` → **/explore** to star/fork
-
-### Phase 4 enterprise
-
-| Feature | Where |
-|---|---|
-| SSO / SAML (demo ACS) | `/sso` + Org → Enterprise |
-| Data residency | Org → Enterprise (`regions/<id>/…` storage) |
-| DFM partners | Project → DFM |
-| Firmware pinout sync | Project → Pinout |
-| Public community | `/explore` + project visibility |
-
-SSO demo: enable SSO on org, then open `/sso` with assertion `flux-demo-assertion` (built into the page).
+4. Cut a **Release**
+5. **Pinout** sync for `U1` → download `.h`
 
 ### CLI
 
 ```bash
-npm run flux -- push --org flux-labs --project blinky --file ./board.zip
+npm run solderlab -- push --org solderlab --project blinky --file ./board.zip
 ```
 
-## Implemented (Phase 0–4)
+Env: `SOLDERLAB_URL`, `SOLDERLAB_EMAIL`, `SOLDERLAB_PASSWORD`
 
-Phase 0–3 collaboration platform **plus** Phase 4: SSO/SAML settings + demo ACS, DFM partner jobs, firmware pinout sync/export, data residency regions, public explore/star/fork.
+## What’s in this repo
 
-**Electrical core (NetDiff / parser_new inspired):** KiCad wire+pin connectivity resolve → DesignSnapshot pins/nets; NetDiff-style semantic diff (rename / merge / split / pin moves); Compare → **electrical** tab; Copilot `/nets`; `connectivity-gate` check vs parent (critical shorts hard-block merge when green checks required).
+Collaboration surfaces for hardware teams (orgs, revisions, visual + electrical diff, reviews, checks, releases, library policy) plus:
 
-Real cloud IdP signature validation, live fab APIs, and multi-region cloud storage remain production integrations on top of these surfaces.
+- KiCad wire/pin connectivity resolve → DesignSnapshot
+- NetDiff-style semantic electrical diff
+- Pinout sync (foundation for Board Support Contract)
+
+## KiCad corpus
+
+Real open-source boards for parser/diff regression (not the blinky demo):
+
+```bash
+npm run corpus:fetch
+```
+
+Writes `fixtures/corpus/<id>/{older,newer}/` and `fixtures/corpus/manifest.json` (source URL, commit SHA, sheet/component counts, hierarchical flag, KiCad major guess). Failures are recorded in the manifest — nothing synthetic is substituted.
+
+## Explicitly not mocked here
+
+Enterprise SSO, fake DFM partner jobs, storage-prefix “data residency”, and public explore/star/fork were removed. Rebuild only when a real customer needs them.
+
+## Rename note
+
+Formerly developed under a working name that collided with an existing PCB AI company. Product name is **SolderLab**; AI assist is **SolderLab Review**.

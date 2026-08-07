@@ -1,0 +1,120 @@
+/*
+ * generated-by: @solderlab/bsc (zephyr)
+ * board: angloxx
+ * source-revision: 4c0d316fb844ea3e6e4d162ae49918d5c09a722f
+ * bsc-schema-version: 1.0
+ * source-sha256: b397345d20e75b44a42312df288ff2c696ac7c6b8e6ef211cbf34cada13d51fa
+ * DO NOT EDIT
+ */
+
+/* Board: angloxx — Zephyr overlay (stub pinctrl from BSC nets) */
+
+/ {
+	chosen {
+		/* Primary MCU from BSC: STM55001 (STM32F103C8Tx) */
+	};
+
+	solderlab_bsc_pins {
+		compatible = "solderlab,bsc-pins";
+		status = "okay";
+		i2c2_scl {
+			mcu = "STM55001";
+			pad = <2>;
+			net = "I2C2_SCL";
+			pin-name = "PC13";
+		};
+		pb9 {
+			mcu = "STM55001";
+			pad = <3>;
+			net = "PB9";
+			pin-name = "PC14";
+		};
+		pb8 {
+			mcu = "STM55001";
+			pad = <4>;
+			net = "PB8";
+			pin-name = "PC15";
+		};
+		pb13 {
+			mcu = "STM55001";
+			pad = <5>;
+			net = "PB13";
+			pin-name = "PD0";
+		};
+		i2c2_smbai {
+			mcu = "STM55001";
+			pad = <6>;
+			net = "I2C2_SMBAI";
+			pin-name = "PD1";
+		};
+		i2c1_scl {
+			mcu = "STM55001";
+			pad = <18>;
+			net = "I2C1_SCL";
+			pin-name = "PB0";
+		};
+		i2c1_smbai {
+			mcu = "STM55001";
+			pad = <19>;
+			net = "I2C1_SMBAI";
+			pin-name = "PB1";
+		};
+		pb4 {
+			mcu = "STM55001";
+			pad = <20>;
+			net = "PB4";
+			pin-name = "PB2";
+		};
+		boot0 {
+			mcu = "STM55001";
+			pad = <28>;
+			net = "BOOT0";
+			pin-name = "PB15";
+		};
+		pa15 {
+			mcu = "STM55001";
+			pad = <34>;
+			net = "PA15";
+			pin-name = "PA13";
+		};
+		pb3 {
+			mcu = "STM55001";
+			pad = <39>;
+			net = "PB3";
+			pin-name = "PB3";
+		};
+		boot1 {
+			mcu = "STM55001";
+			pad = <40>;
+			net = "BOOT1";
+			pin-name = "PB4";
+		};
+		pb15 {
+			mcu = "STM55001";
+			pad = <44>;
+			net = "PB15";
+			pin-name = "BOOT0";
+		};
+	};
+
+	pinctrl {
+		solderlab_default: solderlab_default {
+			group1 {
+				/* Pads with named nets — assign SoC pins in board DTS */
+				/* STM55001.2 <-> I2C2_SCL */
+				/* STM55001.3 <-> PB9 */
+				/* STM55001.4 <-> PB8 */
+				/* STM55001.5 <-> PB13 */
+				/* STM55001.6 <-> I2C2_SMBAI */
+				/* STM55001.18 <-> I2C1_SCL */
+				/* STM55001.19 <-> I2C1_SMBAI */
+				/* STM55001.20 <-> PB4 */
+				/* STM55001.28 <-> BOOT0 */
+				/* STM55001.34 <-> PA15 */
+				/* STM55001.39 <-> PB3 */
+				/* STM55001.40 <-> BOOT1 */
+				/* STM55001.44 <-> PB15 */
+			};
+		};
+	};
+};

@@ -1,0 +1,752 @@
+{
+  "fetchedAt": "2026-08-06T20:42:20.430Z",
+  "selectionCriteria": {
+    "count": 10,
+    "minHierarchical": 4,
+    "minLarge200": 3,
+    "minDualRevision": 5,
+    "kicadMajorsDesired": [
+      7,
+      8,
+      9
+    ],
+    "noSynthetic": true
+  },
+  "projects": [
+    {
+      "id": "zynq-som",
+      "sourceRepoUrl": "https://github.com/pinguz97/Zynq-SoM",
+      "notes": "Zynq 7020 SoM — multi-sheet FPGA SoM",
+      "revisions": [
+        {
+          "label": "older",
+          "requestedRef": "1e19ff0f5e8eb83f328ca2fea38d16b9d679e3c1",
+          "commitSha": "1e19ff0f5e8eb83f328ca2fea38d16b9d679e3c1",
+          "status": "ok",
+          "path": "fixtures/corpus/zynq-som/older",
+          "sheetCount": 16,
+          "componentCount": 494,
+          "uuidAnnotationCount": 370,
+          "hierarchical": true,
+          "sheetInstanceCount": 15,
+          "kicadFileVersions": [
+            "20231120"
+          ],
+          "kicadMajorGuess": 8,
+          "schematicFiles": [
+            "schematic/connectors.kicad_sch",
+            "schematic/DDR3L.kicad_sch",
+            "schematic/emmc.kicad_sch",
+            "schematic/Ethernet PHY.kicad_sch",
+            "schematic/Power.kicad_sch",
+            "schematic/power_architecture.kicad_sch",
+            "schematic/revision_changes.kicad_sch",
+            "schematic/Sensors.kicad_sch",
+            "schematic/system_controller.kicad_sch",
+            "schematic/usb_hs_phy.kicad_sch",
+            "schematic/zynq_b33_b34_b35.kicad_sch",
+            "schematic/zynq_config.kicad_sch",
+            "schematic/zynq_ddr.kicad_sch",
+            "schematic/zynq_PL_b13.kicad_sch",
+            "schematic/zynq_power.kicad_sch",
+            "schematic/zynq_PS_b500_b501.kicad_sch",
+            "Zynq_SoM.kicad_sch"
+          ],
+          "parserProjectRoot": "Zynq_SoM.kicad_pro",
+          "unresolvedLibCount": 1
+        },
+        {
+          "label": "newer",
+          "requestedRef": "ad96951a225fbf9f263b555ef070a536b09ff710",
+          "commitSha": "ad96951a225fbf9f263b555ef070a536b09ff710",
+          "status": "ok",
+          "path": "fixtures/corpus/zynq-som/newer",
+          "sheetCount": 16,
+          "componentCount": 494,
+          "uuidAnnotationCount": 370,
+          "hierarchical": true,
+          "sheetInstanceCount": 15,
+          "kicadFileVersions": [
+            "20231120",
+            "20250114"
+          ],
+          "kicadMajorGuess": 9,
+          "schematicFiles": [
+            "schematic/connectors.kicad_sch",
+            "schematic/DDR3L.kicad_sch",
+            "schematic/emmc.kicad_sch",
+            "schematic/Ethernet PHY.kicad_sch",
+            "schematic/Power.kicad_sch",
+            "schematic/power_architecture.kicad_sch",
+            "schematic/revision_changes.kicad_sch",
+            "schematic/Sensors.kicad_sch",
+            "schematic/system_controller.kicad_sch",
+            "schematic/usb_hs_phy.kicad_sch",
+            "schematic/zynq_b33_b34_b35.kicad_sch",
+            "schematic/zynq_config.kicad_sch",
+            "schematic/zynq_ddr.kicad_sch",
+            "schematic/zynq_PL_b13.kicad_sch",
+            "schematic/zynq_power.kicad_sch",
+            "schematic/zynq_PS_b500_b501.kicad_sch",
+            "Zynq_SoM.kicad_sch"
+          ],
+          "parserProjectRoot": "Zynq_SoM.kicad_pro",
+          "unresolvedLibCount": 1
+        }
+      ],
+      "failed": false,
+      "errors": [],
+      "primary": {
+        "commitSha": "ad96951a225fbf9f263b555ef070a536b09ff710",
+        "componentCount": 494,
+        "sheetCount": 16,
+        "hierarchical": true,
+        "kicadMajorGuess": 9,
+        "kicadFileVersions": [
+          "20231120",
+          "20250114"
+        ]
+      }
+    },
+    {
+      "id": "amulet-controller",
+      "sourceRepoUrl": "https://github.com/nguyen-v/amulet_controller_kibot",
+      "notes": "KiCad 8/9 industrial controller with hierarchical sheets",
+      "revisions": [
+        {
+          "label": "older",
+          "requestedRef": "1.1.1",
+          "commitSha": "3fede4236e3c4a9afbe39c000d584b8bf1e7a4fa",
+          "status": "ok",
+          "path": "fixtures/corpus/amulet-controller/older",
+          "sheetCount": 21,
+          "componentCount": 476,
+          "uuidAnnotationCount": 270,
+          "hierarchical": true,
+          "sheetInstanceCount": 20,
+          "kicadFileVersions": [
+            "20231120"
+          ],
+          "kicadMajorGuess": 8,
+          "schematicFiles": [
+            "amulet_controller.kicad_sch",
+            "Block Diagram.kicad_sch",
+            "Interface - Fan Control.kicad_sch",
+            "Interface - FD-CAN.kicad_sch",
+            "Interface - Interconnects.kicad_sch",
+            "Interface - RS-422.kicad_sch",
+            "MCU - IOs.kicad_sch",
+            "MCU - Power.kicad_sch",
+            "Misc - Board Version DAC.kicad_sch",
+            "Misc - Holes Fiducials.kicad_sch",
+            "Motor Control - Inverter.kicad_sch",
+            "Motor Control - Top Level.kicad_sch",
+            "Power - Connectors.kicad_sch",
+            "Power - Generation.kicad_sch",
+            "Power - Sequencing.kicad_sch",
+            "Project Architecture.kicad_sch",
+            "Revision History.kicad_sch",
+            "Sensing - Battery.kicad_sch",
+            "Sensing - Position.kicad_sch",
+            "Sensing - Temperature.kicad_sch",
+            "User - LED Indicators.kicad_sch"
+          ],
+          "parserProjectRoot": "amulet_controller.kicad_pro",
+          "unresolvedLibCount": 0
+        },
+        {
+          "label": "newer",
+          "requestedRef": "01574e7261474919fe5bfa7e24bd05a05f188a86",
+          "commitSha": "01574e7261474919fe5bfa7e24bd05a05f188a86",
+          "status": "ok",
+          "path": "fixtures/corpus/amulet-controller/newer",
+          "sheetCount": 21,
+          "componentCount": 476,
+          "uuidAnnotationCount": 270,
+          "hierarchical": true,
+          "sheetInstanceCount": 20,
+          "kicadFileVersions": [
+            "20231120"
+          ],
+          "kicadMajorGuess": 8,
+          "schematicFiles": [
+            "amulet_controller.kicad_sch",
+            "Block Diagram.kicad_sch",
+            "Interface - Fan Control.kicad_sch",
+            "Interface - FD-CAN.kicad_sch",
+            "Interface - Interconnects.kicad_sch",
+            "Interface - RS-422.kicad_sch",
+            "MCU - IOs.kicad_sch",
+            "MCU - Power.kicad_sch",
+            "Misc - Board Version DAC.kicad_sch",
+            "Misc - Holes Fiducials.kicad_sch",
+            "Motor Control - Inverter.kicad_sch",
+            "Motor Control - Top Level.kicad_sch",
+            "Power - Connectors.kicad_sch",
+            "Power - Generation.kicad_sch",
+            "Power - Sequencing.kicad_sch",
+            "Project Architecture.kicad_sch",
+            "Revision History.kicad_sch",
+            "Sensing - Battery.kicad_sch",
+            "Sensing - Position.kicad_sch",
+            "Sensing - Temperature.kicad_sch",
+            "User - LED Indicators.kicad_sch"
+          ],
+          "parserProjectRoot": "amulet_controller.kicad_pro",
+          "unresolvedLibCount": 0
+        }
+      ],
+      "failed": false,
+      "errors": [],
+      "primary": {
+        "commitSha": "01574e7261474919fe5bfa7e24bd05a05f188a86",
+        "componentCount": 476,
+        "sheetCount": 21,
+        "hierarchical": true,
+        "kicadMajorGuess": 8,
+        "kicadFileVersions": [
+          "20231120"
+        ]
+      }
+    },
+    {
+      "id": "kintex-pcie",
+      "sourceRepoUrl": "https://github.com/piotr-binkowski/kintex-pcie-board",
+      "notes": "Kintex-7 PCIe board",
+      "revisions": [
+        {
+          "label": "older",
+          "requestedRef": "f0ebc53a068b2590e0fc595952c7dd10bdc25d7c",
+          "commitSha": "f0ebc53a068b2590e0fc595952c7dd10bdc25d7c",
+          "status": "ok",
+          "path": "fixtures/corpus/kintex-pcie/older",
+          "sheetCount": 1,
+          "componentCount": 294,
+          "uuidAnnotationCount": 8740,
+          "hierarchical": true,
+          "sheetInstanceCount": 0,
+          "kicadFileVersions": [
+            "20211123"
+          ],
+          "kicadMajorGuess": 6,
+          "schematicFiles": [
+            "kintex-pcie.kicad_sch",
+            "xc7k160t.kicad_sch"
+          ],
+          "parserProjectRoot": "kintex-pcie.kicad_pro",
+          "unresolvedLibCount": 0
+        },
+        {
+          "label": "newer",
+          "requestedRef": "056792c009a8920d4ef11e76ba3284ee58376078",
+          "commitSha": "056792c009a8920d4ef11e76ba3284ee58376078",
+          "status": "ok",
+          "path": "fixtures/corpus/kintex-pcie/newer",
+          "sheetCount": 1,
+          "componentCount": 294,
+          "uuidAnnotationCount": 8740,
+          "hierarchical": true,
+          "sheetInstanceCount": 0,
+          "kicadFileVersions": [
+            "20211123"
+          ],
+          "kicadMajorGuess": 6,
+          "schematicFiles": [
+            "kintex-pcie.kicad_sch",
+            "xc7k160t.kicad_sch"
+          ],
+          "parserProjectRoot": "kintex-pcie.kicad_pro",
+          "unresolvedLibCount": 0
+        }
+      ],
+      "failed": false,
+      "errors": [],
+      "primary": {
+        "commitSha": "056792c009a8920d4ef11e76ba3284ee58376078",
+        "componentCount": 294,
+        "sheetCount": 1,
+        "hierarchical": true,
+        "kicadMajorGuess": 6,
+        "kicadFileVersions": [
+          "20211123"
+        ]
+      }
+    },
+    {
+      "id": "upsy-desky",
+      "sourceRepoUrl": "https://github.com/tjhorner/upsy-desky",
+      "notes": "Upsy Desky sit/stand controller PCB",
+      "revisions": [
+        {
+          "label": "newer",
+          "requestedRef": "master",
+          "commitSha": "3fe1e14ff6250c9321da221a03aa932919f4842d",
+          "status": "ok",
+          "path": "fixtures/corpus/upsy-desky/newer",
+          "sheetCount": 1,
+          "componentCount": 82,
+          "uuidAnnotationCount": 0,
+          "hierarchical": false,
+          "sheetInstanceCount": 0,
+          "kicadFileVersions": [
+            "20231120"
+          ],
+          "kicadMajorGuess": 8,
+          "schematicFiles": [
+            "upsy-desky.kicad_sch"
+          ],
+          "parserProjectRoot": "upsy-desky.kicad_pro",
+          "unresolvedLibCount": 0
+        }
+      ],
+      "failed": false,
+      "errors": [],
+      "primary": {
+        "commitSha": "3fe1e14ff6250c9321da221a03aa932919f4842d",
+        "componentCount": 82,
+        "sheetCount": 1,
+        "hierarchical": false,
+        "kicadMajorGuess": 8,
+        "kicadFileVersions": [
+          "20231120"
+        ]
+      }
+    },
+    {
+      "id": "piantor",
+      "sourceRepoUrl": "https://github.com/beekeeb/piantor",
+      "notes": "Piantor split keyboard PCBs",
+      "revisions": [
+        {
+          "label": "older",
+          "requestedRef": "8df0eab0021e176a1e845e1a1a87114d46ad83ed",
+          "commitSha": "8df0eab0021e176a1e845e1a1a87114d46ad83ed",
+          "status": "ok",
+          "path": "fixtures/corpus/piantor/older",
+          "sheetCount": 1,
+          "componentCount": 68,
+          "uuidAnnotationCount": 638,
+          "hierarchical": true,
+          "sheetInstanceCount": 0,
+          "kicadFileVersions": [
+            "20211123"
+          ],
+          "kicadMajorGuess": 6,
+          "schematicFiles": [
+            "left/keyboard_pcb.kicad_sch",
+            "right/keyboard_pcb.kicad_sch"
+          ],
+          "parserProjectRoot": "left/keyboard_pcb.kicad_pro",
+          "unresolvedLibCount": 0
+        },
+        {
+          "label": "newer",
+          "requestedRef": "cd847afb4f9a86e8c1c8e36f243140644013afb2",
+          "commitSha": "cd847afb4f9a86e8c1c8e36f243140644013afb2",
+          "status": "ok",
+          "path": "fixtures/corpus/piantor/newer",
+          "sheetCount": 1,
+          "componentCount": 68,
+          "uuidAnnotationCount": 638,
+          "hierarchical": true,
+          "sheetInstanceCount": 0,
+          "kicadFileVersions": [
+            "20211123"
+          ],
+          "kicadMajorGuess": 6,
+          "schematicFiles": [
+            "left/keyboard_pcb.kicad_sch",
+            "right/keyboard_pcb.kicad_sch"
+          ],
+          "parserProjectRoot": "left/keyboard_pcb.kicad_pro",
+          "unresolvedLibCount": 0
+        }
+      ],
+      "failed": false,
+      "errors": [],
+      "primary": {
+        "commitSha": "cd847afb4f9a86e8c1c8e36f243140644013afb2",
+        "componentCount": 68,
+        "sheetCount": 1,
+        "hierarchical": true,
+        "kicadMajorGuess": 6,
+        "kicadFileVersions": [
+          "20211123"
+        ]
+      }
+    },
+    {
+      "id": "angloxx",
+      "sourceRepoUrl": "https://github.com/gauravmm/AngloDox",
+      "notes": "Hierarchical keyboard (AngloDox)",
+      "revisions": [
+        {
+          "label": "older",
+          "requestedRef": "525a636d6e12cb9df6d40b1ffad696f861428cb8",
+          "commitSha": "525a636d6e12cb9df6d40b1ffad696f861428cb8",
+          "status": "ok",
+          "path": "fixtures/corpus/angloxx/older",
+          "sheetCount": 54,
+          "componentCount": 540,
+          "uuidAnnotationCount": 1405,
+          "hierarchical": true,
+          "sheetInstanceCount": 58,
+          "kicadFileVersions": [
+            "20230121"
+          ],
+          "kicadMajorGuess": 7,
+          "schematicFiles": [
+            "Alternatives/stm32mod.kicad_sch",
+            "keeb_left.kicad_sch",
+            "key_column.kicad_sch",
+            "key_module.kicad_sch",
+            "key_module_5.kicad_sch",
+            "PCB.kicad_sch",
+            "stm32mod.kicad_sch"
+          ],
+          "parserProjectRoot": "PCB.kicad_pro",
+          "unresolvedLibCount": 0
+        },
+        {
+          "label": "newer",
+          "requestedRef": "4c0d316fb844ea3e6e4d162ae49918d5c09a722f",
+          "commitSha": "4c0d316fb844ea3e6e4d162ae49918d5c09a722f",
+          "status": "ok",
+          "path": "fixtures/corpus/angloxx/newer",
+          "sheetCount": 54,
+          "componentCount": 540,
+          "uuidAnnotationCount": 441,
+          "hierarchical": true,
+          "sheetInstanceCount": 58,
+          "kicadFileVersions": [
+            "20230121",
+            "20231120"
+          ],
+          "kicadMajorGuess": 8,
+          "schematicFiles": [
+            "Alternatives/stm32mod.kicad_sch",
+            "keeb_left.kicad_sch",
+            "key_column.kicad_sch",
+            "key_module.kicad_sch",
+            "key_module_5.kicad_sch",
+            "PCB.kicad_sch",
+            "stm32mod.kicad_sch"
+          ],
+          "parserProjectRoot": "PCB.kicad_pro",
+          "unresolvedLibCount": 0
+        }
+      ],
+      "failed": false,
+      "errors": [],
+      "primary": {
+        "commitSha": "4c0d316fb844ea3e6e4d162ae49918d5c09a722f",
+        "componentCount": 540,
+        "sheetCount": 54,
+        "hierarchical": true,
+        "kicadMajorGuess": 8,
+        "kicadFileVersions": [
+          "20230121",
+          "20231120"
+        ]
+      }
+    },
+    {
+      "id": "glasgow",
+      "sourceRepoUrl": "https://github.com/whitequark/Glasgow",
+      "notes": "Glasgow Interface Explorer hardware",
+      "revisions": [
+        {
+          "label": "older",
+          "requestedRef": "13f7c6983dab2a86051267393506c52f18b08790",
+          "commitSha": "13f7c6983dab2a86051267393506c52f18b08790",
+          "status": "ok",
+          "path": "fixtures/corpus/glasgow/older",
+          "sheetCount": 4,
+          "componentCount": 474,
+          "uuidAnnotationCount": 0,
+          "hierarchical": true,
+          "sheetInstanceCount": 3,
+          "kicadFileVersions": [
+            "20231120"
+          ],
+          "kicadMajorGuess": 8,
+          "schematicFiles": [
+            "boards/glasgow/glasgow.kicad_sch",
+            "boards/glasgow/io_banks.kicad_sch",
+            "boards/glasgow/io_buffer.kicad_sch"
+          ],
+          "parserProjectRoot": "boards/glasgow/glasgow.kicad_pro",
+          "unresolvedLibCount": 0
+        },
+        {
+          "label": "newer",
+          "requestedRef": "06201dd31888e1af3ebefaaf6dc8b1d2babbbca9",
+          "commitSha": "06201dd31888e1af3ebefaaf6dc8b1d2babbbca9",
+          "status": "ok",
+          "path": "fixtures/corpus/glasgow/newer",
+          "sheetCount": 4,
+          "componentCount": 474,
+          "uuidAnnotationCount": 0,
+          "hierarchical": true,
+          "sheetInstanceCount": 3,
+          "kicadFileVersions": [
+            "20231120"
+          ],
+          "kicadMajorGuess": 8,
+          "schematicFiles": [
+            "boards/glasgow/glasgow.kicad_sch",
+            "boards/glasgow/io_banks.kicad_sch",
+            "boards/glasgow/io_buffer.kicad_sch"
+          ],
+          "parserProjectRoot": "boards/glasgow/glasgow.kicad_pro",
+          "unresolvedLibCount": 0
+        }
+      ],
+      "failed": false,
+      "errors": [],
+      "primary": {
+        "commitSha": "06201dd31888e1af3ebefaaf6dc8b1d2babbbca9",
+        "componentCount": 474,
+        "sheetCount": 4,
+        "hierarchical": true,
+        "kicadMajorGuess": 8,
+        "kicadFileVersions": [
+          "20231120"
+        ]
+      }
+    },
+    {
+      "id": "ethersweep",
+      "sourceRepoUrl": "https://github.com/Neumi/ethersweep",
+      "notes": "Ethersweep stepper controller family",
+      "revisions": [
+        {
+          "label": "older",
+          "requestedRef": "cffb18c5f0fe1418a2e64802ec5be14e98b6a215",
+          "commitSha": "cffb18c5f0fe1418a2e64802ec5be14e98b6a215",
+          "status": "ok",
+          "path": "fixtures/corpus/ethersweep/older",
+          "sheetCount": 1,
+          "componentCount": 227,
+          "uuidAnnotationCount": 6455,
+          "hierarchical": true,
+          "sheetInstanceCount": 0,
+          "kicadFileVersions": [
+            "20211123",
+            "20230121"
+          ],
+          "kicadMajorGuess": 7,
+          "schematicFiles": [
+            "development/ethersweep402/ethersweep.kicad_sch",
+            "development/ethersweep406/ethersweep.kicad_sch",
+            "development/ethersweep407_CAN/ethersweep.kicad_sch",
+            "development/ethersweep_tmc2209/ethersweep.kicad_sch",
+            "production/ethersweep405/ethersweep.kicad_sch"
+          ],
+          "parserProjectRoot": "production/ethersweep405/ethersweep.kicad_pro",
+          "unresolvedLibCount": 0
+        },
+        {
+          "label": "newer",
+          "requestedRef": "67f2547e582de59cb77d4b3c2a25c8a6326ed864",
+          "commitSha": "67f2547e582de59cb77d4b3c2a25c8a6326ed864",
+          "status": "ok",
+          "path": "fixtures/corpus/ethersweep/newer",
+          "sheetCount": 1,
+          "componentCount": 227,
+          "uuidAnnotationCount": 6455,
+          "hierarchical": true,
+          "sheetInstanceCount": 0,
+          "kicadFileVersions": [
+            "20211123",
+            "20230121"
+          ],
+          "kicadMajorGuess": 7,
+          "schematicFiles": [
+            "development/ethersweep402/ethersweep.kicad_sch",
+            "development/ethersweep406/ethersweep.kicad_sch",
+            "development/ethersweep407_CAN/ethersweep.kicad_sch",
+            "development/ethersweep_tmc2209/ethersweep.kicad_sch",
+            "production/ethersweep405/ethersweep.kicad_sch"
+          ],
+          "parserProjectRoot": "production/ethersweep405/ethersweep.kicad_pro",
+          "unresolvedLibCount": 0
+        }
+      ],
+      "failed": false,
+      "errors": [],
+      "primary": {
+        "commitSha": "67f2547e582de59cb77d4b3c2a25c8a6326ed864",
+        "componentCount": 227,
+        "sheetCount": 1,
+        "hierarchical": true,
+        "kicadMajorGuess": 7,
+        "kicadFileVersions": [
+          "20211123",
+          "20230121"
+        ]
+      }
+    },
+    {
+      "id": "kicad-demo-complex-hierarchy",
+      "sourceRepoUrl": "https://github.com/KiCad/kicad-source-mirror",
+      "notes": "Official KiCad complex_hierarchy demo (KiCad 7 → current)",
+      "revisions": [
+        {
+          "label": "older",
+          "requestedRef": "7.0.11",
+          "commitSha": "f67945aae92f39abd522454fc25cd73b145084dd",
+          "status": "ok",
+          "path": "fixtures/corpus/kicad-demo-complex-hierarchy/older",
+          "sheetCount": 3,
+          "componentCount": 119,
+          "uuidAnnotationCount": 366,
+          "hierarchical": true,
+          "sheetInstanceCount": 2,
+          "kicadFileVersions": [
+            "20230121"
+          ],
+          "kicadMajorGuess": 7,
+          "schematicFiles": [
+            "ampli_ht.kicad_sch",
+            "complex_hierarchy.kicad_sch"
+          ],
+          "parserProjectRoot": "complex_hierarchy.kicad_pro",
+          "unresolvedLibCount": 0
+        },
+        {
+          "label": "newer",
+          "requestedRef": "master",
+          "commitSha": "d4248d8a874d3fa9a3a395b471588bd6ecef34e3",
+          "status": "ok",
+          "path": "fixtures/corpus/kicad-demo-complex-hierarchy/newer",
+          "sheetCount": 3,
+          "componentCount": 119,
+          "uuidAnnotationCount": 0,
+          "hierarchical": true,
+          "sheetInstanceCount": 2,
+          "kicadFileVersions": [
+            "20250114"
+          ],
+          "kicadMajorGuess": 9,
+          "schematicFiles": [
+            "ampli_ht.kicad_sch",
+            "complex_hierarchy.kicad_sch"
+          ],
+          "parserProjectRoot": "complex_hierarchy.kicad_pro",
+          "unresolvedLibCount": 0
+        }
+      ],
+      "failed": false,
+      "errors": [],
+      "primary": {
+        "commitSha": "d4248d8a874d3fa9a3a395b471588bd6ecef34e3",
+        "componentCount": 119,
+        "sheetCount": 3,
+        "hierarchical": true,
+        "kicadMajorGuess": 9,
+        "kicadFileVersions": [
+          "20250114"
+        ]
+      }
+    },
+    {
+      "id": "kicad-demo-vme-wren",
+      "sourceRepoUrl": "https://github.com/KiCad/kicad-source-mirror",
+      "notes": "Official KiCad vme-wren — large multi-sheet hierarchical demo",
+      "revisions": [
+        {
+          "label": "newer",
+          "requestedRef": "master",
+          "commitSha": "d4248d8a874d3fa9a3a395b471588bd6ecef34e3",
+          "status": "ok",
+          "path": "fixtures/corpus/kicad-demo-vme-wren/newer",
+          "sheetCount": 73,
+          "componentCount": 2876,
+          "uuidAnnotationCount": 1177,
+          "hierarchical": true,
+          "sheetInstanceCount": 48,
+          "kicadFileVersions": [
+            "20230819",
+            "20250114"
+          ],
+          "kicadMajorGuess": 9,
+          "schematicFiles": [
+            "clocks.kicad_sch",
+            "ddr4-ps.kicad_sch",
+            "flash.kicad_sch",
+            "fpga-config.kicad_sch",
+            "fpga-hd-banks.kicad_sch",
+            "fpga-hp-banks.kicad_sch",
+            "fpga-mgts-power.kicad_sch",
+            "fpga-mgts.kicad_sch",
+            "fpga-mio.kicad_sch",
+            "fpga-power-gnd.kicad_sch",
+            "fpga-power.kicad_sch",
+            "fpga-ps-ddr.kicad_sch",
+            "fpga.kicad_sch",
+            "fp_connectors.kicad_sch",
+            "front-panel-io.kicad_sch",
+            "io_driver.kicad_sch",
+            "io_driver_32x.kicad_sch",
+            "io_driver_8x.kicad_sch",
+            "pcie_connector.kicad_sch",
+            "power-supply-1.kicad_sch",
+            "power-supply-2.kicad_sch",
+            "power-supply-3.kicad_sch",
+            "pp_driver_2x.kicad_sch",
+            "pp_driver_32x.kicad_sch",
+            "pp_driver_8x.kicad_sch",
+            "sfp+.kicad_sch",
+            "slow_gpio.kicad_sch",
+            "user_interface.kicad_sch",
+            "vme-wren.kicad_sch",
+            "vme_buffers_addr.kicad_sch",
+            "vme_buffers_aux.kicad_sch",
+            "vme_buffers_data.kicad_sch",
+            "vme_buffers_p0_hwbyte.kicad_sch",
+            "vme_buffers_userio_p2.kicad_sch",
+            "vme_interface.kicad_sch",
+            "vme_p0.kicad_sch",
+            "vme_p1_p2.kicad_sch"
+          ],
+          "parserProjectRoot": "vme-wren.kicad_pro",
+          "unresolvedLibCount": 2
+        }
+      ],
+      "failed": false,
+      "errors": [],
+      "primary": {
+        "commitSha": "d4248d8a874d3fa9a3a395b471588bd6ecef34e3",
+        "componentCount": 2876,
+        "sheetCount": 73,
+        "hierarchical": true,
+        "kicadMajorGuess": 9,
+        "kicadFileVersions": [
+          "20230819",
+          "20250114"
+        ]
+      }
+    }
+  ],
+  "summary": {
+    "attempted": 10,
+    "succeeded": 10,
+    "failed": 0,
+    "hierarchicalCount": 9,
+    "largeOver200Count": 7,
+    "dualRevisionCount": 8,
+    "kicadMajorsObserved": [
+      6,
+      7,
+      8,
+      9
+    ],
+    "criteria": {
+      "hierarchicalOk": true,
+      "largeOk": true,
+      "dualOk": true,
+      "versionSpanOk": true
+    }
+  }
+}

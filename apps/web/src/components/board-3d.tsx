@@ -2,7 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
-import type { DiffBundleData, PcbSnapshot } from "@flux/design-core";
+import type { DiffBundleData, PcbSnapshot } from "@solderlab/design-core";
 
 export default function Board3D({
   base,

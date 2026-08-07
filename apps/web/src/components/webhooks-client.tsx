@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Button, Input } from "@flux/ui";
+import { Button, Input } from "@solderlab/ui";
 
 export default function WebhooksClient({ orgSlug }: { orgSlug: string }) {
   const [hooks, setHooks] = useState<
     Array<{ id: string; url: string; events: string[]; active: boolean }>
   >([]);
-  const [url, setUrl] = useState("https://example.com/flux-hook");
+  const [url, setUrl] = useState("https://example.com/solderlab-hook");
 
   async function load() {
     const res = await fetch(`/api/orgs/${orgSlug}/webhooks`);

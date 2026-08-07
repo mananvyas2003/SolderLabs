@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@flux/ui/tokens.css";
+@import "@solderlab/ui/tokens.css";
 
 @theme {
   --font-sans: "Sora", "Segoe UI", sans-serif;

@@ -8,7 +8,7 @@ export function monorepoRoot() {
     if (fs.existsSync(pkg)) {
       try {
         const j = JSON.parse(fs.readFileSync(pkg, "utf8")) as { name?: string };
-        if (j.name === "flux") return dir;
+        if (j.name === "solderlab") return dir;
       } catch {
         /* continue */
       }
@@ -34,5 +34,5 @@ export function storageDir() {
 }
 
 export function dbFilePath() {
-  return path.join(dataDir(), "flux.json");
+  return path.join(dataDir(), "solderlab.json");
 }

@@ -1,4 +1,4 @@
-import type { PcbSnapshot, PcbFootprint, PcbTrack } from "@flux/design-core";
+import type { PcbSnapshot, PcbFootprint, PcbTrack } from "@solderlab/design-core";
 import fs from "node:fs";
 import path from "node:path";
 

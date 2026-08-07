@@ -14,7 +14,7 @@ const plex = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Flux — GitHub for Hardware",
+  title: "SolderLab — GitHub for Hardware",
   description:
     "Version, review, and release electronics designs together — with AI that understands what actually changed on the board.",
 };

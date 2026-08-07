@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { getDb, persist, nowIso } from "@flux/db";
-import { parseAltiumLikeText } from "@flux/parser";
+import { getDb, persist, nowIso } from "@solderlab/db";
+import { parseAltiumLikeText } from "@solderlab/parser";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject, getMainBranch } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";

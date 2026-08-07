@@ -1,0 +1,4092 @@
+// * generated-by: @solderlab/bsc (json)
+// * board: zynq-som
+// * source-revision: ad96951a225fbf9f263b555ef070a536b09ff710
+// * bsc-schema-version: 1.0
+// * source-sha256: 60e7f93961f901fb92c3a7fcd36ea09f0b5a118d4fb4292ab16b5c5f065f36d1
+// * DO NOT EDIT
+{
+  "schemaVersion": "1.0",
+  "boardName": "zynq-som",
+  "revision": "newer",
+  "generatedFrom": {
+    "revisionId": "ad96951a225fbf9f263b555ef070a536b09ff710",
+    "sha256": "60e7f93961f901fb92c3a7fcd36ea09f0b5a118d4fb4292ab16b5c5f065f36d1"
+  },
+  "mcus": [
+    {
+      "refdes": "U9",
+      "mpn": "STM32G431CBUx",
+      "package": "Mylibrary:STM32G431CBU6",
+      "confidenceNotes": [
+        {
+          "field": "mpn",
+          "reason": "Using Value field; dedicated MPN property absent"
+        }
+      ]
+    }
+  ],
+  "pins": [
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "1",
+      "pinName": "VBAT",
+      "net": "Net-(U9-Pad1)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "2",
+      "pinName": "PC13",
+      "net": "STM32_USB_CC1",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J1",
+          "pin": "69"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "3",
+      "pinName": "PC14",
+      "net": "STM32_GPIO2",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J1",
+          "pin": "63"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "4",
+      "pinName": "PC15",
+      "net": "STM32_USB_CC2",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J1",
+          "pin": "67"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "5",
+      "pinName": "PF0",
+      "net": "ZYNQ_PS_SRST",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R94",
+          "pin": "1"
+        },
+        {
+          "refdes": "TP5",
+          "pin": "1"
+        },
+        {
+          "refdes": "U2",
+          "pin": "D13"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "6",
+      "pinName": "PF1",
+      "net": "ZYNQ_PS_POR",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R100",
+          "pin": "1"
+        },
+        {
+          "refdes": "U2",
+          "pin": "B6"
+        },
+        {
+          "refdes": "U2",
+          "pin": "W3"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "7",
+      "pinName": "PG10",
+      "net": "Net-(U9-Pad7)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "8",
+      "pinName": "PA0",
+      "net": "Net-(U9-Pad8)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "9",
+      "pinName": "PA1",
+      "net": "Net-(U9-Pad9)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "10",
+      "pinName": "PA2",
+      "net": "Net-(U9-Pad10)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "11",
+      "pinName": "PA3",
+      "net": "Net-(U9-Pad11)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "12",
+      "pinName": "PA4",
+      "net": "Net-(U9-Pad12)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "13",
+      "pinName": "PA5",
+      "net": "Net-(U9-Pad13)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "14",
+      "pinName": "PA6",
+      "net": "Net-(U9-Pad14)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "15",
+      "pinName": "PA7",
+      "net": "Net-(U9-Pad15)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "16",
+      "pinName": "PC4",
+      "net": "STM32_GPIO7",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J1",
+          "pin": "39"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "17",
+      "pinName": "PB0",
+      "net": "ZYNQ_BMODE_0",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R6",
+          "pin": "1"
+        },
+        {
+          "refdes": "TP10",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "18",
+      "pinName": "PB1",
+      "net": "SENSE_1V8",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R80",
+          "pin": "1"
+        },
+        {
+          "refdes": "R81",
+          "pin": "2"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "19",
+      "pinName": "PB2",
+      "net": "SENSE_1V35",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R84",
+          "pin": "1"
+        },
+        {
+          "refdes": "R85",
+          "pin": "2"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "20",
+      "pinName": "VREF+",
+      "net": "Net-(U9-Pad20)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "21",
+      "pinName": "VDDA",
+      "net": "Net-(U9-Pad21)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "22",
+      "pinName": "PB10",
+      "net": "eMMC_~{RST}",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R97",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "23",
+      "pinName": "VDD",
+      "net": "Net-(U9-Pad23)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "24",
+      "pinName": "PB11",
+      "net": "Net-(U9-Pad24)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "25",
+      "pinName": "PB12",
+      "net": "1V35_PG",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R36",
+          "pin": "1"
+        },
+        {
+          "refdes": "U10",
+          "pin": "2"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "26",
+      "pinName": "PB13",
+      "net": "1V0_EN",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R27",
+          "pin": "2"
+        },
+        {
+          "refdes": "U8",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "27",
+      "pinName": "PB14",
+      "net": "Net-(U9-Pad27)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "28",
+      "pinName": "PB15",
+      "net": "STM32_NRST",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "C13",
+          "pin": "2"
+        },
+        {
+          "refdes": "J1",
+          "pin": "51"
+        },
+        {
+          "refdes": "R3",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "29",
+      "pinName": "PC6",
+      "net": "1V8_EN",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R30",
+          "pin": "2"
+        },
+        {
+          "refdes": "U4",
+          "pin": "3"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "30",
+      "pinName": "PA8",
+      "net": "Net-(U9-Pad30)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "31",
+      "pinName": "PA9",
+      "net": "Net-(U9-Pad31)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "32",
+      "pinName": "PA10",
+      "net": "Net-(U9-Pad32)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "33",
+      "pinName": "PA11",
+      "net": "Net-(U9-Pad33)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "34",
+      "pinName": "PA12",
+      "net": "Net-(U9-Pad34)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "35",
+      "pinName": "VDD",
+      "net": "Net-(U9-Pad35)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "36",
+      "pinName": "PA13",
+      "net": "Net-(U9-Pad36)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "37",
+      "pinName": "PA14",
+      "net": "Net-(U9-Pad37)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "38",
+      "pinName": "PA15",
+      "net": "Net-(U9-Pad38)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "39",
+      "pinName": "PC10",
+      "net": "STM32_BOOT0",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J1",
+          "pin": "41"
+        },
+        {
+          "refdes": "R4",
+          "pin": "2"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "40",
+      "pinName": "PC11",
+      "net": "Net-(U9-Pad40)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "41",
+      "pinName": "PB3",
+      "net": "Net-(U9-Pad41)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "42",
+      "pinName": "PB4",
+      "net": "1V8_PG",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R29",
+          "pin": "1"
+        },
+        {
+          "refdes": "U4",
+          "pin": "5"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "43",
+      "pinName": "PB5",
+      "net": "3V3_EN",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R31",
+          "pin": "2"
+        },
+        {
+          "refdes": "U6",
+          "pin": "3"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "44",
+      "pinName": "PB6",
+      "net": "1V0_PG",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R28",
+          "pin": "1"
+        },
+        {
+          "refdes": "U8",
+          "pin": "17"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "45",
+      "pinName": "PB7",
+      "net": "STM32_GPIO1",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J1",
+          "pin": "65"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "46",
+      "pinName": "PB8",
+      "net": "STM32_GPIO3",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "J1",
+          "pin": "55"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "47",
+      "pinName": "PB9",
+      "net": "USB_PHY_RST",
+      "function": null,
+      "connectedTo": [
+        {
+          "refdes": "R5",
+          "pin": "1"
+        }
+      ],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "48",
+      "pinName": "VDD",
+      "net": "Net-(U9-Pad48)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    },
+    {
+      "mcuRefdes": "U9",
+      "pinNumber": "49",
+      "pinName": "VSS",
+      "net": "Net-(U9-Pad49)",
+      "function": null,
+      "connectedTo": [],
+      "direction": null,
+      "pullState": null,
+      "confidenceNotes": [
+        {
+          "field": "function",
+          "reason": "Pin mux / alternate function not in schematic; left null"
+        },
+        {
+          "field": "direction",
+          "reason": "Electrical direction not reliably in snapshot; left null"
+        },
+        {
+          "field": "pullState",
+          "reason": "Pull-up/down not encoded on pin; left null"
+        }
+      ]
+    }
+  ],
+  "revStraps": [],
+  "busDevices": [],
+  "powerRails": [
+    {
+      "name": "1V0_EN",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"1V0_EN\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "1V0_ETH",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"1V0_ETH\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "1V0_PG",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"1V0_PG\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "1V35_EN",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"1V35_EN\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "1V35_PG",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"1V35_PG\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "1V8_EN",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"1V8_EN\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "1V8_PG",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"1V8_PG\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "1V8A_ETH",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"1V8A_ETH\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "3V3_EN",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"3V3_EN\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "3V3_PG",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"3V3_PG\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "3V3A_ETH",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"3V3A_ETH\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "VBUS_OUT_EN",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"VBUS_OUT_EN\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "VCCADC",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"VCCADC\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    },
+    {
+      "name": "VCCPLL",
+      "nominalVolts": null,
+      "tolerancePct": null,
+      "sourceRefdes": null,
+      "enableNet": null,
+      "senseNet": null,
+      "sequenceIndex": null,
+      "confidenceNotes": [
+        {
+          "field": "nominalVolts",
+          "reason": "Net name \"VCCPLL\" does not encode an unambiguous voltage"
+        },
+        {
+          "field": "tolerancePct",
+          "reason": "Tolerance not present in schematic; left null"
+        },
+        {
+          "field": "sourceRefdes",
+          "reason": "Regulator source inference not implemented; left null"
+        },
+        {
+          "field": "enableNet",
+          "reason": "Enable net not inferred; left null"
+        },
+        {
+          "field": "senseNet",
+          "reason": "Sense net not inferred; left null"
+        },
+        {
+          "field": "sequenceIndex",
+          "reason": "Power sequence not encoded; left null"
+        }
+      ]
+    }
+  ],
+  "connectors": [
+    {
+      "refdes": "J1",
+      "description": "DF40C-100DS-0.4V_51",
+      "pins": [
+        {
+          "number": "1",
+          "net": "ETH_PHY_MDI0_P",
+          "signal": "1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "ETH_LED1",
+          "signal": "2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "ETH_PHY_MDI0_N",
+          "signal": "3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J1-Pad4)",
+          "signal": "4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "5",
+          "net": "Net-(#PWR0130-Pad1)",
+          "signal": "5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "6",
+          "net": "ETH_LED2",
+          "signal": "6",
+          "confidenceNotes": []
+        },
+        {
+          "number": "7",
+          "net": "ETH_PHY_MDI1_P",
+          "signal": "7",
+          "confidenceNotes": []
+        },
+        {
+          "number": "8",
+          "net": "IO_L1_N_35",
+          "signal": "8",
+          "confidenceNotes": []
+        },
+        {
+          "number": "9",
+          "net": "ETH_PHY_MDI1_N",
+          "signal": "9",
+          "confidenceNotes": []
+        },
+        {
+          "number": "10",
+          "net": "IO_L5_P_35",
+          "signal": "10",
+          "confidenceNotes": []
+        },
+        {
+          "number": "11",
+          "net": "Net-(#PWR0130-Pad1)",
+          "signal": "11",
+          "confidenceNotes": []
+        },
+        {
+          "number": "12",
+          "net": "IO_L5_N_35",
+          "signal": "12",
+          "confidenceNotes": []
+        },
+        {
+          "number": "13",
+          "net": "ETH_PHY_MDI2_P",
+          "signal": "13",
+          "confidenceNotes": []
+        },
+        {
+          "number": "14",
+          "net": "IO_0_35",
+          "signal": "14",
+          "confidenceNotes": []
+        },
+        {
+          "number": "15",
+          "net": "ETH_PHY_MDI2_N",
+          "signal": "15",
+          "confidenceNotes": []
+        },
+        {
+          "number": "16",
+          "net": "IO_L4_N_35",
+          "signal": "16",
+          "confidenceNotes": []
+        },
+        {
+          "number": "17",
+          "net": "Net-(#PWR0130-Pad1)",
+          "signal": "17",
+          "confidenceNotes": []
+        },
+        {
+          "number": "18",
+          "net": "Net-(J1-Pad4)",
+          "signal": "18",
+          "confidenceNotes": []
+        },
+        {
+          "number": "19",
+          "net": "ETH_PHY_MDI3_P",
+          "signal": "19",
+          "confidenceNotes": []
+        },
+        {
+          "number": "20",
+          "net": "IO_L4_P_35",
+          "signal": "20",
+          "confidenceNotes": []
+        },
+        {
+          "number": "21",
+          "net": "ETH_PHY_MDI3_N",
+          "signal": "21",
+          "confidenceNotes": []
+        },
+        {
+          "number": "22",
+          "net": "IO_L6_P_35",
+          "signal": "22",
+          "confidenceNotes": []
+        },
+        {
+          "number": "23",
+          "net": "Net-(#PWR0130-Pad1)",
+          "signal": "23",
+          "confidenceNotes": []
+        },
+        {
+          "number": "24",
+          "net": "IO_L6_VREF_N_35",
+          "signal": "24",
+          "confidenceNotes": []
+        },
+        {
+          "number": "25",
+          "net": "SDIO_D2",
+          "signal": "25",
+          "confidenceNotes": []
+        },
+        {
+          "number": "26",
+          "net": "IO_L1_P_35",
+          "signal": "26",
+          "confidenceNotes": []
+        },
+        {
+          "number": "27",
+          "net": "SDIO_D3",
+          "signal": "27",
+          "confidenceNotes": []
+        },
+        {
+          "number": "28",
+          "net": "Net-(J1-Pad4)",
+          "signal": "28",
+          "confidenceNotes": []
+        },
+        {
+          "number": "29",
+          "net": "SDIO_CMD",
+          "signal": "29",
+          "confidenceNotes": []
+        },
+        {
+          "number": "30",
+          "net": "ZYNQ_TDI",
+          "signal": "30",
+          "confidenceNotes": []
+        },
+        {
+          "number": "31",
+          "net": "SDIO_CLK",
+          "signal": "31",
+          "confidenceNotes": []
+        },
+        {
+          "number": "32",
+          "net": "ZYNQ_TDO",
+          "signal": "32",
+          "confidenceNotes": []
+        },
+        {
+          "number": "33",
+          "net": "SDIO_D0",
+          "signal": "33",
+          "confidenceNotes": []
+        },
+        {
+          "number": "34",
+          "net": "ZYNQ_TMS",
+          "signal": "34",
+          "confidenceNotes": []
+        },
+        {
+          "number": "35",
+          "net": "Net-(#PWR0130-Pad1)",
+          "signal": "35",
+          "confidenceNotes": []
+        },
+        {
+          "number": "36",
+          "net": "ZYNQ_TCK",
+          "signal": "36",
+          "confidenceNotes": []
+        },
+        {
+          "number": "37",
+          "net": "SDIO_D1",
+          "signal": "37",
+          "confidenceNotes": []
+        },
+        {
+          "number": "38",
+          "net": "Net-(J1-Pad4)",
+          "signal": "38",
+          "confidenceNotes": []
+        },
+        {
+          "number": "39",
+          "net": "STM32_GPIO7",
+          "signal": "39",
+          "confidenceNotes": []
+        },
+        {
+          "number": "40",
+          "net": "Net-(#PWR0146-Pad1)",
+          "signal": "40",
+          "confidenceNotes": []
+        },
+        {
+          "number": "41",
+          "net": "STM32_BOOT0",
+          "signal": "41",
+          "confidenceNotes": []
+        },
+        {
+          "number": "42",
+          "net": "Net-(#PWR0146-Pad1)",
+          "signal": "42",
+          "confidenceNotes": []
+        },
+        {
+          "number": "43",
+          "net": "STM32_DAC2",
+          "signal": "43",
+          "confidenceNotes": []
+        },
+        {
+          "number": "44",
+          "net": "Net-(#PWR0146-Pad1)",
+          "signal": "44",
+          "confidenceNotes": []
+        },
+        {
+          "number": "45",
+          "net": "STM32_GPIO5",
+          "signal": "45",
+          "confidenceNotes": []
+        },
+        {
+          "number": "46",
+          "net": "STM32_GPIO8",
+          "signal": "46",
+          "confidenceNotes": []
+        },
+        {
+          "number": "47",
+          "net": "Net-(#PWR0130-Pad1)",
+          "signal": "47",
+          "confidenceNotes": []
+        },
+        {
+          "number": "48",
+          "net": "ZYNQ_PS_MIO9",
+          "signal": "48",
+          "confidenceNotes": []
+        },
+        {
+          "number": "49",
+          "net": "STM32_DAC1",
+          "signal": "49",
+          "confidenceNotes": []
+        },
+        {
+          "number": "50",
+          "net": "ZYNQ_PS_MIO0",
+          "signal": "50",
+          "confidenceNotes": []
+        },
+        {
+          "number": "51",
+          "net": "STM32_NRST",
+          "signal": "51",
+          "confidenceNotes": []
+        },
+        {
+          "number": "52",
+          "net": "ZYNQ_PS_MIO11",
+          "signal": "52",
+          "confidenceNotes": []
+        },
+        {
+          "number": "53",
+          "net": "STM32_GPIO6",
+          "signal": "53",
+          "confidenceNotes": []
+        },
+        {
+          "number": "54",
+          "net": "ZYNQ_PS_MIO12",
+          "signal": "54",
+          "confidenceNotes": []
+        },
+        {
+          "number": "55",
+          "net": "STM32_GPIO3",
+          "signal": "55",
+          "confidenceNotes": []
+        },
+        {
+          "number": "56",
+          "net": "Net-(J1-Pad4)",
+          "signal": "56",
+          "confidenceNotes": []
+        },
+        {
+          "number": "57",
+          "net": "STM32_GPIO4",
+          "signal": "57",
+          "confidenceNotes": []
+        },
+        {
+          "number": "58",
+          "net": "ZYNQ_PS_MIO10",
+          "signal": "58",
+          "confidenceNotes": []
+        },
+        {
+          "number": "59",
+          "net": "Net-(#PWR0130-Pad1)",
+          "signal": "59",
+          "confidenceNotes": []
+        },
+        {
+          "number": "60",
+          "net": "ZYNQ_PS_MIO7{slash}VM0",
+          "signal": "60",
+          "confidenceNotes": []
+        },
+        {
+          "number": "61",
+          "net": "Net-(J1-Pad61)",
+          "signal": "61",
+          "confidenceNotes": []
+        },
+        {
+          "number": "62",
+          "net": "VBUS_OUT_EN",
+          "signal": "62",
+          "confidenceNotes": []
+        },
+        {
+          "number": "63",
+          "net": "STM32_GPIO2",
+          "signal": "63",
+          "confidenceNotes": []
+        },
+        {
+          "number": "64",
+          "net": "ZYNQ_PS_MIO8\\\\VM1",
+          "signal": "64",
+          "confidenceNotes": []
+        },
+        {
+          "number": "65",
+          "net": "STM32_GPIO1",
+          "signal": "65",
+          "confidenceNotes": []
+        },
+        {
+          "number": "66",
+          "net": "Net-(J1-Pad4)",
+          "signal": "66",
+          "confidenceNotes": []
+        },
+        {
+          "number": "67",
+          "net": "STM32_USB_CC2",
+          "signal": "67",
+          "confidenceNotes": []
+        },
+        {
+          "number": "68",
+          "net": "USB_D+",
+          "signal": "68",
+          "confidenceNotes": []
+        },
+        {
+          "number": "69",
+          "net": "STM32_USB_CC1",
+          "signal": "69",
+          "confidenceNotes": []
+        },
+        {
+          "number": "70",
+          "net": "USB_D-",
+          "signal": "70",
+          "confidenceNotes": []
+        },
+        {
+          "number": "71",
+          "net": "Net-(J1-Pad71)",
+          "signal": "71",
+          "confidenceNotes": []
+        },
+        {
+          "number": "72",
+          "net": "Net-(J1-Pad4)",
+          "signal": "72",
+          "confidenceNotes": []
+        },
+        {
+          "number": "73",
+          "net": "Net-(J1-Pad71)",
+          "signal": "73",
+          "confidenceNotes": []
+        },
+        {
+          "number": "74",
+          "net": "Net-(#PWR033-Pad1)",
+          "signal": "74",
+          "confidenceNotes": []
+        },
+        {
+          "number": "75",
+          "net": "Net-(#PWR0130-Pad1)",
+          "signal": "75",
+          "confidenceNotes": []
+        },
+        {
+          "number": "76",
+          "net": "Net-(#PWR033-Pad1)",
+          "signal": "76",
+          "confidenceNotes": []
+        },
+        {
+          "number": "77",
+          "net": "STM32_USB_D_N",
+          "signal": "77",
+          "confidenceNotes": []
+        },
+        {
+          "number": "78",
+          "net": "USB_VBUS",
+          "signal": "78",
+          "confidenceNotes": []
+        },
+        {
+          "number": "79",
+          "net": "STM32_USB_D_P",
+          "signal": "79",
+          "confidenceNotes": []
+        },
+        {
+          "number": "80",
+          "net": "USB_ID",
+          "signal": "80",
+          "confidenceNotes": []
+        },
+        {
+          "number": "81",
+          "net": "Net-(#PWR0130-Pad1)",
+          "signal": "81",
+          "confidenceNotes": []
+        },
+        {
+          "number": "82",
+          "net": "Net-(J1-Pad4)",
+          "signal": "82",
+          "confidenceNotes": []
+        },
+        {
+          "number": "83",
+          "net": "Net-(#PWR0130-Pad1)",
+          "signal": "83",
+          "confidenceNotes": []
+        },
+        {
+          "number": "84",
+          "net": "Net-(J1-Pad4)",
+          "signal": "84",
+          "confidenceNotes": []
+        },
+        {
+          "number": "85",
+          "net": "Net-(#PWR0168-Pad1)",
+          "signal": "85",
+          "confidenceNotes": []
+        },
+        {
+          "number": "86",
+          "net": "Net-(#PWR0169-Pad1)",
+          "signal": "86",
+          "confidenceNotes": []
+        },
+        {
+          "number": "87",
+          "net": "Net-(#PWR0168-Pad1)",
+          "signal": "87",
+          "confidenceNotes": []
+        },
+        {
+          "number": "88",
+          "net": "Net-(#PWR0169-Pad1)",
+          "signal": "88",
+          "confidenceNotes": []
+        },
+        {
+          "number": "89",
+          "net": "Net-(#PWR0168-Pad1)",
+          "signal": "89",
+          "confidenceNotes": []
+        },
+        {
+          "number": "90",
+          "net": "Net-(#PWR0169-Pad1)",
+          "signal": "90",
+          "confidenceNotes": []
+        },
+        {
+          "number": "91",
+          "net": "Net-(#PWR0168-Pad1)",
+          "signal": "91",
+          "confidenceNotes": []
+        },
+        {
+          "number": "92",
+          "net": "Net-(#PWR0169-Pad1)",
+          "signal": "92",
+          "confidenceNotes": []
+        },
+        {
+          "number": "93",
+          "net": "Net-(#PWR0168-Pad1)",
+          "signal": "93",
+          "confidenceNotes": []
+        },
+        {
+          "number": "94",
+          "net": "Net-(#PWR0169-Pad1)",
+          "signal": "94",
+          "confidenceNotes": []
+        },
+        {
+          "number": "95",
+          "net": "Net-(#PWR0168-Pad1)",
+          "signal": "95",
+          "confidenceNotes": []
+        },
+        {
+          "number": "96",
+          "net": "Net-(#PWR0169-Pad1)",
+          "signal": "96",
+          "confidenceNotes": []
+        },
+        {
+          "number": "97",
+          "net": "Net-(#PWR0168-Pad1)",
+          "signal": "97",
+          "confidenceNotes": []
+        },
+        {
+          "number": "98",
+          "net": "Net-(#PWR0169-Pad1)",
+          "signal": "98",
+          "confidenceNotes": []
+        },
+        {
+          "number": "99",
+          "net": "Net-(J1-Pad99)",
+          "signal": "99",
+          "confidenceNotes": []
+        },
+        {
+          "number": "100",
+          "net": "Net-(J1-Pad100)",
+          "signal": "100",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J2",
+      "description": "DF40C-100DS-0.4V_51",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(J2-Pad1)",
+          "signal": "1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(J2-Pad2)",
+          "signal": "2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J2-Pad1)",
+          "signal": "3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(J2-Pad4)",
+          "signal": "4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "5",
+          "net": "IO_L11_SRCC_P_33",
+          "signal": "5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "6",
+          "net": "IO_L10_N_33",
+          "signal": "6",
+          "confidenceNotes": []
+        },
+        {
+          "number": "7",
+          "net": "IO_L11_SRCC_N_33",
+          "signal": "7",
+          "confidenceNotes": []
+        },
+        {
+          "number": "8",
+          "net": "IO_L10_P_33",
+          "signal": "8",
+          "confidenceNotes": []
+        },
+        {
+          "number": "9",
+          "net": "IO_L6_P_33",
+          "signal": "9",
+          "confidenceNotes": []
+        },
+        {
+          "number": "10",
+          "net": "IO_L12_MRCC_P_33",
+          "signal": "10",
+          "confidenceNotes": []
+        },
+        {
+          "number": "11",
+          "net": "IO_L16_N_33",
+          "signal": "11",
+          "confidenceNotes": []
+        },
+        {
+          "number": "12",
+          "net": "IO_L12_MRCC_N_33",
+          "signal": "12",
+          "confidenceNotes": []
+        },
+        {
+          "number": "13",
+          "net": "Net-(J2-Pad1)",
+          "signal": "13",
+          "confidenceNotes": []
+        },
+        {
+          "number": "14",
+          "net": "Net-(J2-Pad4)",
+          "signal": "14",
+          "confidenceNotes": []
+        },
+        {
+          "number": "15",
+          "net": "IO_L14_SRCC_N_33",
+          "signal": "15",
+          "confidenceNotes": []
+        },
+        {
+          "number": "16",
+          "net": "IO_L17_N_33",
+          "signal": "16",
+          "confidenceNotes": []
+        },
+        {
+          "number": "17",
+          "net": "IO_L14_SRCC_P_33",
+          "signal": "17",
+          "confidenceNotes": []
+        },
+        {
+          "number": "18",
+          "net": "IO_L17_P_33",
+          "signal": "18",
+          "confidenceNotes": []
+        },
+        {
+          "number": "19",
+          "net": "IO_25_33",
+          "signal": "19",
+          "confidenceNotes": []
+        },
+        {
+          "number": "20",
+          "net": "IO_L18_N_33",
+          "signal": "20",
+          "confidenceNotes": []
+        },
+        {
+          "number": "21",
+          "net": "IO_L15_P_33",
+          "signal": "21",
+          "confidenceNotes": []
+        },
+        {
+          "number": "22",
+          "net": "IO_L18_P_33",
+          "signal": "22",
+          "confidenceNotes": []
+        },
+        {
+          "number": "23",
+          "net": "Net-(J2-Pad1)",
+          "signal": "23",
+          "confidenceNotes": []
+        },
+        {
+          "number": "24",
+          "net": "Net-(J2-Pad4)",
+          "signal": "24",
+          "confidenceNotes": []
+        },
+        {
+          "number": "25",
+          "net": "IO_L21_DQS_N_33",
+          "signal": "25",
+          "confidenceNotes": []
+        },
+        {
+          "number": "26",
+          "net": "IO_L24_N_33",
+          "signal": "26",
+          "confidenceNotes": []
+        },
+        {
+          "number": "27",
+          "net": "IO_L21_DQS_P_33",
+          "signal": "27",
+          "confidenceNotes": []
+        },
+        {
+          "number": "28",
+          "net": "IO_L24_P_33",
+          "signal": "28",
+          "confidenceNotes": []
+        },
+        {
+          "number": "29",
+          "net": "IO_L22_N_33",
+          "signal": "29",
+          "confidenceNotes": []
+        },
+        {
+          "number": "30",
+          "net": "IO_L23_P_33",
+          "signal": "30",
+          "confidenceNotes": []
+        },
+        {
+          "number": "31",
+          "net": "IO_L22_P_33",
+          "signal": "31",
+          "confidenceNotes": []
+        },
+        {
+          "number": "32",
+          "net": "IO_L23_N_33",
+          "signal": "32",
+          "confidenceNotes": []
+        },
+        {
+          "number": "33",
+          "net": "Net-(J2-Pad1)",
+          "signal": "33",
+          "confidenceNotes": []
+        },
+        {
+          "number": "34",
+          "net": "Net-(J2-Pad4)",
+          "signal": "34",
+          "confidenceNotes": []
+        },
+        {
+          "number": "35",
+          "net": "IO_L4_N_13",
+          "signal": "35",
+          "confidenceNotes": []
+        },
+        {
+          "number": "36",
+          "net": "IO_L7_N_13",
+          "signal": "36",
+          "confidenceNotes": []
+        },
+        {
+          "number": "37",
+          "net": "IO_L4_P_13",
+          "signal": "37",
+          "confidenceNotes": []
+        },
+        {
+          "number": "38",
+          "net": "IO_L7_P_13",
+          "signal": "38",
+          "confidenceNotes": []
+        },
+        {
+          "number": "39",
+          "net": "IO_L20_P_33",
+          "signal": "39",
+          "confidenceNotes": []
+        },
+        {
+          "number": "40",
+          "net": "IO_L8_N_13",
+          "signal": "40",
+          "confidenceNotes": []
+        },
+        {
+          "number": "41",
+          "net": "IO_L1P_13",
+          "signal": "41",
+          "confidenceNotes": []
+        },
+        {
+          "number": "42",
+          "net": "IO_L8_P_13",
+          "signal": "42",
+          "confidenceNotes": []
+        },
+        {
+          "number": "43",
+          "net": "Net-(J2-Pad1)",
+          "signal": "43",
+          "confidenceNotes": []
+        },
+        {
+          "number": "44",
+          "net": "Net-(J2-Pad4)",
+          "signal": "44",
+          "confidenceNotes": []
+        },
+        {
+          "number": "45",
+          "net": "IO_L10_P_13",
+          "signal": "45",
+          "confidenceNotes": []
+        },
+        {
+          "number": "46",
+          "net": "IO_L15_N_33",
+          "signal": "46",
+          "confidenceNotes": []
+        },
+        {
+          "number": "47",
+          "net": "IO_L10_N_13",
+          "signal": "47",
+          "confidenceNotes": []
+        },
+        {
+          "number": "48",
+          "net": "IO_L19_VREF_N_33",
+          "signal": "48",
+          "confidenceNotes": []
+        },
+        {
+          "number": "49",
+          "net": "IO_L12_MRCC_P_13",
+          "signal": "49",
+          "confidenceNotes": []
+        },
+        {
+          "number": "50",
+          "net": "IO_L9_DQS_P_13",
+          "signal": "50",
+          "confidenceNotes": []
+        },
+        {
+          "number": "51",
+          "net": "IO_L12_MRCC_N_13",
+          "signal": "51",
+          "confidenceNotes": []
+        },
+        {
+          "number": "52",
+          "net": "IO_L9_DQS_N_13",
+          "signal": "52",
+          "confidenceNotes": []
+        },
+        {
+          "number": "53",
+          "net": "Net-(J2-Pad1)",
+          "signal": "53",
+          "confidenceNotes": []
+        },
+        {
+          "number": "54",
+          "net": "Net-(J2-Pad4)",
+          "signal": "54",
+          "confidenceNotes": []
+        },
+        {
+          "number": "55",
+          "net": "IO_L3_N_13",
+          "signal": "55",
+          "confidenceNotes": []
+        },
+        {
+          "number": "56",
+          "net": "IO_L20_N_33",
+          "signal": "56",
+          "confidenceNotes": []
+        },
+        {
+          "number": "57",
+          "net": "IO_L14_P_SRCC_13",
+          "signal": "57",
+          "confidenceNotes": []
+        },
+        {
+          "number": "58",
+          "net": "IO_L11_SRCC_P_13",
+          "signal": "58",
+          "confidenceNotes": []
+        },
+        {
+          "number": "59",
+          "net": "IO_L14_N_SRCC_13",
+          "signal": "59",
+          "confidenceNotes": []
+        },
+        {
+          "number": "60",
+          "net": "IO_L11_SRCC_N_13",
+          "signal": "60",
+          "confidenceNotes": []
+        },
+        {
+          "number": "61",
+          "net": "IO_L1_N_13",
+          "signal": "61",
+          "confidenceNotes": []
+        },
+        {
+          "number": "62",
+          "net": "IO_L5P_13",
+          "signal": "62",
+          "confidenceNotes": []
+        },
+        {
+          "number": "63",
+          "net": "Net-(J2-Pad1)",
+          "signal": "63",
+          "confidenceNotes": []
+        },
+        {
+          "number": "64",
+          "net": "Net-(J2-Pad4)",
+          "signal": "64",
+          "confidenceNotes": []
+        },
+        {
+          "number": "65",
+          "net": "IO_L23_P_13",
+          "signal": "65",
+          "confidenceNotes": []
+        },
+        {
+          "number": "66",
+          "net": "IO_L17_P_13",
+          "signal": "66",
+          "confidenceNotes": []
+        },
+        {
+          "number": "67",
+          "net": "IO_L23_N_13",
+          "signal": "67",
+          "confidenceNotes": []
+        },
+        {
+          "number": "68",
+          "net": "IO_L17_N_13",
+          "signal": "68",
+          "confidenceNotes": []
+        },
+        {
+          "number": "69",
+          "net": "IO_L13_MRCC_P_13",
+          "signal": "69",
+          "confidenceNotes": []
+        },
+        {
+          "number": "70",
+          "net": "IO_L16_P_13",
+          "signal": "70",
+          "confidenceNotes": []
+        },
+        {
+          "number": "71",
+          "net": "IO_L13_MRCC_N_13",
+          "signal": "71",
+          "confidenceNotes": []
+        },
+        {
+          "number": "72",
+          "net": "IO_L16_N_13",
+          "signal": "72",
+          "confidenceNotes": []
+        },
+        {
+          "number": "73",
+          "net": "Net-(J2-Pad1)",
+          "signal": "73",
+          "confidenceNotes": []
+        },
+        {
+          "number": "74",
+          "net": "Net-(J2-Pad4)",
+          "signal": "74",
+          "confidenceNotes": []
+        },
+        {
+          "number": "75",
+          "net": "IO_25_13",
+          "signal": "75",
+          "confidenceNotes": []
+        },
+        {
+          "number": "76",
+          "net": "IO_L5_N_13",
+          "signal": "76",
+          "confidenceNotes": []
+        },
+        {
+          "number": "77",
+          "net": "IO_L6_P_13",
+          "signal": "77",
+          "confidenceNotes": []
+        },
+        {
+          "number": "78",
+          "net": "IO_L19_P_33",
+          "signal": "78",
+          "confidenceNotes": []
+        },
+        {
+          "number": "79",
+          "net": "IO_L22_P_13",
+          "signal": "79",
+          "confidenceNotes": []
+        },
+        {
+          "number": "80",
+          "net": "IO_L2_P_13",
+          "signal": "80",
+          "confidenceNotes": []
+        },
+        {
+          "number": "81",
+          "net": "IO_L6_N_VREF_13",
+          "signal": "81",
+          "confidenceNotes": []
+        },
+        {
+          "number": "82",
+          "net": "IO_L3_P_13",
+          "signal": "82",
+          "confidenceNotes": []
+        },
+        {
+          "number": "83",
+          "net": "Net-(J2-Pad1)",
+          "signal": "83",
+          "confidenceNotes": []
+        },
+        {
+          "number": "84",
+          "net": "Net-(J2-Pad4)",
+          "signal": "84",
+          "confidenceNotes": []
+        },
+        {
+          "number": "85",
+          "net": "IO_L21_P_13",
+          "signal": "85",
+          "confidenceNotes": []
+        },
+        {
+          "number": "86",
+          "net": "IO_L2_N_13",
+          "signal": "86",
+          "confidenceNotes": []
+        },
+        {
+          "number": "87",
+          "net": "IO_L18_P_13",
+          "signal": "87",
+          "confidenceNotes": []
+        },
+        {
+          "number": "88",
+          "net": "IO_L19_P_13",
+          "signal": "88",
+          "confidenceNotes": []
+        },
+        {
+          "number": "89",
+          "net": "IO_L15_P_13",
+          "signal": "89",
+          "confidenceNotes": []
+        },
+        {
+          "number": "90",
+          "net": "IO_L24_P_13",
+          "signal": "90",
+          "confidenceNotes": []
+        },
+        {
+          "number": "91",
+          "net": "IO_L24_N_13",
+          "signal": "91",
+          "confidenceNotes": []
+        },
+        {
+          "number": "92",
+          "net": "IO_L18_N_13",
+          "signal": "92",
+          "confidenceNotes": []
+        },
+        {
+          "number": "93",
+          "net": "Net-(J2-Pad1)",
+          "signal": "93",
+          "confidenceNotes": []
+        },
+        {
+          "number": "94",
+          "net": "Net-(J2-Pad4)",
+          "signal": "94",
+          "confidenceNotes": []
+        },
+        {
+          "number": "95",
+          "net": "Net-(J2-Pad95)",
+          "signal": "95",
+          "confidenceNotes": []
+        },
+        {
+          "number": "96",
+          "net": "Net-(J2-Pad4)",
+          "signal": "96",
+          "confidenceNotes": []
+        },
+        {
+          "number": "97",
+          "net": "Net-(J2-Pad95)",
+          "signal": "97",
+          "confidenceNotes": []
+        },
+        {
+          "number": "98",
+          "net": "Net-(J2-Pad98)",
+          "signal": "98",
+          "confidenceNotes": []
+        },
+        {
+          "number": "99",
+          "net": "Net-(J2-Pad99)",
+          "signal": "99",
+          "confidenceNotes": []
+        },
+        {
+          "number": "100",
+          "net": "Net-(J2-Pad100)",
+          "signal": "100",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "J3",
+      "description": "DF40C-100DS-0.4V_51",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(#PWR0172-Pad1)",
+          "signal": "1",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "IO_L4_P_33",
+          "signal": "2",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(J3-Pad3)",
+          "signal": "3",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "IO_L4_N_33",
+          "signal": "4",
+          "confidenceNotes": []
+        },
+        {
+          "number": "5",
+          "net": "IO_L3_DQS_N_33",
+          "signal": "5",
+          "confidenceNotes": []
+        },
+        {
+          "number": "6",
+          "net": "IO_L5_N_33",
+          "signal": "6",
+          "confidenceNotes": []
+        },
+        {
+          "number": "7",
+          "net": "IO_L3_DQS_P_33",
+          "signal": "7",
+          "confidenceNotes": []
+        },
+        {
+          "number": "8",
+          "net": "IO_L5_P_33",
+          "signal": "8",
+          "confidenceNotes": []
+        },
+        {
+          "number": "9",
+          "net": "IO_L1_N_33",
+          "signal": "9",
+          "confidenceNotes": []
+        },
+        {
+          "number": "10",
+          "net": "Net-(J3-Pad10)",
+          "signal": "10",
+          "confidenceNotes": []
+        },
+        {
+          "number": "11",
+          "net": "IO_L2_N_33",
+          "signal": "11",
+          "confidenceNotes": []
+        },
+        {
+          "number": "12",
+          "net": "IO_L23_P_34",
+          "signal": "12",
+          "confidenceNotes": []
+        },
+        {
+          "number": "13",
+          "net": "IO_L2_P_33",
+          "signal": "13",
+          "confidenceNotes": []
+        },
+        {
+          "number": "14",
+          "net": "IO_L1_P_33",
+          "signal": "14",
+          "confidenceNotes": []
+        },
+        {
+          "number": "15",
+          "net": "Net-(J3-Pad3)",
+          "signal": "15",
+          "confidenceNotes": []
+        },
+        {
+          "number": "16",
+          "net": "IO_L22_N_34",
+          "signal": "16",
+          "confidenceNotes": []
+        },
+        {
+          "number": "17",
+          "net": "IO_L17_N_34",
+          "signal": "17",
+          "confidenceNotes": []
+        },
+        {
+          "number": "18",
+          "net": "IO_L24_P_34",
+          "signal": "18",
+          "confidenceNotes": []
+        },
+        {
+          "number": "19",
+          "net": "IO_L17_P_34",
+          "signal": "19",
+          "confidenceNotes": []
+        },
+        {
+          "number": "20",
+          "net": "Net-(J3-Pad10)",
+          "signal": "20",
+          "confidenceNotes": []
+        },
+        {
+          "number": "21",
+          "net": "IO_L16_N_34",
+          "signal": "21",
+          "confidenceNotes": []
+        },
+        {
+          "number": "22",
+          "net": "IO_L6_VREF_N_34",
+          "signal": "22",
+          "confidenceNotes": []
+        },
+        {
+          "number": "23",
+          "net": "IO_L16_P_34",
+          "signal": "23",
+          "confidenceNotes": []
+        },
+        {
+          "number": "24",
+          "net": "IO_L20_N_34",
+          "signal": "24",
+          "confidenceNotes": []
+        },
+        {
+          "number": "25",
+          "net": "Net-(J3-Pad3)",
+          "signal": "25",
+          "confidenceNotes": []
+        },
+        {
+          "number": "26",
+          "net": "IO_L18_N_34",
+          "signal": "26",
+          "confidenceNotes": []
+        },
+        {
+          "number": "27",
+          "net": "IO_L15_DQS_P_34",
+          "signal": "27",
+          "confidenceNotes": []
+        },
+        {
+          "number": "28",
+          "net": "IO_L14_SRCC_P_34",
+          "signal": "28",
+          "confidenceNotes": []
+        },
+        {
+          "number": "29",
+          "net": "IO_L15_DQS_N_34",
+          "signal": "29",
+          "confidenceNotes": []
+        },
+        {
+          "number": "30",
+          "net": "IO_L14_SRCC_N_34",
+          "signal": "30",
+          "confidenceNotes": []
+        },
+        {
+          "number": "31",
+          "net": "IO_L10_P_34",
+          "signal": "31",
+          "confidenceNotes": []
+        },
+        {
+          "number": "32",
+          "net": "Net-(J3-Pad10)",
+          "signal": "32",
+          "confidenceNotes": []
+        },
+        {
+          "number": "33",
+          "net": "IO_L10_N_34",
+          "signal": "33",
+          "confidenceNotes": []
+        },
+        {
+          "number": "34",
+          "net": "IO_L13_MRCC_P_34",
+          "signal": "34",
+          "confidenceNotes": []
+        },
+        {
+          "number": "35",
+          "net": "Net-(J3-Pad3)",
+          "signal": "35",
+          "confidenceNotes": []
+        },
+        {
+          "number": "36",
+          "net": "IO_L13_MRCC_N_34",
+          "signal": "36",
+          "confidenceNotes": []
+        },
+        {
+          "number": "37",
+          "net": "IO_L9_DQS_N_34",
+          "signal": "37",
+          "confidenceNotes": []
+        },
+        {
+          "number": "38",
+          "net": "IO_L12_MRCC_N_34",
+          "signal": "38",
+          "confidenceNotes": []
+        },
+        {
+          "number": "39",
+          "net": "IO_L9_DQS_P_34",
+          "signal": "39",
+          "confidenceNotes": []
+        },
+        {
+          "number": "40",
+          "net": "IO_L5_P_34",
+          "signal": "40",
+          "confidenceNotes": []
+        },
+        {
+          "number": "41",
+          "net": "IO_L8_N_34",
+          "signal": "41",
+          "confidenceNotes": []
+        },
+        {
+          "number": "42",
+          "net": "Net-(J3-Pad10)",
+          "signal": "42",
+          "confidenceNotes": []
+        },
+        {
+          "number": "43",
+          "net": "IO_L8_P_34",
+          "signal": "43",
+          "confidenceNotes": []
+        },
+        {
+          "number": "44",
+          "net": "IO_L11_SRCC_N_34",
+          "signal": "44",
+          "confidenceNotes": []
+        },
+        {
+          "number": "45",
+          "net": "Net-(J3-Pad3)",
+          "signal": "45",
+          "confidenceNotes": []
+        },
+        {
+          "number": "46",
+          "net": "IO_L11_SRCC_P_34",
+          "signal": "46",
+          "confidenceNotes": []
+        },
+        {
+          "number": "47",
+          "net": "IO_L24_P_35",
+          "signal": "47",
+          "confidenceNotes": []
+        },
+        {
+          "number": "48",
+          "net": "IO_L19_N_VREF_35",
+          "signal": "48",
+          "confidenceNotes": []
+        },
+        {
+          "number": "49",
+          "net": "IO_L24_N_35",
+          "signal": "49",
+          "confidenceNotes": []
+        },
+        {
+          "number": "50",
+          "net": "IO_L19_P_35",
+          "signal": "50",
+          "confidenceNotes": []
+        },
+        {
+          "number": "51",
+          "net": "IO_L23_P_35",
+          "signal": "51",
+          "confidenceNotes": []
+        },
+        {
+          "number": "52",
+          "net": "Net-(J3-Pad10)",
+          "signal": "52",
+          "confidenceNotes": []
+        },
+        {
+          "number": "53",
+          "net": "IO_L23_N_35",
+          "signal": "53",
+          "confidenceNotes": []
+        },
+        {
+          "number": "54",
+          "net": "IO_L12_MRCC_P_34",
+          "signal": "54",
+          "confidenceNotes": []
+        },
+        {
+          "number": "55",
+          "net": "Net-(J3-Pad3)",
+          "signal": "55",
+          "confidenceNotes": []
+        },
+        {
+          "number": "56",
+          "net": "IO_L22_N_35",
+          "signal": "56",
+          "confidenceNotes": []
+        },
+        {
+          "number": "57",
+          "net": "IO_L4_N_34",
+          "signal": "57",
+          "confidenceNotes": []
+        },
+        {
+          "number": "58",
+          "net": "IO_L22_P_35",
+          "signal": "58",
+          "confidenceNotes": []
+        },
+        {
+          "number": "59",
+          "net": "IO_L3P_PUDC_34",
+          "signal": "59",
+          "confidenceNotes": []
+        },
+        {
+          "number": "60",
+          "net": "IO_L7_N_34",
+          "signal": "60",
+          "confidenceNotes": []
+        },
+        {
+          "number": "61",
+          "net": "IO_L17_P_35",
+          "signal": "61",
+          "confidenceNotes": []
+        },
+        {
+          "number": "62",
+          "net": "Net-(J3-Pad10)",
+          "signal": "62",
+          "confidenceNotes": []
+        },
+        {
+          "number": "63",
+          "net": "IO_L17_N_35",
+          "signal": "63",
+          "confidenceNotes": []
+        },
+        {
+          "number": "64",
+          "net": "IO_L5_N_34",
+          "signal": "64",
+          "confidenceNotes": []
+        },
+        {
+          "number": "65",
+          "net": "Net-(J3-Pad3)",
+          "signal": "65",
+          "confidenceNotes": []
+        },
+        {
+          "number": "66",
+          "net": "IO_L20_P_35",
+          "signal": "66",
+          "confidenceNotes": []
+        },
+        {
+          "number": "67",
+          "net": "IO_L16_P_35",
+          "signal": "67",
+          "confidenceNotes": []
+        },
+        {
+          "number": "68",
+          "net": "IO_L20_N_35",
+          "signal": "68",
+          "confidenceNotes": []
+        },
+        {
+          "number": "69",
+          "net": "IO_L16_N_35",
+          "signal": "69",
+          "confidenceNotes": []
+        },
+        {
+          "number": "70",
+          "net": "IO_L20_P_34",
+          "signal": "70",
+          "confidenceNotes": []
+        },
+        {
+          "number": "71",
+          "net": "IO_L18_P_35",
+          "signal": "71",
+          "confidenceNotes": []
+        },
+        {
+          "number": "72",
+          "net": "Net-(J3-Pad10)",
+          "signal": "72",
+          "confidenceNotes": []
+        },
+        {
+          "number": "73",
+          "net": "IO_L18_N_35",
+          "signal": "73",
+          "confidenceNotes": []
+        },
+        {
+          "number": "74",
+          "net": "IO_L21_DQS_N_35",
+          "signal": "74",
+          "confidenceNotes": []
+        },
+        {
+          "number": "75",
+          "net": "Net-(J3-Pad3)",
+          "signal": "75",
+          "confidenceNotes": []
+        },
+        {
+          "number": "76",
+          "net": "IO_L21_DQS_P_35",
+          "signal": "76",
+          "confidenceNotes": []
+        },
+        {
+          "number": "77",
+          "net": "IO_L24_N_34",
+          "signal": "77",
+          "confidenceNotes": []
+        },
+        {
+          "number": "78",
+          "net": "IO_L14_SRCC_P_35",
+          "signal": "78",
+          "confidenceNotes": []
+        },
+        {
+          "number": "79",
+          "net": "IO_L7_P_34",
+          "signal": "79",
+          "confidenceNotes": []
+        },
+        {
+          "number": "80",
+          "net": "IO_L14_SRCC_N_35",
+          "signal": "80",
+          "confidenceNotes": []
+        },
+        {
+          "number": "81",
+          "net": "IO_L15_DQS_P_35",
+          "signal": "81",
+          "confidenceNotes": []
+        },
+        {
+          "number": "82",
+          "net": "Net-(J3-Pad10)",
+          "signal": "82",
+          "confidenceNotes": []
+        },
+        {
+          "number": "83",
+          "net": "IO_L15_DQS_N_35",
+          "signal": "83",
+          "confidenceNotes": []
+        },
+        {
+          "number": "84",
+          "net": "IO_L12_MRCC_N_35",
+          "signal": "84",
+          "confidenceNotes": []
+        },
+        {
+          "number": "85",
+          "net": "Net-(J3-Pad3)",
+          "signal": "85",
+          "confidenceNotes": []
+        },
+        {
+          "number": "86",
+          "net": "IO_L12_MRCC_P_35",
+          "signal": "86",
+          "confidenceNotes": []
+        },
+        {
+          "number": "87",
+          "net": "IO_L13_MRCC_N_35",
+          "signal": "87",
+          "confidenceNotes": []
+        },
+        {
+          "number": "88",
+          "net": "Net-(J3-Pad10)",
+          "signal": "88",
+          "confidenceNotes": []
+        },
+        {
+          "number": "89",
+          "net": "IO_L13_MRCC_P_35",
+          "signal": "89",
+          "confidenceNotes": []
+        },
+        {
+          "number": "90",
+          "net": "IO_L11_SRCC_N_35",
+          "signal": "90",
+          "confidenceNotes": []
+        },
+        {
+          "number": "91",
+          "net": "IO_L10_N_35",
+          "signal": "91",
+          "confidenceNotes": []
+        },
+        {
+          "number": "92",
+          "net": "IO_L11_SRCC_P_35",
+          "signal": "92",
+          "confidenceNotes": []
+        },
+        {
+          "number": "93",
+          "net": "IO_L10_P_35",
+          "signal": "93",
+          "confidenceNotes": []
+        },
+        {
+          "number": "94",
+          "net": "Net-(J3-Pad10)",
+          "signal": "94",
+          "confidenceNotes": []
+        },
+        {
+          "number": "95",
+          "net": "Net-(J3-Pad3)",
+          "signal": "95",
+          "confidenceNotes": []
+        },
+        {
+          "number": "96",
+          "net": "Net-(#PWR0171-Pad1)",
+          "signal": "96",
+          "confidenceNotes": []
+        },
+        {
+          "number": "97",
+          "net": "Net-(#PWR0182-Pad1)",
+          "signal": "97",
+          "confidenceNotes": []
+        },
+        {
+          "number": "98",
+          "net": "Net-(#PWR0171-Pad1)",
+          "signal": "98",
+          "confidenceNotes": []
+        },
+        {
+          "number": "99",
+          "net": "Net-(J3-Pad99)",
+          "signal": "99",
+          "confidenceNotes": []
+        },
+        {
+          "number": "100",
+          "net": "Net-(J3-Pad100)",
+          "signal": "100",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP1",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "ZYNQ_PL_PROGB",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP2",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "ZYNQ_PL_INITB",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP3",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "ZYNQ_PL_DONE",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP4",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(TP4-Pad1)",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP5",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "ZYNQ_PS_SRST",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP6",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "QSPI_~{CS}",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP7",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "QSPI_D0{slash}BM3",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP8",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "QSPI_D1{slash}BM1",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP9",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "ZYNQ_BMODE_2",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP10",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "ZYNQ_BMODE_0",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP11",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "QSPI_CLK",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP12",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "CLK_25MHz",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP13",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "1V0_ETH",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP14",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(TP14-Pad1)",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP15",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(R37-Pad2)",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP16",
+      "description": "TestPoint",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(#PWR0198-Pad1)",
+          "signal": "1",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "X1",
+      "description": "ASCO",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(X1-Pad1)",
+          "signal": "Tri-State",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(X1-Pad1)",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "CLK_13MHz",
+          "signal": "OUT",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(X1-Pad4)",
+          "signal": "VDD",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "X2",
+      "description": "ASE-xxxMHz",
+      "pins": [
+        {
+          "number": "1",
+          "net": "Net-(C22-Pad2)",
+          "signal": "EN",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "Net-(C22-Pad2)",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "CLK_25MHz",
+          "signal": "OUT",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(#PWR06-Pad1)",
+          "signal": "Vdd",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "X3",
+      "description": "CMOS_OSC",
+      "pins": [
+        {
+          "number": "1",
+          "net": "33MHz_3V3",
+          "signal": "EN",
+          "confidenceNotes": []
+        },
+        {
+          "number": "2",
+          "net": "33MHz_3V3",
+          "signal": "GND",
+          "confidenceNotes": []
+        },
+        {
+          "number": "3",
+          "net": "Net-(TP4-Pad1)",
+          "signal": "OUT",
+          "confidenceNotes": []
+        },
+        {
+          "number": "4",
+          "net": "Net-(C23-Pad1)",
+          "signal": "Vdd",
+          "confidenceNotes": []
+        }
+      ],
+      "confidenceNotes": []
+    }
+  ],
+  "testPoints": [
+    {
+      "refdes": "TP1",
+      "net": "ZYNQ_PL_PROGB",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP2",
+      "net": "ZYNQ_PL_INITB",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP3",
+      "net": "ZYNQ_PL_DONE",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP4",
+      "net": "Net-(TP4-Pad1)",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP5",
+      "net": "ZYNQ_PS_SRST",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP6",
+      "net": "QSPI_~{CS}",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP7",
+      "net": "QSPI_D0{slash}BM3",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP8",
+      "net": "QSPI_D1{slash}BM1",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP9",
+      "net": "ZYNQ_BMODE_2",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP10",
+      "net": "ZYNQ_BMODE_0",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP11",
+      "net": "QSPI_CLK",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP12",
+      "net": "CLK_25MHz",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP13",
+      "net": "1V0_ETH",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP14",
+      "net": "Net-(TP14-Pad1)",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP15",
+      "net": "Net-(R37-Pad2)",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    },
+    {
+      "refdes": "TP16",
+      "net": "Net-(#PWR0198-Pad1)",
+      "description": "TestPoint",
+      "confidenceNotes": []
+    }
+  ],
+  "confidenceNotes": []
+}
