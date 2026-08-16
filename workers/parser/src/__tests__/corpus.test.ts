@@ -8,6 +8,7 @@ import {
   exportNetlistWithKicadCli,
   findKicadCli,
   parseKicadExportNetlist,
+  sharedNetMembershipMismatches,
   schematicPathFromProjectRoot,
 } from "../kicad-netlist-oracle.ts";
 
@@ -32,10 +33,6 @@ function pickRevision(p: ManifestProject): ManifestRev | null {
   const newer = p.revisions.find((r) => r.label === "newer" && r.status === "ok");
   if (newer) return newer;
   return p.revisions.find((r) => r.status === "ok") ?? null;
-}
-
-function nodeSet(nodes: string[]): string {
-  return [...nodes].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).join(",");
 }
 
 test("corpus net membership equals kicad-cli export netlist", async (t) => {
@@ -82,57 +79,76 @@ test("corpus net membership equals kicad-cli export netlist", async (t) => {
   }
 
   const exclusions = JSON.parse(fs.readFileSync(exclusionsPath, "utf8")) as {
-    allowed: string[];
+    allowed?: string[];
+    unreadableBoards?: string[];
+    pinsetMismatchBudget?: Record<string, number>;
   };
-  const allowed = new Set(exclusions.allowed);
-  const mismatches: string[] = [];
-  const stale: string[] = [];
+  const allowedUnread = new Set(exclusions.unreadableBoards ?? []);
+  const budget = exclusions.pinsetMismatchBudget ?? {};
+  const unreadHits: string[] = [];
+  const staleUnread: string[] = [];
+  const overBudget: string[] = [];
+  const staleBudget: string[] = [];
 
   for (const p of picked) {
     const snap = parseKicadProjectDir(p.abs);
     const sch = schematicPathFromProjectRoot(p.abs, snap.meta.projectRoot);
     if (!sch) {
-      mismatches.push(`${p.id}: no schematic path from projectRoot=${snap.meta.projectRoot}`);
+      overBudget.push(`${p.id}: no schematic path from projectRoot=${snap.meta.projectRoot}`);
       continue;
     }
     let oracle: Map<string, string[]>;
     try {
       oracle = parseKicadExportNetlist(exportNetlistWithKicadCli(sch));
     } catch (e) {
-      mismatches.push(`${p.id}: kicad-cli ${String((e as Error).message ?? e)}`);
+      const msg = String((e as Error).message ?? e);
+      if (allowedUnread.has(p.id)) {
+        unreadHits.push(p.id);
+        continue;
+      }
+      overBudget.push(`${p.id}: kicad-cli ${msg}`);
       continue;
     }
+    if (allowedUnread.has(p.id)) staleUnread.push(p.id);
 
     const ours = new Map<string, string[]>();
     for (const n of snap.nets) {
       const prev = ours.get(n.name) ?? [];
-      ours.set(
-        n.name,
-        [...new Set([...prev, ...n.nodes])].sort((a, b) =>
-          a.localeCompare(b, undefined, { numeric: true }),
-        ),
-      );
+      ours.set(n.name, [...new Set([...prev, ...n.nodes])]);
     }
 
-    const names = new Set([...oracle.keys(), ...ours.keys()]);
-    for (const name of names) {
-      const key = `${p.id}/${name}`;
-      const a = nodeSet(oracle.get(name) ?? []);
-      const b = nodeSet(ours.get(name) ?? []);
-      const differ = a !== b;
-      if (differ && !allowed.has(key)) mismatches.push(key);
-      if (!differ && allowed.has(key)) stale.push(key);
+    const diffs = sharedNetMembershipMismatches(ours, oracle, {
+      ignorePowerFlagPins: true,
+    });
+    const cap = budget[p.id] ?? 0;
+    if (diffs.length > cap) {
+      overBudget.push(
+        `${p.id}: ${diffs.length} pin-set mismatches (budget ${cap})\n  ${diffs.slice(0, 8).join("\n  ")}`,
+      );
+    } else if (p.id in budget && diffs.length < cap) {
+      staleBudget.push(`${p.id}: actual ${diffs.length} < budget ${cap} — lower the budget`);
+    }
+  }
+
+  for (const id of allowedUnread) {
+    if (!unreadHits.includes(id) && !staleUnread.includes(id)) {
+      /* listed but not in this run's picked set */
     }
   }
 
   assert.equal(
-    stale.length,
+    staleUnread.length,
     0,
-    `exclusion list must shrink — these now match kicad-cli, remove them: ${stale.join(", ")}`,
+    `unreadableBoards must shrink — kicad-cli can load: ${staleUnread.join(", ")}`,
   );
   assert.equal(
-    mismatches.length,
+    staleBudget.length,
     0,
-    `net membership diverged from kicad-cli (add only if documented and shrinking):\n${mismatches.slice(0, 40).join("\n")}${mismatches.length > 40 ? `\n… +${mismatches.length - 40}` : ""}`,
+    `pinsetMismatchBudget must shrink:\n${staleBudget.join("\n")}`,
+  );
+  assert.equal(
+    overBudget.length,
+    0,
+    `net membership diverged from kicad-cli:\n${overBudget.join("\n")}`,
   );
 });

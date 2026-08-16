@@ -1,4 +1,5 @@
 {
-  "_comment": "Nets whose membership may differ from kicad-cli. Must shrink: CI fails if a listed pair is no longer a mismatch, and fails if a new mismatch appears. Format: projectId/netName",
-  "allowed": []
+  "_comment": "Shrinking budgets. CI fails if pin-set mismatches exceed the budget, or if a budget/unreadable entry is stale (actual is better). Lower numbers as the resolver improves.",
+  "unreadableBoards": [],
+  "pinsetMismatchBudget": {}
 }
