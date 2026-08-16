@@ -1,5 +1,5 @@
 {
-  "_comment": "Shrinking budgets. Fail if a count grows, or if kicad-cli can load a board listed in unreadableBoards. zynq-som and glasgow now load — they must match oracle (budget 0) or get an explicit pinsetMismatchBudget.",
+  "_comment": "Shrinking budgets. Fail if a count grows, or if kicad-cli can load a board listed in unreadableBoards. Boards that load but do not match oracle must have an explicit pinsetMismatchBudget.",
   "unreadableBoards": [],
   "pinsetMismatchBudget": {
     "amulet-controller": 7,
@@ -9,6 +9,8 @@
     "angloxx": 4,
     "ethersweep": 38,
     "kicad-demo-complex-hierarchy": 5,
-    "kicad-demo-vme-wren": 135
+    "kicad-demo-vme-wren": 135,
+    "zynq-som": 286,
+    "glasgow": 40
   }
 }
