@@ -1,15 +1,10 @@
-import { getDb, resetDbCache } from "@solderlab/db";
-import { dbFilePath } from "@/lib/paths";
-
-let ready = false;
+import path from "node:path";
+import { getDb } from "@solderlab/db";
+import { dataDir } from "@/lib/paths";
 
 export function ensureDb() {
-  if (ready) return;
-  const file = dbFilePath();
-  process.env.DATABASE_URL = `file:${file}`;
-  if (process.env.SOLDERLAB_FORCE_DB_RELOAD) {
-    resetDbCache();
+  if (!process.env.DATABASE_URL && !process.env.SOLDERLAB_DATABASE_URL) {
+    process.env.DATABASE_URL = `file:${path.join(dataDir(), "solderlab.json")}`;
   }
   getDb();
-  ready = true;
 }

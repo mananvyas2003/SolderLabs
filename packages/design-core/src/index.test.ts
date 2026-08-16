@@ -237,3 +237,64 @@ test("semanticDiff flags pin rewire", () => {
   assert.ok(d.changes.some((c) => c.type === "PinConnectionChanged"));
   assert.ok(d.changes.some((c) => c.message.includes("U1.7")));
 });
+
+test("semanticDiff does not cross boardKey pin identities", () => {
+  const a: DesignSnapshot = {
+    schemaVersion: 1,
+    tool: { name: "kicad" },
+    sheets: [{ id: "root", name: "Root" }],
+    components: [
+      {
+        refdes: "R1",
+        value: "10k",
+        footprint: "R",
+        sheetId: "root",
+        boardKey: "alpha.kicad_pro",
+        pins: [{ number: "1", name: "~", net: "NET_A" }],
+      },
+      {
+        refdes: "R1",
+        value: "10k",
+        footprint: "R",
+        sheetId: "root",
+        boardKey: "beta.kicad_pro",
+        pins: [{ number: "1", name: "~", net: "NET_B" }],
+      },
+    ],
+    nets: [
+      { name: "NET_A", nodes: ["R1.1"], boardKey: "alpha.kicad_pro" },
+      { name: "NET_B", nodes: ["R1.1"], boardKey: "beta.kicad_pro" },
+    ],
+    meta: { sheetCount: 1, componentCount: 2, netCount: 2 },
+  };
+  const b: DesignSnapshot = {
+    ...a,
+    components: a.components.map((c) =>
+      c.boardKey === "beta.kicad_pro"
+        ? {
+            ...c,
+            pins: [{ number: "1", name: "~", net: "NET_B2" }],
+          }
+        : c,
+    ),
+    nets: [
+      { name: "NET_A", nodes: ["R1.1"], boardKey: "alpha.kicad_pro" },
+      { name: "NET_B2", nodes: ["R1.1"], boardKey: "beta.kicad_pro" },
+    ],
+  };
+  const d = semanticDiff(a, b);
+  assert.ok(
+    d.changes.some(
+      (c) =>
+        (c.type === "NetRenamed" || c.type === "NetAdded" || c.type === "PinConnectionChanged") &&
+        (c.message.includes("NET_B") || c.afterName === "NET_B2" || c.net === "NET_B2"),
+    ),
+  );
+  assert.ok(
+    !d.changes.some(
+      (c) =>
+        c.type === "PinConnectionChanged" &&
+        (c.beforeNet === "NET_A" || c.afterNet === "NET_A"),
+    ),
+  );
+});

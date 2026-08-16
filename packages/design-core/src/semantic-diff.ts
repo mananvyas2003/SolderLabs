@@ -114,6 +114,84 @@ export function semanticDiff(
   head: DesignSnapshot,
   cfg: DiffConfig = {},
 ): SemanticDiffResult {
+  const boardKeys = [
+    ...new Set([
+      ...base.components.map((c) => c.boardKey ?? ""),
+      ...head.components.map((c) => c.boardKey ?? ""),
+      ...base.nets.map((n) => n.boardKey ?? ""),
+      ...head.nets.map((n) => n.boardKey ?? ""),
+    ]),
+  ].sort();
+  if (boardKeys.length > 1) {
+    const changes: ElectricalChange[] = [];
+    for (const key of boardKeys) {
+      const slice = (snap: DesignSnapshot): DesignSnapshot => ({
+        ...snap,
+        components: snap.components.filter((c) => (c.boardKey ?? "") === key),
+        nets: snap.nets.filter((n) => (n.boardKey ?? "") === key),
+      });
+      const b = slice(base);
+      const h = slice(head);
+      if (!b.components.length && !h.components.length && !b.nets.length && !h.nets.length) {
+        continue;
+      }
+      changes.push(...semanticDiffUnscoped(b, h, cfg).changes);
+    }
+    return summarizeElectrical(changes, cfg);
+  }
+  return semanticDiffUnscoped(base, head, cfg);
+}
+
+function summarizeElectrical(
+  changes: ElectricalChange[],
+  cfg: DiffConfig,
+): SemanticDiffResult {
+  const failOn = cfg.failOn ?? "significant";
+  const ignore = new Set(cfg.ignoreChangeTypes ?? []);
+  const sigRank: Record<Significance, number> = {
+    critical: 0,
+    significant: 1,
+    cosmetic: 2,
+  };
+  const sorted = [...changes].sort((a, b) => {
+    if (sigRank[a.significance] !== sigRank[b.significance]) {
+      return sigRank[a.significance] - sigRank[b.significance];
+    }
+    if (a.type !== b.type) return a.type.localeCompare(b.type);
+    return a.message.localeCompare(b.message);
+  });
+  const byType: Partial<Record<ElectricalChangeType, number>> = {};
+  for (const c of sorted) {
+    byType[c.type] = (byType[c.type] ?? 0) + 1;
+  }
+  const significantCount = sorted.filter(
+    (c) =>
+      (c.significance === "significant" || c.significance === "critical") &&
+      !ignore.has(c.type),
+  ).length;
+  const cosmeticCount = sorted.filter((c) => c.significance === "cosmetic").length;
+  const criticalCount = sorted.filter((c) => c.significance === "critical").length;
+  let gate: "PASS" | "FAIL" = "PASS";
+  if (failOn === "any" && sorted.length > 0) gate = "FAIL";
+  if (failOn === "significant" && significantCount > 0) gate = "FAIL";
+  return {
+    schemaVersion: "1.0",
+    changes: sorted,
+    summary: {
+      significantCount,
+      cosmeticCount,
+      criticalCount,
+      gate,
+      byType,
+    },
+  };
+}
+
+function semanticDiffUnscoped(
+  base: DesignSnapshot,
+  head: DesignSnapshot,
+  cfg: DiffConfig = {},
+): SemanticDiffResult {
   const threshold = cfg.jaccardThreshold ?? 0.6;
   const failOn = cfg.failOn ?? "significant";
   const ignore = new Set(cfg.ignoreChangeTypes ?? []);

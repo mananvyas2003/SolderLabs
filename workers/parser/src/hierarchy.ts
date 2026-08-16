@@ -8,7 +8,7 @@ import type {
 } from "@solderlab/design-core";
 import fs from "node:fs";
 import path from "node:path";
-import { resolveConnectivity } from "./connectivity";
+import { resolveConnectivity, extractLibSymbolsPins, mergeLibPinMaps } from "./connectivity";
 import { loadProjectLibTables, resolveLibId, type LibTableEntry } from "./libs";
 import {
   extractBlocks,
@@ -144,6 +144,10 @@ function parseComponentBlock(
     projectDir: string;
     embedded: Set<string>;
     unresolved: Set<string>;
+    projectLibPins: Map<
+      string,
+      Array<{ number: string; name: string; x: number; y: number }>
+    >;
   },
 ): SnapshotComponent | null {
   if (!ctx.refdes || ctx.refdes.endsWith("?")) return null;
@@ -165,6 +169,12 @@ function parseComponentBlock(
   );
   if (libRes.status === "unresolved" && libRes.nickname) {
     ctx.unresolved.add(libRes.nickname);
+  }
+  if (libRes.resolvedPath) {
+    mergeLibPinMaps(
+      ctx.projectLibPins,
+      extractLibSymbolsPins(fs.readFileSync(libRes.resolvedPath, "utf8")),
+    );
   }
   return {
     refdes: ctx.refdes,
@@ -190,7 +200,12 @@ function componentsForSheetInstance(
   libTables: LibTableEntry[],
   projectDir: string,
   unresolved: Set<string>,
+  projectLibPins: Map<
+    string,
+    Array<{ number: string; name: string; x: number; y: number }>
+  >,
 ): SnapshotComponent[] {
+  mergeLibPinMaps(projectLibPins, extractLibSymbolsPins(src));
   const embedded = extractEmbeddedNicknames(src);
   const out: SnapshotComponent[] = [];
   for (const block of extractSymbolInstanceBlocks(src)) {
@@ -210,6 +225,7 @@ function componentsForSheetInstance(
           projectDir,
           embedded,
           unresolved,
+          projectLibPins,
         });
         if (c) out.push(c);
       }
@@ -222,6 +238,7 @@ function componentsForSheetInstance(
         projectDir,
         embedded,
         unresolved,
+        projectLibPins,
       });
       if (c) out.push(c);
     }
@@ -368,6 +385,10 @@ function parseSingleKicadProject(projectDirOrPro: string): DesignSnapshot {
   const libTables = loadProjectLibTables(projectDir).symbol;
   const unresolved = new Set<string>();
   const warnings: ParseWarning[] = [];
+  const projectLibPins = new Map<
+    string,
+    Array<{ number: string; name: string; x: number; y: number }>
+  >();
   const rootSrc = readText(rootSch);
   const rootUuid = sheetFileUuid(rootSrc);
   const rootPath = `/${rootUuid}`;
@@ -391,8 +412,9 @@ function parseSingleKicadProject(projectDirOrPro: string): DesignSnapshot {
       libTables,
       projectDir,
       unresolved,
+      projectLibPins,
     );
-    const resolved = resolveConnectivity(src, comps);
+    const resolved = resolveConnectivity(src, comps, projectLibPins);
     components.push(...resolved.components);
     let combined = resolved.nets;
 

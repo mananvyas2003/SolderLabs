@@ -62,10 +62,8 @@ function heuristicPins(
       { number: "5", name: "VOUT", x: 1.27, y: -2.54 },
     ];
   }
-  return [
-    { number: "1", name: "1", x: 0, y: 2.54 },
-    { number: "2", name: "2", x: 0, y: -2.54 },
-  ];
+  // Do not invent a 2-pin body for ICs — that is not extraction.
+  return [];
 }
 
 function extractBlocks(src: string, tag: string): string[] {
@@ -88,9 +86,20 @@ function extractBlocks(src: string, tag: string): string[] {
     }
     let depth = 0;
     let j = start;
+    let inStr = false;
     for (; j < src.length; j++) {
-      if (src[j] === "(") depth++;
-      else if (src[j] === ")") {
+      const ch = src[j]!;
+      if (ch === "\\" && inStr) {
+        j++;
+        continue;
+      }
+      if (ch === '"') {
+        inStr = !inStr;
+        continue;
+      }
+      if (inStr) continue;
+      if (ch === "(") depth++;
+      else if (ch === ")") {
         depth--;
         if (depth === 0) {
           j++;
@@ -104,16 +113,11 @@ function extractBlocks(src: string, tag: string): string[] {
   return blocks;
 }
 
-function extractLibSymbolsPins(src: string): Map<
-  string,
-  Array<{ number: string; name: string; x: number; y: number }>
-> {
-  const map = new Map<
-    string,
-    Array<{ number: string; name: string; x: number; y: number }>
-  >();
-  const libSec = extractBlocks(src, "lib_symbols")[0];
-  if (!libSec) return map;
+type LibPinDef = { number: string; name: string; x: number; y: number };
+
+export function extractLibSymbolsPins(src: string): Map<string, LibPinDef[]> {
+  const map = new Map<string, LibPinDef[]>();
+  const libSec = extractBlocks(src, "lib_symbols")[0] ?? src;
 
   const re = /\(symbol\s+"([^"]+)"/g;
   let m: RegExpExecArray | null;
@@ -124,8 +128,7 @@ function extractLibSymbolsPins(src: string): Map<
   for (let i = 0; i < starts.length; i++) {
     const end = i + 1 < starts.length ? starts[i + 1].idx : libSec.length;
     const block = libSec.slice(starts[i].idx, end);
-    const pins: Array<{ number: string; name: string; x: number; y: number }> =
-      [];
+    const pins: LibPinDef[] = [];
     for (const pb of extractBlocks(block, "pin")) {
       const at = parseAt(pb);
       if (!at) continue;
@@ -294,6 +297,16 @@ export function classifyNet(
   return "signal";
 }
 
+export function mergeLibPinMaps(
+  into: Map<string, Array<{ number: string; name: string; x: number; y: number }>>,
+  from: Map<string, Array<{ number: string; name: string; x: number; y: number }>>,
+) {
+  for (const [k, pins] of from) {
+    const prev = into.get(k);
+    if (!prev || pins.length > prev.length) into.set(k, pins);
+  }
+}
+
 /**
  * Build connectivity from wires/junctions/labels + pin endpoints.
  * Inspired by parser_new net_resolver and NetDiff ConnectivityGraph.
@@ -301,9 +314,14 @@ export function classifyNet(
 export function resolveConnectivity(
   src: string,
   components: SnapshotComponent[],
+  extraLibPins?: Map<
+    string,
+    Array<{ number: string; name: string; x: number; y: number }>
+  >,
 ): { components: SnapshotComponent[]; nets: SnapshotNet[] } {
   const uf = new UnionFind();
   const libPins = extractLibSymbolsPins(src);
+  if (extraLibPins) mergeLibPinMaps(libPins, extraLibPins);
   const segments: Array<{ a: Pt; b: Pt }> = [];
 
   for (const wire of extractBlocks(src, "wire")) {
@@ -407,6 +425,7 @@ export function resolveConnectivity(
     number: string;
     name: string;
     refdes: string;
+    sheetPath: string;
   }> = [];
 
   const powerMeta = new Map<string, { libId?: string; value: string }>();
@@ -423,6 +442,7 @@ export function resolveConnectivity(
         ? [{ number: "1", name: c.value || "1", x: 0, y: 0 }]
         : heuristicPins(libId || "Device:R");
     }
+    if (!pins.length) continue;
 
     const ax = c.x ?? 0;
     const ay = c.y ?? 0;
@@ -440,6 +460,7 @@ export function resolveConnectivity(
         number: pin.number,
         name: pin.name,
         refdes: c.refdes,
+        sheetPath: c.sheetPath ?? "",
       });
       if (power) {
         const netName = normalizeNetName(c.value || pin.name || "GND");
@@ -533,7 +554,11 @@ export function resolveConnectivity(
 
   const enriched = components.map((c) => {
     const pins: SnapshotPin[] = [];
-    for (const pp of pinPoints.filter((p) => p.refdes === c.refdes)) {
+    for (const pp of pinPoints.filter(
+      (p) =>
+        p.refdes === c.refdes &&
+        (p.sheetPath ?? "") === (c.sheetPath ?? ""),
+    )) {
       pins.push({
         number: pp.number,
         name: pp.name,

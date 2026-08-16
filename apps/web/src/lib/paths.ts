@@ -34,5 +34,11 @@ export function storageDir() {
 }
 
 export function dbFilePath() {
+  const url = process.env.DATABASE_URL ?? process.env.SOLDERLAB_DATABASE_URL;
+  if (url) {
+    const file = url.startsWith("file:") ? url.slice("file:".length) : url;
+    if (path.isAbsolute(file)) return file;
+    return path.resolve(monorepoRoot(), file);
+  }
   return path.join(dataDir(), "solderlab.json");
 }

@@ -392,7 +392,18 @@ export function emittedMcusFromCache(snapshot: DesignSnapshot): BscMcu[] {
     const prev = byKey.get(k);
     if (!prev || pinCount(c) > pinCount(prev)) byKey.set(k, c);
   }
-  const eligible = cache.candidates.filter((cand) => cand.score >= cache.threshold);
+  const eligible = cache.candidates.filter(
+    (cand) => cand.score >= cache.threshold && cand.pinCount > 0,
+  );
+  const identityNoPins = cache.candidates.find(
+    (cand) =>
+      cand.score >= cache.threshold &&
+      (cand.parts.identity ?? 0) > 0 &&
+      cand.pinCount === 0,
+  );
+  if (identityNoPins && !eligible.some((c) => (c.parts.identity ?? 0) > 0)) {
+    return [];
+  }
   const withFamily = eligible.filter((cand) => (cand.parts.identity ?? 0) > 0);
   const hubOnly = eligible.filter((cand) => (cand.parts.hub ?? 0) < 0);
   const ranked = (withFamily.length ? withFamily : eligible.length ? eligible : hubOnly).slice(
@@ -427,6 +438,7 @@ export function emittedMcusFromCache(snapshot: DesignSnapshot): BscMcu[] {
     }
     out.push({
       refdes: c.refdes,
+      boardKey: cand.boardKey,
       mpn: mpn || null,
       package: pkg,
       confidence: cand.score,

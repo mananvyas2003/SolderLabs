@@ -20,6 +20,7 @@ export interface BscGeneratedFrom {
 
 export interface BscMcu {
   refdes: string;
+  boardKey?: string;
   mpn: string | null;
   package: string | null;
   /** Weighted heuristic score in [0, 1], computed at parse time. */

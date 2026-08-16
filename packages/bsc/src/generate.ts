@@ -87,8 +87,13 @@ function connectedToOnNet(
 function buildMcuPins(
   snapshot: DesignSnapshot,
   mcuRefdes: string,
+  boardKey?: string,
 ): BscPin[] {
-  const mcu = snapshot.components.find((c) => c.refdes === mcuRefdes);
+  const mcu = snapshot.components.find(
+    (c) =>
+      c.refdes === mcuRefdes &&
+      (boardKey == null || (c.boardKey ?? "") === boardKey),
+  );
   if (!mcu) return [];
   const pins: BscPin[] = [];
 
@@ -180,11 +185,16 @@ export function generateBSC(
   void DETECTION_RULES; // inspectable table — individual rules invoked below
 
   const mcus = mcuRule.match(ctx);
-  const pins = mcus.flatMap((m) => buildMcuPins(snapshot, m.refdes));
+  const pins = mcus.flatMap((m) => buildMcuPins(snapshot, m.refdes, m.boardKey));
   const busDevices = [...i2cBusRule.match(ctx), ...spiBusRule.match(ctx)].sort(
     (a, b) => a.refdes.localeCompare(b.refdes, undefined, { numeric: true }),
   );
-  const powerRails = powerRailRule.match(ctx);
+  const railSeen = new Set<string>();
+  const powerRails = powerRailRule.match(ctx).filter((r) => {
+    if (railSeen.has(r.name)) return false;
+    railSeen.add(r.name);
+    return true;
+  });
   const testPoints = testPointRule.match(ctx);
   const connectors = connectorRule.match(ctx);
   const revStraps = revStrapRule.match(ctx);

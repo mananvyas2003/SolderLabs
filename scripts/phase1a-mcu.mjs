@@ -53,7 +53,7 @@ for (const name of boards) {
   if (expectedB2[name]) {
     b2[name] = bsc.mcus.map((m) => m.mpn);
   }
-  if (name === "cm5_minima" || name === "jetson-agx-thor-baseboard") {
+  if (name === "cm5_minima" || name === "jetson-agx-thor-baseboard" || name === "vme-wren") {
     b4[name] = bsc.pins.length;
   }
 }
@@ -72,6 +72,10 @@ for (const n of noMcu) {
 
 console.log("\n=== B4 pin counts ===");
 console.log(JSON.stringify(b4, null, 2));
+if (b4["vme-wren"] !== 2352) {
+  console.log("B4 FAIL vme-wren pins", b4["vme-wren"], "expected 2352");
+  process.exit(1);
+}
 
 function timeParse(name) {
   const p = path.join(demos, name);

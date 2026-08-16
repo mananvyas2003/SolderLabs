@@ -14,10 +14,10 @@ import {
   jsonPathToSqlitePath,
   loadAll,
   openSqlite,
-  persistAll,
+  persistChanged,
+  captureRowSnapshot,
   replaceAll,
-  snapshotIds,
-  tableCounts,
+  type RowSnapshot,
 } from "./sqlite-store";
 import { TABLE_NAMES, type TableName } from "./sqlite-schema";
 
@@ -28,10 +28,13 @@ export {
   loadAll,
   openSqlite,
   persistAll,
+  persistChanged,
+  captureRowSnapshot,
   replaceAll,
   snapshotIds,
   tableCounts,
 } from "./sqlite-store";
+export type { RowSnapshot } from "./sqlite-store";
 export { TABLE_NAMES } from "./sqlite-schema";
 export type { TableName };
 
@@ -154,7 +157,7 @@ let cache: SolderLabDb | null = null;
 let cachePath: string | null = null;
 let sqlite: Sql | null = null;
 let sqlitePath: string | null = null;
-let loadedIds: Record<TableName, Set<string>> | null = null;
+let rowSnapshot: RowSnapshot | null = null;
 
 function countsOf(db: SolderLabDb): Record<TableName, number> {
   const out = {} as Record<TableName, number>;
@@ -209,9 +212,6 @@ export function getSqlite(): Sql {
 export function getDb(): SolderLabDb {
   const jsonPath = resolveJsonPath();
   const file = jsonPathToSqlitePath(jsonPath);
-  if (cache && cachePath === file && sqlite && sqlitePath === file) {
-    return cache;
-  }
   const sql = getSqlite();
   if (!sqliteHasRows(sql)) {
     const fromJson = readJsonFile(jsonPath);
@@ -221,14 +221,18 @@ export function getDb(): SolderLabDb {
   }
   cache = loadAll(sql);
   cachePath = file;
-  loadedIds = snapshotIds(cache);
+  rowSnapshot = captureRowSnapshot(cache);
   return cache;
 }
 
 export function persist() {
   if (!cache) return;
   const sql = getSqlite();
-  loadedIds = persistAll(sql, cache, loadedIds ?? snapshotIds(emptyDb()));
+  rowSnapshot = persistChanged(
+    sql,
+    cache,
+    rowSnapshot ?? captureRowSnapshot(emptyDb()),
+  );
 }
 
 export function withTransaction<T>(fn: () => T): T {
@@ -239,7 +243,7 @@ export function withTransaction<T>(fn: () => T): T {
 export function resetDbCache() {
   cache = null;
   cachePath = null;
-  loadedIds = null;
+  rowSnapshot = null;
   if (sqlite) {
     sqlite.close();
     sqlite = null;

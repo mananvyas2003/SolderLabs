@@ -130,6 +130,20 @@ export function snapshotIds(db: SolderLabDb): Record<TableName, Set<string>> {
   return out;
 }
 
+export type RowSnapshot = Record<TableName, Map<string, string>>;
+
+export function captureRowSnapshot(db: SolderLabDb): RowSnapshot {
+  const out = {} as RowSnapshot;
+  for (const table of TABLE_NAMES) {
+    const m = new Map<string, string>();
+    for (const row of db[table] as Array<Record<string, unknown> & { id: string }>) {
+      m.set(row.id, JSON.stringify(encodeRow(table, row)));
+    }
+    out[table] = m;
+  }
+  return out;
+}
+
 function columnsOf(sql: Sql, table: TableName): string[] {
   const info = sql.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
   return info.map((c) => c.name);
@@ -147,38 +161,65 @@ function cols(sql: Sql, table: TableName): string[] {
   return c;
 }
 
-export function persistAll(
+/**
+ * Write only rows this process inserted, updated, or deleted.
+ * Does not upsert the whole cache (that clobbers concurrent writers).
+ */
+export function persistChanged(
   sql: Sql,
   cache: SolderLabDb,
-  loadedIds: Record<TableName, Set<string>>,
-): Record<TableName, Set<string>> {
+  snapshot: RowSnapshot,
+): RowSnapshot {
   const apply = () => {
     for (const table of TABLE_NAMES) {
-      const rows = cache[table] as unknown as Array<Record<string, unknown> & { id: string }>;
       const names = cols(sql, table);
       const placeholders = names.map(() => "?").join(", ");
+      const insertStmt = sql.prepare(
+        `INSERT INTO ${table} (${names.join(", ")}) VALUES (${placeholders})`,
+      );
       const assignments = names
         .filter((n) => n !== "id")
-        .map((n) => `${n}=excluded.${n}`)
+        .map((n) => `${n}=?`)
         .join(", ");
-      const upsert = sql.prepare(
-        `INSERT INTO ${table} (${names.join(", ")}) VALUES (${placeholders})
-         ON CONFLICT(id) DO UPDATE SET ${assignments}`,
+      const updateStmt = sql.prepare(
+        `UPDATE ${table} SET ${assignments} WHERE id=?`,
       );
+      const delStmt = sql.prepare(`DELETE FROM ${table} WHERE id=?`);
+      const prev = snapshot[table] ?? new Map<string, string>();
       const current = new Set<string>();
-      for (const row of rows) {
+      for (const row of cache[table] as unknown as Array<
+        Record<string, unknown> & { id: string }
+      >) {
         const encoded = encodeRow(table, row);
-        upsert.run(...names.map((n) => encoded[n] ?? null));
+        const ser = JSON.stringify(encoded);
         current.add(row.id);
+        const before = prev.get(row.id);
+        if (before === undefined) {
+          insertStmt.run(...names.map((n) => encoded[n] ?? null));
+        } else if (before !== ser) {
+          updateStmt.run(
+            ...names.filter((n) => n !== "id").map((n) => encoded[n] ?? null),
+            row.id,
+          );
+        }
       }
-      const del = sql.prepare(`DELETE FROM ${table} WHERE id = ?`);
-      for (const id of loadedIds[table] ?? []) {
-        if (!current.has(id)) del.run(id);
+      for (const id of prev.keys()) {
+        if (!current.has(id)) delStmt.run(id);
       }
     }
   };
   if (sql.inTransaction) apply();
   else sql.transaction(apply)();
+  return captureRowSnapshot(cache);
+}
+
+/** @deprecated Request path uses persistChanged. Kept for tests that force a full snapshot write. */
+export function persistAll(
+  sql: Sql,
+  cache: SolderLabDb,
+  _loadedIds: Record<TableName, Set<string>>,
+): Record<TableName, Set<string>> {
+  persistChanged(sql, cache, captureRowSnapshot(emptyDb()));
   return snapshotIds(cache);
 }
 
@@ -187,6 +228,6 @@ export function replaceAll(sql: Sql, cache: SolderLabDb): void {
     for (const table of TABLE_NAMES) {
       sql.prepare(`DELETE FROM ${table}`).run();
     }
-    persistAll(sql, cache, snapshotIds(emptyDb()));
+    persistChanged(sql, cache, captureRowSnapshot(emptyDb()));
   })();
 }
