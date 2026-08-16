@@ -77,11 +77,12 @@
     "mcu": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["refdes", "mpn", "package", "confidenceNotes"],
+      "required": ["refdes", "mpn", "package", "confidence", "confidenceNotes"],
       "properties": {
         "refdes": { "type": "string" },
         "mpn": { "type": ["string", "null"] },
         "package": { "type": ["string", "null"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
         "confidenceNotes": {
           "type": "array",
           "items": { "$ref": "#/$defs/confidenceNote" }

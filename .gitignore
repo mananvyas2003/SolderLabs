@@ -7,8 +7,10 @@ dist
 .env.local
 .DS_Store
 data/
-*.db
-*.db-journal
+# SQLite (WAL sidecar files)
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
 apps/web/public/uploads
 .vercel
 coverage
@@ -20,3 +22,6 @@ fixtures/corpus/**
 !fixtures/corpus/manifest.json
 !fixtures/corpus/bsc/
 !fixtures/corpus/bsc/**
+
+# KiCad upstream demos (sparse-cloned for parser acceptance)
+fixtures/kicad-source-mirror/

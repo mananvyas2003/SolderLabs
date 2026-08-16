@@ -191,10 +191,13 @@ export function generateBSC(
 
   const confidenceNotes: ConfidenceNote[] = [];
   if (!mcus.length) {
+    const cache = snapshot.mcuDetection;
+    const top = cache?.candidates[0];
     confidenceNotes.push({
       field: "mcus",
-      reason:
-        "No component matched MCU rule (pin count > 20 plus identity or rail/connector structure)",
+      reason: top
+        ? `No MCU cleared score threshold ${cache!.threshold}; top candidate ${top.refdes} scored ${top.score.toFixed(3)} (identity=${top.identity ?? "none"}, pins=${top.pinCount})`
+        : "No MCU-like ICs to score; refusing to guess",
     });
   }
 

@@ -7,6 +7,8 @@ import { ensureDb } from "@/lib/ensure-db";
 import { ProjectTabs } from "@/components/project-tabs";
 import { ReviewRail } from "@/components/review-rail";
 import { AiAssistantDock } from "@/components/ai-assistant-dock";
+import { SupplyBadgeChip } from "@/components/supply-badge-chip";
+import { projectSupplyBadge } from "@/lib/supply-badge";
 
 export default async function ProjectLayout({
   children,
@@ -54,8 +56,11 @@ export default async function ProjectLayout({
               <span aria-hidden>/</span>
               <span className="text-[var(--text)]">{project.slug}</span>
             </nav>
-            <h1 className="mt-1 text-xl font-semibold tracking-tight md:text-2xl">
+            <h1 className="mt-1 flex flex-wrap items-center gap-3 text-xl font-semibold tracking-tight md:text-2xl">
               {project.name}
+              <SupplyBadgeChip
+                badge={projectSupplyBadge(getDb(), org.id, project.id)}
+              />
             </h1>
           </div>
 

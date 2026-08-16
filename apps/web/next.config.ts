@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     "@solderlab/design-core",
     "@solderlab/db",
     "@solderlab/parser",
+    "@solderlab/parts",
   ],
   // Keep soft-navigated app pages warm so tabs feel instant after first visit.
   experimental: {

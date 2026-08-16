@@ -10,6 +10,7 @@ import {
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
+import { paginateDiff } from "@/lib/paginate-diff";
 
 export async function GET(
   req: Request,
@@ -57,34 +58,27 @@ export async function GET(
       d.baseRevisionId === base &&
       d.headRevisionId === head,
   );
-  const paginate = (data: ReturnType<typeof diffSnapshots>) => {
-    const limit = Math.min(
-      Math.max(Number(url.searchParams.get("limit") ?? 800), 1),
+  const pageOpts = {
+    limit: Math.min(
+      Math.max(Number(url.searchParams.get("limit") ?? 200), 1),
       2000,
-    );
-    const cOff = Math.max(Number(url.searchParams.get("componentsOffset") ?? 0), 0);
-    const nOff = Math.max(Number(url.searchParams.get("netsOffset") ?? 0), 0);
-    const componentsTotal = data.components.length;
-    const netsTotal = data.nets.length;
-    return {
-      ...data,
-      components: data.components.slice(cOff, cOff + limit),
-      nets: data.nets.slice(nOff, nOff + limit),
-      page: {
-        limit,
-        componentsOffset: cOff,
-        netsOffset: nOff,
-        componentsTotal,
-        netsTotal,
-        truncated: cOff + limit < componentsTotal || nOff + limit < netsTotal,
-      },
-    };
+    ),
+    componentsOffset: Math.max(
+      Number(url.searchParams.get("componentsOffset") ?? 0),
+      0,
+    ),
+    netsOffset: Math.max(Number(url.searchParams.get("netsOffset") ?? 0), 0),
+    electricalOffset: Math.max(
+      Number(url.searchParams.get("electricalOffset") ?? 0),
+      0,
+    ),
+    pcbOffset: Math.max(Number(url.searchParams.get("pcbOffset") ?? 0), 0),
   };
 
   if (cached) {
     return NextResponse.json({
       id: cached.id,
-      data: paginate(JSON.parse(cached.dataJson)),
+      data: paginateDiff(JSON.parse(cached.dataJson), pageOpts),
     });
   }
 
@@ -126,16 +120,23 @@ export async function GET(
     headPcb ? (JSON.parse(headPcb.dataJson) as PcbSnapshot) : null,
   );
 
+  const persistable = { ...data };
+  delete persistable.pcbBase;
+  delete persistable.pcbHead;
+
   const id = nanoid();
   db.diffBundles.push({
     id,
     projectId: project.id,
     baseRevisionId: base,
     headRevisionId: head,
-    dataJson: JSON.stringify(data),
+    dataJson: JSON.stringify(persistable),
     createdAt: nowIso(),
   });
   persist();
 
-  return NextResponse.json({ id, data: paginate(data) });
+  return NextResponse.json({
+    id,
+    data: paginateDiff(persistable, pageOpts),
+  });
 }

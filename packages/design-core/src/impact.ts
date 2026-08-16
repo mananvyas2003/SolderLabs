@@ -834,7 +834,7 @@ export async function analyzeImpact(
     grounded = [...grounded, ...gated.grounded];
     unverified = gated.unverified;
     dropped = gated.dropped;
-    if (dropped.length) {
+    if (dropped.length && process.env.DEBUG_IMPACT === "1") {
       console.warn(
         `[impact] dropped ${dropped.length} LLM claim(s) without valid citations`,
         dropped.slice(0, 5),

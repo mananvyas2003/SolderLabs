@@ -11,6 +11,7 @@
     "build": "npm run build -w @solderlab/web",
     "db:push": "npm run push -w @solderlab/db",
     "db:seed": "npm run seed -w @solderlab/db",
+    "db:migrate": "npm run migrate:json -w @solderlab/db",
     "lint": "npm run lint -w @solderlab/web",
     "test": "node scripts/run-tests.mjs",
     "solderlab": "node packages/cli/bin/solderlab.mjs",
@@ -18,7 +19,8 @@
     "corpus:uuid": "node --import tsx scripts/uuid-coverage.mjs",
     "corpus:refresh": "node --import tsx scripts/refresh-manifest-counts.mjs",
     "bsc:golden": "npm run golden -w @solderlab/bsc",
-    "bsc:golden:emit": "npm run golden:emit -w @solderlab/bsc"
+    "bsc:golden:emit": "npm run golden:emit -w @solderlab/bsc",
+    "parts:watch": "npm run watch -w @solderlab/parts"
   },
   "engines": {
     "node": ">=20"

@@ -13,7 +13,8 @@
     "test": "node --import tsx --test src/connectivity.test.ts src/__tests__/corpus.test.ts"
   },
   "dependencies": {
-    "@solderlab/design-core": "*"
+    "@solderlab/design-core": "*",
+    "@solderlab/bsc": "*"
   },
   "devDependencies": {
     "@types/node": "^22.13.9",

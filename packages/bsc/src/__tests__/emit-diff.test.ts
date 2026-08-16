@@ -18,6 +18,7 @@ const sample: BoardSupportContract = {
       refdes: "U1",
       mpn: "STM32F103C8T6",
       package: "LQFP-48",
+      confidence: 0.71,
       confidenceNotes: [],
     },
   ],

@@ -12,7 +12,15 @@ export type SidebarOrg = {
   projects: Array<{ slug: string; name: string }>;
 };
 
-export function AppSidebar({ orgs }: { orgs: SidebarOrg[] }) {
+export function AppSidebar({
+  orgs,
+  showLibrary,
+  showWebhooks,
+}: {
+  orgs: SidebarOrg[];
+  showLibrary?: boolean;
+  showWebhooks?: boolean;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -101,6 +109,13 @@ export function AppSidebar({ orgs }: { orgs: SidebarOrg[] }) {
                         {(
                           [
                             ["Activity", "activity"],
+                            ["Supply", "supply"],
+                            ...(showLibrary
+                              ? ([["Library", "library"]] as const)
+                              : []),
+                            ...(showWebhooks
+                              ? ([["Webhooks", "webhooks"]] as const)
+                              : []),
                           ] as const
                         ).map(([label, seg]) => {
                           const href = `/app/${org.slug}/${seg}`;

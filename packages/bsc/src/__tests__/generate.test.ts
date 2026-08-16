@@ -92,6 +92,8 @@ test("generateBSC produces schemaVersion 1.0 with stable sha256", () => {
   assert.equal(a.generatedFrom.sha256, hashSnapshot(mini));
   assert.equal(a.generatedFrom.sha256, b.generatedFrom.sha256);
   assert.equal(a.mcus.length, 1);
+  assert.equal(typeof a.mcus[0]!.confidence, "number");
+  assert.ok(a.mcus[0]!.confidence > 0 && a.mcus[0]!.confidence <= 1);
   assert.ok(a.pins.length >= 30);
   assert.ok(a.busDevices.some((d) => d.bus === "i2c" && d.refdes === "U5"));
   assert.ok(a.powerRails.some((r) => r.name === "3V3" && r.nominalVolts === 3.3));

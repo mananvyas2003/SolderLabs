@@ -5,6 +5,8 @@ import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
 import { CreateProjectForm } from "@/components/create-project-form";
+import { SupplyBadgeChip } from "@/components/supply-badge-chip";
+import { projectSupplyBadge } from "@/lib/supply-badge";
 
 export default async function OrgPage({
   params,
@@ -18,7 +20,8 @@ export default async function OrgPage({
   const access = assertOrgAccess(orgSlug, user.id);
   if ("error" in access && access.error) notFound();
   const { org } = access as Exclude<typeof access, { error: string }>;
-  const list = getDb().projects.filter((p) => p.orgId === org.id);
+  const db = getDb();
+  const list = db.projects.filter((p) => p.orgId === org.id);
 
   return (
     <div className="space-y-8">
@@ -39,6 +42,7 @@ export default async function OrgPage({
           {(
             [
               ["Activity", "activity"],
+              ["Supply", "supply"],
             ] as const
           ).map(([label, seg]) => (
             <Link
@@ -77,8 +81,13 @@ export default async function OrgPage({
                       {p.description || p.slug}
                     </div>
                   </div>
-                  <span className="shrink-0 text-sm font-medium text-[var(--accent)]">
-                    Open →
+                  <span className="flex shrink-0 items-center gap-3">
+                    <SupplyBadgeChip
+                      badge={projectSupplyBadge(db, org.id, p.id)}
+                    />
+                    <span className="text-sm font-medium text-[var(--accent)]">
+                      Open →
+                    </span>
                   </span>
                 </Link>
               </li>

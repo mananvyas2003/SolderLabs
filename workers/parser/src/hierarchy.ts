@@ -1,3 +1,4 @@
+import { attachMcuDetection } from "@solderlab/bsc";
 import type {
   DesignSnapshot,
   ParseWarning,
@@ -527,18 +528,21 @@ function mergeBoardSnapshots(
 }
 
 export function parseKicadProject(projectDirOrPro: string): DesignSnapshot {
+  let snapshot: DesignSnapshot;
   if (projectDirOrPro.endsWith(".kicad_pro")) {
-    return parseSingleKicadProject(projectDirOrPro);
+    snapshot = parseSingleKicadProject(projectDirOrPro);
+  } else {
+    const pros = discoverProjectRoots(projectDirOrPro);
+    snapshot =
+      pros.length > 1
+        ? mergeBoardSnapshots(
+            projectDirOrPro,
+            pros.map((p) => parseSingleKicadProject(p)),
+            pros,
+          )
+        : parseSingleKicadProject(pros[0] ?? projectDirOrPro);
   }
-  const pros = discoverProjectRoots(projectDirOrPro);
-  if (pros.length > 1) {
-    return mergeBoardSnapshots(
-      projectDirOrPro,
-      pros.map((p) => parseSingleKicadProject(p)),
-      pros,
-    );
-  }
-  return parseSingleKicadProject(pros[0] ?? projectDirOrPro);
+  return attachMcuDetection(snapshot);
 }
 
 export function parseKicadProjectDirHierarchical(dir: string): DesignSnapshot {

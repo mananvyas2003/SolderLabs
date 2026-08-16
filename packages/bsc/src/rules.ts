@@ -8,6 +8,11 @@ import type {
   BscTestPoint,
   ConfidenceNote,
 } from "./types";
+import {
+  MCU_SCORE_THRESHOLD,
+  emittedMcusFromCache,
+  scoreMcuCandidates,
+} from "./mcu-score.ts";
 
 export type RuleId =
   | "mcu"
@@ -22,47 +27,11 @@ export interface RuleContext {
   snapshot: DesignSnapshot;
 }
 
-/** Known MCU library nicknames / categories (prefix match on lib_id). */
-export const MCU_LIB_PREFIXES = [
-  "MCU_",
-  "MCU_ST",
-  "MCU_Microchip",
-  "MCU_Espressif",
-  "MCU_Nordic",
-  "MCU_Cypress",
-  "MCU_NXP",
-  "MCU_Texas",
-  "MCU_Analog",
-  "MCU_Silicon",
-  "Module_ESP",
-  "RF_Module",
-] as const;
-
-/** Known MCU MPN / value prefixes (case-insensitive). */
-export const MCU_MPN_PREFIXES = [
-  "STM32",
-  "ATMEGA",
-  "ATTINY",
-  "ATSAM",
-  "SAMD",
-  "NRF52",
-  "NRF91",
-  "ESP32",
-  "ESP8266",
-  "RP2040",
-  "RP2350",
-  "PIC16",
-  "PIC18",
-  "PIC24",
-  "PIC32",
-  "GD32",
-  "CH32",
-  "CY7C",
-  "LM3S",
-  "TMS320",
-  "EFR32",
-  "EFM32",
-] as const;
+export {
+  MCU_LIB_PREFIXES,
+  MCU_MPN_PREFIXES,
+  matchesMcuIdentity,
+} from "./mcu-identity.ts";
 
 export const I2C_NET_RE = /^(SDA|SCL)$|^I2C\d*_(SDA|SCL)$/i;
 export const SPI_NET_RE =
@@ -87,25 +56,6 @@ function pinCount(c: SnapshotComponent): number {
 function libId(c: SnapshotComponent): string {
   return c.libId ?? "";
 }
-
-function partTokens(c: SnapshotComponent): string {
-  return [c.mpn, c.value, libId(c)].filter(Boolean).join(" ");
-}
-
-/** Exported for unit tests — MCU library/MPN gate (pin count checked separately). */
-export function matchesMcuIdentity(c: SnapshotComponent): boolean {
-  const lib = libId(c);
-  if (MCU_LIB_PREFIXES.some((p) => lib.startsWith(p) || lib.includes(`:${p}`))) {
-    return true;
-  }
-  // lib categories like "MCU_Cypress:CY7C…"
-  if (/[/:]MCU[_A-Za-z]*/i.test(lib) || /^MCU_/i.test(lib)) return true;
-  const tokens = partTokens(c).toUpperCase();
-  return MCU_MPN_PREFIXES.some((p) => tokens.includes(p.toUpperCase()));
-}
-
-const PASSIVE_REF_RE = /^(R|C|L|D|FB|F|BEAD|RN|RP|Jumper)\d/i;
-const POWER_FLAG_REF_RE = /^#PWR|^#FLG|^#E/i;
 
 function netsTouching(
   c: SnapshotComponent,
@@ -138,17 +88,18 @@ export function isMcuCandidate(
   c: SnapshotComponent,
   snapshot?: DesignSnapshot,
 ): boolean {
-  if (pinCount(c) <= 20) return false;
-  if (isConnectorCandidate(c) || isTestPoint(c)) return false;
-  if (POWER_FLAG_REF_RE.test(c.refdes) || PASSIVE_REF_RE.test(c.refdes)) {
-    return false;
-  }
-  const lib = libId(c);
-  if (/^(Device|power|Mechanical|LED):/i.test(lib)) return false;
-  if (matchesMcuIdentity(c)) return true;
-  if (!snapshot) return false;
-  const { railFanIn, connectorFanOut } = mcuStructuralSignals(c, snapshot);
-  return railFanIn >= 2 && (connectorFanOut >= 1 || pinCount(c) >= 48);
+  const view: DesignSnapshot = snapshot ?? {
+    schemaVersion: 1,
+    tool: { name: "kicad" },
+    sheets: [{ id: "root", name: "Root" }],
+    components: [c],
+    nets: [],
+    meta: { sheetCount: 1, componentCount: 1, netCount: 0 },
+  };
+  const hit = scoreMcuCandidates(view).find(
+    (s) => s.refdes === c.refdes && (c.boardKey == null || s.boardKey === c.boardKey),
+  );
+  return (hit?.score ?? 0) >= MCU_SCORE_THRESHOLD;
 }
 
 export function isI2cNet(name: string): boolean {
@@ -252,36 +203,9 @@ function primaryNetForComponent(
 export const mcuRule: DetectionRule<BscMcu> = {
   id: "mcu",
   description:
-    "MCU: pin count > 20, not a connector/passive/power-flag; known lib/MPN or (rail fan-in ≥ 2 and connector fan-out ≥ 1 or ≥ 48 pins)",
+    "MCU: scored heuristics (pins, debug/xtal hops, power fan-in, decoupling, family identity); emit above threshold",
   match(ctx) {
-    const out: BscMcu[] = [];
-    for (const c of ctx.snapshot.components) {
-      if (!isMcuCandidate(c, ctx.snapshot)) continue;
-      const notes: ConfidenceNote[] = [];
-      const mpn = c.mpn || c.value || null;
-      if (!c.mpn) {
-        notes.push({
-          field: "mpn",
-          reason: c.value
-            ? "Using Value field; dedicated MPN property absent"
-            : "No MPN or Value on symbol",
-        });
-      }
-      const pkg = c.footprint || null;
-      if (!pkg) {
-        notes.push({
-          field: "package",
-          reason: "Footprint empty on symbol",
-        });
-      }
-      out.push({
-        refdes: c.refdes,
-        mpn: mpn || null,
-        package: pkg,
-        confidenceNotes: notes,
-      });
-    }
-    return out.sort((a, b) => a.refdes.localeCompare(b.refdes, undefined, { numeric: true }));
+    return emittedMcusFromCache(ctx.snapshot);
   },
 };
 

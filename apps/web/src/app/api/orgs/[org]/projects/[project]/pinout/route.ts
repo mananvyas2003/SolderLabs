@@ -92,18 +92,29 @@ export async function GET(
     );
   }
 
+  if (!resolved) {
+    return NextResponse.json(
+      {
+        error: `No pinout for ${target} on this revision — component missing from snapshot`,
+        pinouts: [],
+        pinout: null,
+        diff: null,
+        target,
+      },
+      { status: 404 },
+    );
+  }
+
   return NextResponse.json({
-    pinouts: resolved
-      ? pinouts.length
-        ? pinouts
-        : [
-            {
-              targetRefdes: resolved.targetRefdes,
-              source: "schematic-live",
-              dataJson: JSON.stringify(resolved),
-            },
-          ]
-      : [],
+    pinouts: pinouts.length
+      ? pinouts
+      : [
+          {
+            targetRefdes: resolved.targetRefdes,
+            source: "schematic-live",
+            dataJson: JSON.stringify(resolved),
+          },
+        ],
     pinout: resolved,
     diff,
     target,

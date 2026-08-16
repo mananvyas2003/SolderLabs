@@ -5,6 +5,7 @@ import { getSessionUser } from "@/lib/auth";
 import { ensureDb } from "@/lib/ensure-db";
 import { AppSidebar, type SidebarOrg } from "@/components/app-sidebar";
 import { SignOutControl } from "@/components/sign-out-control";
+import { featureEnabled } from "@/lib/features";
 
 export default async function AppLayout({
   children,
@@ -30,7 +31,11 @@ export default async function AppLayout({
 
   return (
     <div className="flex min-h-screen bg-[var(--surface-0)] text-[var(--text-soft)]">
-      <AppSidebar orgs={orgs} />
+      <AppSidebar
+        orgs={orgs}
+        showLibrary={featureEnabled("FEATURE_LIBRARY")}
+        showWebhooks={featureEnabled("FEATURE_WEBHOOKS")}
+      />
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sl-glass sticky top-0 z-20 flex h-14 items-center justify-end gap-2 border-b border-[var(--border)] px-4 md:px-6">
           <span className="mr-auto pl-12 text-sm text-[var(--text-muted)] md:pl-0">

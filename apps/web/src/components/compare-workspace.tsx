@@ -54,6 +54,11 @@ export function CompareWorkspace({
   const [impact, setImpact] = useState<ImpactReport | null>(null);
   const [impactLoading, setImpactLoading] = useState(false);
   const [copilotBusy, setCopilotBusy] = useState(false);
+  const [pcbSnaps, setPcbSnaps] = useState<{
+    pcbBase: DiffBundleData["pcbBase"];
+    pcbHead: DiffBundleData["pcbHead"];
+  } | null>(null);
+  const [pcbError, setPcbError] = useState<string | null>(null);
   const viewedAt = useRef(Date.now());
   const diffRef = useRef<DiffBundleData | null>(null);
 
@@ -68,6 +73,28 @@ export function CompareWorkspace({
         diffRef.current = data;
       });
   }, [orgSlug, projectSlug, base, head]);
+
+  useEffect(() => {
+    if (tab !== "pcb" || pcbSnaps) return;
+    fetch(
+      `/api/orgs/${orgSlug}/projects/${projectSlug}/compare/pcb?base=${base}&head=${head}`,
+    )
+      .then(async (r) => {
+        const j = await r.json();
+        if (!r.ok) {
+          setPcbError(j.error ?? `PCB snapshots failed (${r.status})`);
+          return;
+        }
+        setPcbError(null);
+        setPcbSnaps({
+          pcbBase: j.pcbBase ?? null,
+          pcbHead: j.pcbHead ?? null,
+        });
+      })
+      .catch((e: Error) => {
+        setPcbError(e.message || "PCB snapshots failed");
+      });
+  }, [tab, pcbSnaps, orgSlug, projectSlug, base, head]);
 
   useEffect(() => {
     viewedAt.current = Date.now();
@@ -325,7 +352,18 @@ export function CompareWorkspace({
         </div>
       ) : null}
 
-      {tab === "pcb" && diff ? <PcbDiffViewer diff={diff} /> : null}
+      {tab === "pcb" && pcbError ? (
+        <p className="text-sm text-[var(--danger)]">{pcbError}</p>
+      ) : null}
+      {tab === "pcb" && diff ? (
+        <PcbDiffViewer
+          diff={{
+            ...diff,
+            pcbBase: pcbSnaps?.pcbBase ?? diff.pcbBase,
+            pcbHead: pcbSnaps?.pcbHead ?? diff.pcbHead,
+          }}
+        />
+      ) : null}
 
       {tab === "schematic" && (
         <div className="space-y-3">

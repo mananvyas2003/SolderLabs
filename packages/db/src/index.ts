@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { createRequire } from "node:module";
+import type { Sql } from "./sqlite-open";
 import {
   emptyDb,
   normalizeRole,
@@ -10,13 +10,51 @@ import {
   type User,
   type Comment,
 } from "./schema";
+import {
+  jsonPathToSqlitePath,
+  loadAll,
+  openSqlite,
+  persistAll,
+  replaceAll,
+  snapshotIds,
+  tableCounts,
+} from "./sqlite-store";
+import { TABLE_NAMES, type TableName } from "./sqlite-schema";
 
 export * from "./schema";
 export * from "./password";
+export {
+  jsonPathToSqlitePath,
+  loadAll,
+  openSqlite,
+  persistAll,
+  replaceAll,
+  snapshotIds,
+  tableCounts,
+} from "./sqlite-store";
+export { TABLE_NAMES } from "./sqlite-schema";
+export type { TableName };
 
-const require = createRequire(import.meta.url);
+function findRepoRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 8; i++) {
+    const pkg = path.join(dir, "package.json");
+    if (fs.existsSync(pkg)) {
+      try {
+        const j = JSON.parse(fs.readFileSync(pkg, "utf8")) as { name?: string };
+        if (j.name === "solderlab") return dir;
+      } catch {
+        /* keep walking */
+      }
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  return process.cwd();
+}
 
-function resolveDbPath() {
+function resolveJsonPath() {
   const url =
     process.env.DATABASE_URL ??
     process.env.SOLDERLAB_DATABASE_URL ??
@@ -24,18 +62,22 @@ function resolveDbPath() {
   const file = url.startsWith("file:") ? url.slice("file:".length) : url;
   const withExt = file.endsWith(".db")
     ? file.replace(/\.db$/i, ".json")
-    : file.endsWith(".json")
-      ? file
-      : `${file}.json`;
-  // Migrate legacy solderlab.json path
+    : file.endsWith(".sqlite")
+      ? file.replace(/\.sqlite$/i, ".json")
+      : file.endsWith(".json")
+        ? file
+        : `${file}.json`;
+  const root = findRepoRoot();
   if (withExt.includes("solderlab.json") && !process.env.DATABASE_URL) {
-    return path.resolve(process.cwd(), "data/solderlab.json");
+    return path.resolve(root, "data/solderlab.json");
   }
   if (path.isAbsolute(withExt)) return withExt;
   return path.resolve(process.cwd(), withExt);
 }
 
-function migrate(raw: Partial<SolderLabDb> & Record<string, unknown>): SolderLabDb {
+export function migrateJsonShape(
+  raw: Partial<SolderLabDb> & Record<string, unknown>,
+): SolderLabDb {
   const base = emptyDb();
   const merged = { ...base, ...raw } as SolderLabDb & Record<string, unknown>;
   for (const key of Object.keys(base) as (keyof SolderLabDb)[]) {
@@ -43,7 +85,6 @@ function migrate(raw: Partial<SolderLabDb> & Record<string, unknown>): SolderLab
       (merged as unknown as Record<string, unknown>)[key as string] = base[key];
     }
   }
-  // Drop demolished collections if present in old JSON
   delete merged.dfmPartners;
   delete merged.dfmJobs;
   delete merged.projectStars;
@@ -106,175 +147,110 @@ function migrate(raw: Partial<SolderLabDb> & Record<string, unknown>): SolderLab
   return merged as SolderLabDb;
 }
 
+/** @deprecated JSON-shape migrate — kept for the JSON→SQLite importer. */
+const migrate = migrateJsonShape;
+
 let cache: SolderLabDb | null = null;
 let cachePath: string | null = null;
-let cacheMtime = 0;
-let sqliteHandle: {
-  get: () => string | null;
-  set: (v: string) => void;
-  path: string;
-} | null = null;
-let sqliteFailed = false;
+let sqlite: Sql | null = null;
+let sqlitePath: string | null = null;
+let loadedIds: Record<TableName, Set<string>> | null = null;
 
-function sqliteFileFor(jsonPath: string) {
-  return jsonPath.replace(/\.json$/i, ".sqlite");
+function countsOf(db: SolderLabDb): Record<TableName, number> {
+  const out = {} as Record<TableName, number>;
+  for (const t of TABLE_NAMES) out[t] = db[t].length;
+  return out;
 }
 
-function openSqlite(jsonPath: string) {
-  if (sqliteFailed) return null;
-  if (sqliteHandle && sqliteHandle.path === sqliteFileFor(jsonPath)) {
-    return sqliteHandle;
-  }
-  try {
-    const { DatabaseSync } = require("node:sqlite") as {
-      DatabaseSync: new (path: string) => {
-        exec: (sql: string) => void;
-        prepare: (sql: string) => {
-          get: (...args: unknown[]) => { v: string } | undefined;
-          run: (...args: unknown[]) => void;
-        };
-      };
-    };
-    const p = sqliteFileFor(jsonPath);
-    fs.mkdirSync(path.dirname(p), { recursive: true });
-    const db = new DatabaseSync(p);
-    db.exec("PRAGMA journal_mode = WAL");
-    db.exec("PRAGMA busy_timeout = 8000");
-    db.exec("PRAGMA synchronous = NORMAL");
-    db.exec(
-      "CREATE TABLE IF NOT EXISTS kv (k TEXT PRIMARY KEY, v TEXT NOT NULL)",
+function sqliteHasRows(sql: Sql): boolean {
+  const n = sql.prepare("SELECT COUNT(*) AS n FROM users").get() as { n: number };
+  const p = sql.prepare("SELECT COUNT(*) AS n FROM projects").get() as { n: number };
+  return n.n + p.n > 0;
+}
+
+function readJsonFile(jsonPath: string): SolderLabDb | null {
+  if (fs.existsSync(jsonPath)) {
+    return migrate(
+      JSON.parse(fs.readFileSync(jsonPath, "utf8")) as Partial<SolderLabDb>,
     );
-    sqliteHandle = {
-      path: p,
-      get() {
-        return db.prepare("SELECT v FROM kv WHERE k = ?").get("root")?.v ?? null;
-      },
-      set(v: string) {
-        db.exec("BEGIN IMMEDIATE");
-        try {
-          db.prepare("INSERT OR REPLACE INTO kv (k, v) VALUES (?, ?)").run(
-            "root",
-            v,
-          );
-          db.exec("COMMIT");
-        } catch (e) {
-          try {
-            db.exec("ROLLBACK");
-          } catch {
-            /* ignore */
-          }
-          throw e;
-        }
-      },
-    };
-    return sqliteHandle;
-  } catch {
-    sqliteFailed = true;
-    sqliteHandle = null;
-    return null;
   }
-}
-
-function atomicWriteJson(filePath: string, body: string) {
-  const tmp = `${filePath}.${process.pid}.tmp`;
-  const lockPath = `${filePath}.lock`;
-  const start = Date.now();
-  let fd: number | null = null;
-  while (fd == null) {
-    try {
-      fd = fs.openSync(lockPath, "wx");
-    } catch {
-      if (Date.now() - start > 8000) {
-        throw new Error("Timed out waiting for datastore lock");
-      }
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 20);
-    }
+  const root = findRepoRoot();
+  const canonical = path.resolve(root, "data/solderlab.json");
+  const legacy = path.resolve(root, "data/flux.json");
+  if (path.normalize(jsonPath) === path.normalize(canonical) && fs.existsSync(legacy)) {
+    return migrate(
+      JSON.parse(fs.readFileSync(legacy, "utf8")) as Partial<SolderLabDb>,
+    );
   }
-  try {
-    fs.writeFileSync(tmp, body, "utf8");
-    try {
-      fs.renameSync(tmp, filePath);
-    } catch {
-      fs.copyFileSync(tmp, filePath);
-      fs.unlinkSync(tmp);
-    }
-  } finally {
-    fs.closeSync(fd);
-    try {
-      fs.unlinkSync(lockPath);
-    } catch {
-      /* ignore */
-    }
-  }
+  return null;
 }
 
 export function getDbPath() {
-  return resolveDbPath();
+  return jsonPathToSqlitePath(resolveJsonPath());
+}
+
+export function getJsonPath() {
+  return resolveJsonPath();
+}
+
+export function getSqlite(): Sql {
+  const jsonPath = resolveJsonPath();
+  const file = jsonPathToSqlitePath(jsonPath);
+  if (sqlite && sqlitePath === file) return sqlite;
+  if (sqlite) {
+    sqlite.close();
+    sqlite = null;
+  }
+  sqlite = openSqlite(file);
+  sqlitePath = file;
+  return sqlite;
 }
 
 export function getDb(): SolderLabDb {
-  const dbPath = resolveDbPath();
-  fs.mkdirSync(path.dirname(dbPath), { recursive: true });
-
-  const sql = openSqlite(dbPath);
-  if (sql) {
-    const blob = sql.get();
-    if (blob) {
-      const mt = fs.existsSync(sql.path) ? fs.statSync(sql.path).mtimeMs : 0;
-      if (cache && cachePath === dbPath && mt === cacheMtime) return cache;
-      cache = migrate(JSON.parse(blob) as Partial<SolderLabDb>);
-      cachePath = dbPath;
-      cacheMtime = mt;
-      return cache;
+  const jsonPath = resolveJsonPath();
+  const file = jsonPathToSqlitePath(jsonPath);
+  if (cache && cachePath === file && sqlite && sqlitePath === file) {
+    return cache;
+  }
+  const sql = getSqlite();
+  if (!sqliteHasRows(sql)) {
+    const fromJson = readJsonFile(jsonPath);
+    if (fromJson) {
+      replaceAll(sql, fromJson);
     }
-  } else if (cache && cachePath === dbPath && fs.existsSync(dbPath)) {
-    const mt = fs.statSync(dbPath).mtimeMs;
-    if (mt === cacheMtime) return cache;
   }
-
-  const legacy = path.resolve(process.cwd(), "data/flux.json");
-  if (!fs.existsSync(dbPath) && fs.existsSync(legacy) && dbPath.endsWith("solderlab.json")) {
-    const raw = fs.readFileSync(legacy, "utf8");
-    cache = migrate(JSON.parse(raw) as Partial<SolderLabDb>);
-    cachePath = dbPath;
-    persist();
-    return cache;
-  }
-  if (fs.existsSync(dbPath)) {
-    const raw = fs.readFileSync(dbPath, "utf8");
-    cache = migrate(JSON.parse(raw) as Partial<SolderLabDb>);
-    cachePath = dbPath;
-    persist();
-    return cache;
-  }
-  cache = emptyDb();
-  cachePath = dbPath;
-  persist();
+  cache = loadAll(sql);
+  cachePath = file;
+  loadedIds = snapshotIds(cache);
   return cache;
 }
 
 export function persist() {
-  if (!cache || !cachePath) return;
-  fs.mkdirSync(path.dirname(cachePath), { recursive: true });
-  const body = JSON.stringify(cache);
-  const sql = openSqlite(cachePath);
-  if (sql) {
-    sql.set(body);
-    cacheMtime = fs.existsSync(sql.path) ? fs.statSync(sql.path).mtimeMs : Date.now();
-    return;
-  }
-  atomicWriteJson(cachePath, body);
-  cacheMtime = fs.statSync(cachePath).mtimeMs;
+  if (!cache) return;
+  const sql = getSqlite();
+  loadedIds = persistAll(sql, cache, loadedIds ?? snapshotIds(emptyDb()));
+}
+
+export function withTransaction<T>(fn: () => T): T {
+  const sql = getSqlite();
+  return sql.transaction(fn)();
 }
 
 export function resetDbCache() {
   cache = null;
   cachePath = null;
-  cacheMtime = 0;
-  sqliteHandle = null;
-  sqliteFailed = false;
+  loadedIds = null;
+  if (sqlite) {
+    sqlite.close();
+    sqlite = null;
+  }
+  sqlitePath = null;
 }
 
 export function nowIso() {
   return new Date().toISOString();
+}
+
+export function jsonCollectionCounts(db: SolderLabDb): Record<TableName, number> {
+  return countsOf(db);
 }

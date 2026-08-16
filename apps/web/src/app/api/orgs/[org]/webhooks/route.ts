@@ -63,6 +63,7 @@ export async function POST(
           "review.merged",
           "release.published",
           "library.part_added",
+          "part.alert",
         ],
     active: true,
     createdAt: nowIso(),

@@ -11,6 +11,7 @@ const workspaces = [
   "@solderlab/llm",
   "@solderlab/analytics",
   "@solderlab/cli",
+  "@solderlab/parts",
 ];
 
 let failed = 0;

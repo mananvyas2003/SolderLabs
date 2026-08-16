@@ -1,4 +1,5 @@
 import type { DesignSnapshot, SnapshotComponent } from "@solderlab/design-core";
+import { attachMcuDetection } from "@solderlab/bsc";
 import fs from "node:fs";
 import path from "node:path";
 import { resolveConnectivity } from "./connectivity";
@@ -80,7 +81,7 @@ export function parseKicadSchematicText(src: string): DesignSnapshot {
   const resolved = resolveConnectivity(src, uniq);
   const nets = resolved.nets;
 
-  return {
+  return attachMcuDetection({
     schemaVersion: 1,
     tool: { name: "kicad", version: extractQuoted(src, "version") },
     sheets: [{ id: "root", name: "Root", title: "Main" }],
@@ -92,7 +93,7 @@ export function parseKicadSchematicText(src: string): DesignSnapshot {
       netCount: nets.length,
       unresolvedLibs: [],
     },
-  };
+  });
 }
 
 /** Prefer hierarchical project walk; never unions sibling unrelated boards. */

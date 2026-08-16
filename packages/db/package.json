@@ -11,7 +11,8 @@
   "scripts": {
     "build": "tsc --noEmit",
     "push": "tsx src/push.ts",
-    "seed": "tsx src/seed.ts"
+    "seed": "tsx src/seed.ts",
+    "migrate:json": "tsx src/migrate-json.ts"
   },
   "dependencies": {
     "nanoid": "^5.1.2"

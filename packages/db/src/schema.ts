@@ -309,6 +309,78 @@ export interface FirmwarePinout {
   updatedAt: string;
 }
 
+export type LifecycleStatus =
+  | "active"
+  | "nrnd"
+  | "eol"
+  | "obsolete"
+  | "unknown";
+
+export interface PriceBreak {
+  qty: number;
+  unitPrice: number;
+}
+
+export interface PartWatch {
+  id: string;
+  orgId: string;
+  mpn: string;
+  manufacturer: string | null;
+  usedIn: string[];
+  lifecycleStatus: LifecycleStatus;
+  lastTimeBuyDate: string | null;
+  leadTimeWeeks: number | null;
+  stockTotal: number | null;
+  priceBreaks: PriceBreak[];
+  lastCheckedAt: string | null;
+  sourceProvider: string;
+  lastError: string | null;
+}
+
+export interface PartAlert {
+  id: string;
+  orgId: string;
+  mpn: string;
+  kind: "lifecycle" | "lead_time" | "stock" | "price";
+  severity: "critical" | "warning" | "info";
+  detectedAt: string;
+  acknowledgedBy: string | null;
+  affectedProjects: string[];
+  detail: string;
+}
+
+export interface OrgSupplySettings {
+  id: string;
+  orgId: string;
+  leadTimeWeeksThreshold: number;
+  buildQty: number;
+  priceChangePercent: number;
+  volumeTierQty: number;
+}
+
+export interface ManualPartCatalogRow {
+  id: string;
+  orgId: string;
+  mpn: string;
+  manufacturer: string | null;
+  lifecycleStatus: LifecycleStatus;
+  lastTimeBuyDate: string | null;
+  leadTimeWeeks: number | null;
+  stockTotal: number | null;
+  priceBreaks: PriceBreak[];
+  updatedAt: string;
+}
+
+export interface EmailOutboxRow {
+  id: string;
+  orgId: string;
+  toAddresses: string[];
+  subject: string;
+  body: string;
+  createdAt: string;
+  sentAt: string | null;
+}
+
 export interface SolderLabDb {
   users: User[];
   organizations: Organization[];
@@ -338,6 +410,11 @@ export interface SolderLabDb {
   webhooks: Webhook[];
   auditEvents: AuditEvent[];
   firmwarePinouts: FirmwarePinout[];
+  partWatches: PartWatch[];
+  partAlerts: PartAlert[];
+  orgSupplySettings: OrgSupplySettings[];
+  manualPartCatalog: ManualPartCatalogRow[];
+  emailOutbox: EmailOutboxRow[];
 }
 
 /** @deprecated Use SolderLabDb */
@@ -373,6 +450,11 @@ export function emptyDb(): SolderLabDb {
     webhooks: [],
     auditEvents: [],
     firmwarePinouts: [],
+    partWatches: [],
+    partAlerts: [],
+    orgSupplySettings: [],
+    manualPartCatalog: [],
+    emailOutbox: [],
   };
 }
 

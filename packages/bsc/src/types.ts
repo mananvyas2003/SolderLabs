@@ -22,6 +22,8 @@ export interface BscMcu {
   refdes: string;
   mpn: string | null;
   package: string | null;
+  /** Weighted heuristic score in [0, 1], computed at parse time. */
+  confidence: number;
   confidenceNotes: ConfidenceNote[];
 }
 

@@ -70,6 +70,21 @@ export interface DesignSnapshot {
   boards?: Array<{ key: string; name: string }>;
   warnings?: ParseWarning[];
   parseStatus?: "ok" | "partial";
+  /**
+   * MCU heuristic scores computed once at parse time.
+   * Omitted from snapshot hashes; never re-scored per HTTP request.
+   */
+  mcuDetection?: {
+    threshold: number;
+    candidates: Array<{
+      refdes: string;
+      boardKey?: string;
+      identity: string | null;
+      pinCount: number;
+      score: number;
+      parts: Record<string, number>;
+    }>;
+  };
   meta: {
     sheetCount: number;
     componentCount: number;

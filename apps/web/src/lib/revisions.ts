@@ -1,11 +1,13 @@
 import { nanoid } from "nanoid";
-import { getDb, persist, nowIso } from "@solderlab/db";
+import { getDb, persist, nowIso, resetDbCache } from "@solderlab/db";
 import {
   parseKicadProjectDir,
   parseKicadPcbProjectDir,
 } from "@solderlab/parser";
 import { snapshotToBom, semanticDiff, diffSnapshots, findUnintendedConnectivity, reconcileBom, lintManufacturingPackage, type DesignSnapshot } from "@solderlab/design-core";
 import { generateBSC } from "@solderlab/bsc";
+import { evaluateBomLifecycle } from "@solderlab/parts";
+import { revisionChecksPassing as gate } from "@/lib/check-gate";
 import { track } from "@solderlab/analytics";
 import { sha256, writeStorage, storagePath } from "@/lib/storage";
 import { logActivity } from "@/lib/activity";
@@ -328,6 +330,19 @@ export async function createRevisionFromZip(opts: {
     });
     ingestErcDrcReports(opts.projectId, revisionId, parseRoot);
 
+    const life = evaluateBomLifecycle(db, orgId, revisionId);
+    db.checkRuns.push({
+      id: nanoid(),
+      projectId: opts.projectId,
+      revisionId,
+      reviewId: null,
+      name: "bom-lifecycle",
+      status: life.status,
+      summary: life.summary,
+      detailsJson: JSON.stringify(life.details),
+      createdAt: now,
+    });
+
     // NetDiff-style connectivity gate vs parent revision
     if (opts.parentRevisionId) {
       const parentSnapRow = db.designSnapshots.find(
@@ -534,10 +549,12 @@ export async function createRevisionFromZip(opts: {
     const missingSheet = snapshot.warnings?.some((w) => w.code === "missing-sheet");
     rev.parseStatus =
       snapshot.parseStatus === "partial" || missingSheet ? "partial" : "succeeded";
+
+    const branch = db.branches.find((b) => b.id === opts.branchId);
+    if (branch) branch.headRevisionId = revisionId;
+    persist();
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Parse failed";
-    const rev = db.revisions.find((r) => r.id === revisionId)!;
-    rev.parseStatus = "failed";
     track(
       "parse_completed",
       {
@@ -549,22 +566,10 @@ export async function createRevisionFromZip(opts: {
       },
       { orgId: orgId || null },
     );
-    db.checkRuns.push({
-      id: nanoid(),
-      projectId: opts.projectId,
-      revisionId,
-      reviewId: null,
-      name: "parse",
-      status: "fail",
-      summary: msg,
-      detailsJson: null,
-      createdAt: now,
-    });
+    resetDbCache();
+    getDb();
+    throw new Error(msg);
   }
-
-  const branch = db.branches.find((b) => b.id === opts.branchId);
-  if (branch) branch.headRevisionId = revisionId;
-  persist();
 
   if (orgId) {
     logActivity({
@@ -625,35 +630,7 @@ export function normalizeUploadToZip(
 }
 
 export function revisionChecksPassing(projectId: string, revisionId: string) {
-  const db = getDb();
-  const project = db.projects.find((p) => p.id === projectId);
-  const checks = db.checkRuns.filter((c) => c.revisionId === revisionId);
-  const declaredRequired = ["bom-mpn", "connectivity-gate", "unintended-connectivity"];
-  const blockingStatus = new Set(["fail", "error", "pending", "running"]);
-
-  const failing = checks.filter((c) => blockingStatus.has(c.status));
-  const missing = declaredRequired.filter((name) => !checks.some((c) => c.name === name));
-  const missingAsFails = missing.map((name) => ({
-    name,
-    summary: `Required check never ran: ${name}`,
-    status: "missing",
-  }));
-
-  if (project?.requireGreenChecks && (failing.length || missing.length)) {
-    return {
-      ok: false as const,
-      failing: [
-        ...failing,
-        ...missingAsFails.map((m) => ({
-          name: m.name,
-          summary: m.summary,
-          status: m.status,
-        })),
-      ],
-      required: declaredRequired,
-    };
-  }
-  return { ok: true as const, failing: [], required: declaredRequired };
+  return gate(projectId, revisionId);
 }
 
 function countBscNulls(value: unknown): number {

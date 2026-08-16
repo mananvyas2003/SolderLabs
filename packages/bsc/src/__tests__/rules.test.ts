@@ -58,7 +58,7 @@ test("DETECTION_RULES table lists every rule id exactly once", () => {
   ]);
 });
 
-test("rule:mcu — requires pin count > 20 AND known MCU identity or structure", () => {
+test("rule:mcu — scored heuristics; identity is a signal not a gate", () => {
   const stm: SnapshotComponent = {
     refdes: "U1",
     value: "STM32F407VGT6",
@@ -101,6 +101,9 @@ test("rule:mcu — requires pin count > 20 AND known MCU identity or structure",
   assert.equal(hit.length, 1);
   assert.equal(hit[0]!.refdes, "U1");
   assert.equal(hit[0]!.package, "LQFP-100");
+  assert.equal(typeof hit[0]!.confidence, "number");
+  assert.ok(hit[0]!.confidence >= 0.4);
+  assert.ok(hit[0]!.confidence <= 1);
 });
 
 test("rule:mcu — Cypress CY7C matched via MPN prefix without inventing package", () => {
@@ -148,6 +151,27 @@ test("rule:mcu — unknown high-pin IC with rail fan-in and connector fan-out", 
   const hit = mcuRule.match({ snapshot });
   assert.equal(hit.some((m) => m.refdes === "U3"), true);
   assert.equal(hit.some((m) => m.refdes === "J1"), false);
+});
+
+test("rule:mcu — analog / valve parts are not emitted", () => {
+  const u: SnapshotComponent = {
+    refdes: "U1",
+    value: "ECC83",
+    footprint: "DIP-9",
+    libId: "Valve:ECC83",
+    sheetId: "root",
+    pins: pins(27),
+  };
+  const snapshot = snap({
+    components: [u],
+    nets: [
+      { name: "VCC", class: "power", nodes: ["U1.1"] },
+      { name: "GND", class: "ground", nodes: ["U1.2"] },
+    ],
+  });
+  assert.equal(isMcuCandidate(u, snapshot), false);
+  const bscHit = mcuRule.match({ snapshot });
+  assert.equal(bscHit.length, 0);
 });
 
 test("rule:i2c_bus — detects SDA/SCL and I2C1_SDA patterns; address stays null", () => {
