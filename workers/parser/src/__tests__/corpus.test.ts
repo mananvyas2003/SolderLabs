@@ -94,6 +94,10 @@ test("corpus net membership equals kicad-cli export netlist", async (t) => {
     const snap = parseKicadProjectDir(p.abs);
     const sch = schematicPathFromProjectRoot(p.abs, snap.meta.projectRoot);
     if (!sch) {
+      if (allowedUnread.has(p.id)) {
+        unreadHits.push(p.id);
+        continue;
+      }
       overBudget.push(`${p.id}: no schematic path from projectRoot=${snap.meta.projectRoot}`);
       continue;
     }

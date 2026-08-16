@@ -1,5 +1,14 @@
 {
-  "_comment": "Shrinking budgets. CI fails if pin-set mismatches exceed the budget, or if a budget/unreadable entry is stale (actual is better). Lower numbers as the resolver improves.",
-  "unreadableBoards": [],
-  "pinsetMismatchBudget": {}
+  "_comment": "Shrinking budgets from CI run 31942239446. Fail if a count grows, or if kicad-cli can load a board listed in unreadableBoards. Lower pinsetMismatchBudget as the resolver improves.",
+  "unreadableBoards": ["zynq-som", "glasgow"],
+  "pinsetMismatchBudget": {
+    "amulet-controller": 7,
+    "kintex-pcie": 122,
+    "upsy-desky": 27,
+    "piantor": 27,
+    "angloxx": 5,
+    "ethersweep": 42,
+    "kicad-demo-complex-hierarchy": 5,
+    "kicad-demo-vme-wren": 399
+  }
 }

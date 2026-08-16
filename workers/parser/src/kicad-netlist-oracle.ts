@@ -229,6 +229,16 @@ export function schematicPathFromProjectRoot(
   if (resolved.endsWith(".kicad_pro")) {
     const sch = resolved.replace(/\.kicad_pro$/i, ".kicad_sch");
     if (fs.existsSync(sch)) return sch;
+    if (fs.existsSync(resolved)) {
+      try {
+        const sibling = fs
+          .readdirSync(path.dirname(resolved))
+          .find((n) => n.endsWith(".kicad_sch"));
+        if (sibling) return path.join(path.dirname(resolved), sibling);
+      } catch {
+        /* ignore */
+      }
+    }
   }
   return fs.existsSync(resolved) ? resolved : null;
 }
