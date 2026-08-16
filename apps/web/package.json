@@ -15,6 +15,7 @@
     "@solderlab/parser": "*",
     "@solderlab/ui": "*",
     "@solderlab/bsc": "*",
+    "@solderlab/llm": "*",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.7.0",
     "adm-zip": "0.5.18",

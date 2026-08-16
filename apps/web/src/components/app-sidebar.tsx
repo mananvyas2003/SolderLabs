@@ -100,9 +100,7 @@ export function AppSidebar({ orgs }: { orgs: SidebarOrg[] }) {
                       <li className="space-y-0.5 pt-1">
                         {(
                           [
-                            ["Library", "library"],
                             ["Activity", "activity"],
-                            ["Webhooks", "webhooks"],
                           ] as const
                         ).map(([label, seg]) => {
                           const href = `/app/${org.slug}/${seg}`;

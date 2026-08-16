@@ -2,62 +2,21 @@ import { nanoid } from "nanoid";
 import { getDb, persist, nowIso } from "@solderlab/db";
 import {
   analyzeImpact,
+  analyzeImpactDeterministic,
   diffSnapshots,
+  snapshotToBom,
   type DesignSnapshot,
-  type DeterministicImpact,
-  type ImpactReport,
-  type RawLlmClaim,
 } from "@solderlab/design-core";
 import { generateBSC, diffBSC } from "@solderlab/bsc";
+import {
+  buildBoardCard,
+  formatImpactHttpBody,
+  maybeRunLlmClaims,
+  type ToolHost,
+} from "@solderlab/llm";
 import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
-
-async function optionalLlmClaims(
-  ground: DeterministicImpact,
-): Promise<RawLlmClaim[]> {
-  const key = process.env.OPENAI_API_KEY;
-  if (!key) return [];
-
-  const sys = `You are an electrical impact assistant. Return JSON only: {"claims":[{"text":"...","citations":[{"kind":"component|net|bom_line","ref":"..."}]}]}.
-Every claim MUST cite only refs from the provided ground-truth lists. Do not invent refdes or nets.`;
-
-  const user = JSON.stringify({
-    components: ground.connectedComponents.map((c) => c.refdes),
-    nets: ground.touchedNets.map((n) => n.net),
-    bom: ground.bom.lines.map((b) => b.refdes),
-    bsc: ground.bscSurface.map((b) => b.message),
-  });
-
-  try {
-    const res = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
-        temperature: 0,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: sys },
-          { role: "user", content: user },
-        ],
-      }),
-    });
-    if (!res.ok) return [];
-    const json = (await res.json()) as {
-      choices?: Array<{ message?: { content?: string } }>;
-    };
-    const content = json.choices?.[0]?.message?.content;
-    if (!content) return [];
-    const parsed = JSON.parse(content) as { claims?: RawLlmClaim[] };
-    return parsed.claims ?? [];
-  } catch {
-    return [];
-  }
-}
 
 export async function POST(
   req: Request,
@@ -138,7 +97,6 @@ export async function POST(
     .filter((r) => r.projectId === project.id)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0];
 
-  // Transmittals: model as release downloads still associated with prior revision
   const openTransmittals = latestRelease
     ? db.downloadAudits
         .filter((d) => d.releaseId === latestRelease.id)
@@ -164,7 +122,6 @@ export async function POST(
       name: c.name,
       revisionId: c.revisionId,
       status: c.status,
-      // Soft bind ERC/connectivity checks to components/nets from the diff neighborhood later
       components: diff.components
         ?.filter((x: { kind: string }) => x.kind !== "unchanged")
         .slice(0, 20)
@@ -175,21 +132,68 @@ export async function POST(
         .map((x: { name: string }) => x.name),
     }));
 
-  const report: ImpactReport = await analyzeImpact(
-    diff,
-    {
-      snapshot: head,
-      bscChanges,
-      openTransmittals,
-      testEvidence,
-      releasedRevisionId: latestRelease?.revisionId,
-      headRevisionId: body.headRevisionId,
-      baseRevisionId: body.baseRevisionId,
+  const host: ToolHost = {
+    head,
+    base,
+    baseRevisionId: body.baseRevisionId,
+    headRevisionId: body.headRevisionId,
+    snapshotFor: (id) => {
+      const row = db.designSnapshots.find((s) => s.revisionId === id);
+      return row ? (JSON.parse(row.dataJson) as DesignSnapshot) : null;
     },
-    {
-      llm: async (ground) => optionalLlmClaims(ground),
+    checksFor: (revisionId) =>
+      db.checkRuns
+        .filter((c) => c.revisionId === revisionId)
+        .map((c) => ({
+          name: c.name,
+          status: c.status,
+          summary: c.summary,
+        })),
+    bomRevisionsFor: (revisionId) => {
+      const snapRow = db.designSnapshots.find((s) => s.revisionId === revisionId);
+      if (!snapRow) return [];
+      const snap = JSON.parse(snapRow.dataJson) as DesignSnapshot;
+      const rev = db.revisions.find((r) => r.id === revisionId);
+      return [
+        {
+          revisionId,
+          createdAt: rev?.createdAt ?? "",
+          lines: snapshotToBom(snap).map((l) => ({
+            refdes: l.refdes,
+            uuid: l.uuid,
+            value: l.value,
+            footprint: l.footprint,
+            mpn: l.mpn ?? null,
+            manufacturer: l.manufacturer ?? null,
+          })),
+        },
+      ];
     },
-  );
+  };
 
-  return Response.json({ data: report });
+  const context = {
+    snapshot: head,
+    bscChanges,
+    openTransmittals,
+    testEvidence,
+    releasedRevisionId: latestRelease?.revisionId,
+    headRevisionId: body.headRevisionId,
+    baseRevisionId: body.baseRevisionId,
+  };
+
+  const ground = analyzeImpactDeterministic(diff, context);
+  const llm = await maybeRunLlmClaims({
+    ground,
+    boardCard: buildBoardCard(head, {
+      board: project.slug,
+      revision: body.headRevisionId,
+    }),
+    host,
+  });
+
+  const report = await analyzeImpact(diff, context, {
+    llm: async () => llm.claims,
+  });
+
+  return Response.json(formatImpactHttpBody(report, llm));
 }

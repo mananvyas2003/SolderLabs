@@ -38,9 +38,7 @@ export default async function OrgPage({
         <nav className="flex flex-wrap gap-1 text-sm">
           {(
             [
-              ["Library", "library"],
               ["Activity", "activity"],
-              ["Webhooks", "webhooks"],
             ] as const
           ).map(([label, seg]) => (
             <Link

@@ -428,27 +428,37 @@ function parseSingleKicadProject(projectDirOrPro: string): DesignSnapshot {
 
   const unresolvedLibs = [...unresolved].sort();
   const missingSheet = warnings.some((w) => w.code === "missing-sheet");
-  const boardKey = path
-    .relative(searchRoot, proPath ?? rootSch)
-    .replace(/\\/g, "/");
+  const boardKey = path.basename(proPath ?? rootSch);
+
+  const ns = (id: string) => `${boardKey}:${id}`;
+  const sheetsNs = sheets.map((s) => ({ ...s, id: ns(s.id) }));
+  const uniqNs = uniq.map((c) => ({
+    ...c,
+    boardKey,
+    sheetId: c.sheetId.startsWith(`${boardKey}:`) ? c.sheetId : ns(c.sheetId),
+  }));
+  const netsNs = [...netMap.values()]
+    .filter((n) => n.nodes.length > 0)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((n) => ({ ...n, boardKey }));
 
   return {
     schemaVersion: 1,
     tool: { name: "kicad", version: extractQuoted(rootSrc, "version") },
-    sheets,
-    components: uniq.map((c) => ({ ...c, boardKey })),
-    nets: [...netMap.values()]
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((n) => ({ ...n, boardKey })),
+    sheets: sheetsNs,
+    components: uniqNs,
+    nets: netsNs,
     boards: [{ key: boardKey, name: path.basename(boardKey, path.extname(boardKey)) }],
     warnings,
     parseStatus: missingSheet ? "partial" : "ok",
     meta: {
-      sheetCount: sheets.length,
-      componentCount: uniq.length,
-      netCount: netMap.size,
+      sheetCount: sheetsNs.length,
+      componentCount: uniqNs.length,
+      netCount: netsNs.length,
       unresolvedLibs,
-      projectRoot: boardKey,
+      projectRoot: path
+        .relative(searchRoot, proPath ?? rootSch)
+        .replace(/\\/g, "/"),
     },
   };
 }
@@ -459,7 +469,7 @@ function mergeBoardSnapshots(
   proPaths: string[],
 ): DesignSnapshot {
   const boards = snaps.map((s, i) => {
-    const key = path.relative(searchRoot, proPaths[i]!).replace(/\\/g, "/");
+    const key = path.basename(proPaths[i]!);
     return {
       key,
       name: path.basename(proPaths[i]!, ".kicad_pro"),
@@ -477,16 +487,20 @@ function mergeBoardSnapshots(
     b.snap.components.map((c) => ({
       ...c,
       boardKey: b.key,
-      sheetId: `${b.key}:${c.sheetId}`,
+      sheetId: c.sheetId.startsWith(`${b.key}:`)
+        ? c.sheetId
+        : `${b.key}:${c.sheetId}`,
     })),
   );
   const nets = boards.flatMap((b) =>
-    b.snap.nets.map((n) => ({ ...n, boardKey: b.key })),
+    b.snap.nets
+      .filter((n) => n.nodes.length > 0)
+      .map((n) => ({ ...n, boardKey: b.key })),
   );
   const sheets = boards.flatMap((b) =>
     b.snap.sheets.map((sh) => ({
       ...sh,
-      id: `${b.key}:${sh.id}`,
+      id: sh.id.startsWith(`${b.key}:`) ? sh.id : `${b.key}:${sh.id}`,
     })),
   );
   const unresolvedLibs = [

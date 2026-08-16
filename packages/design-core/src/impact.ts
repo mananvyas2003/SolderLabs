@@ -565,9 +565,25 @@ function citationKey(c: ImpactCitation): string {
   return `${c.kind}:${c.ref}`;
 }
 
+/** Imperative / instruction-injection language — never grounded. */
+export const IMPACT_IMPERATIVE_RE =
+  /(?:SYSTEM\s*:|ignore\s+(?:all\s+)?prior|disregard\s+(?:all\s+)?(?:previous|prior)|follow\s+new\s+instructions|you\s+are\s+now|approve\s+this\s+review|new\s+instructions\s*:)/i;
+
+export function claimHasImperativeLanguage(text: string): boolean {
+  return IMPACT_IMPERATIVE_RE.test(text);
+}
+
+export function claimMentionsOwnCitation(
+  text: string,
+  citations: ImpactCitation[],
+): boolean {
+  return citations.some((c) => c.ref && text.includes(c.ref));
+}
+
 /**
  * Every LLM claim must cite a specific component, net, or BOM line
- * from the deterministic result. Drop claims that cannot cite.
+ * from the deterministic result. Drop claims that cannot cite, that
+ * never mention their own citations, or that carry instruction language.
  */
 export function gateImpactClaims(
   raw: RawLlmClaim[],
@@ -592,6 +608,10 @@ export function gateImpactClaims(
       (c) => c?.kind && c?.ref,
     );
     if (!citations.length) {
+      dropped.push(text);
+      continue;
+    }
+    if (claimHasImperativeLanguage(text) || !claimMentionsOwnCitation(text, citations)) {
       dropped.push(text);
       continue;
     }

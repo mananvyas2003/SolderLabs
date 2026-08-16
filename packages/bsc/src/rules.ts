@@ -104,8 +104,51 @@ export function matchesMcuIdentity(c: SnapshotComponent): boolean {
   return MCU_MPN_PREFIXES.some((p) => tokens.includes(p.toUpperCase()));
 }
 
-export function isMcuCandidate(c: SnapshotComponent): boolean {
-  return pinCount(c) > 20 && matchesMcuIdentity(c);
+const PASSIVE_REF_RE = /^(R|C|L|D|FB|F|BEAD|RN|RP|Jumper)\d/i;
+const POWER_FLAG_REF_RE = /^#PWR|^#FLG|^#E/i;
+
+function netsTouching(
+  c: SnapshotComponent,
+  snapshot: DesignSnapshot,
+): SnapshotNet[] {
+  const prefix = `${c.refdes}.`;
+  return snapshot.nets.filter((n) => n.nodes.some((node) => node.startsWith(prefix)));
+}
+
+/** Rail fan-in and connector fan-out used when the MCU allowlist misses. */
+export function mcuStructuralSignals(
+  c: SnapshotComponent,
+  snapshot: DesignSnapshot,
+): { railFanIn: number; connectorFanOut: number } {
+  const connectorRefs = new Set(
+    snapshot.components.filter((x) => isConnectorCandidate(x)).map((x) => x.refdes),
+  );
+  const mine = netsTouching(c, snapshot);
+  const railFanIn = mine.filter((n) => isPowerRailNet(n)).length;
+  const connectorFanOut = mine.filter((n) =>
+    n.nodes.some((node) => {
+      const i = node.lastIndexOf(".");
+      return i > 0 && connectorRefs.has(node.slice(0, i));
+    }),
+  ).length;
+  return { railFanIn, connectorFanOut };
+}
+
+export function isMcuCandidate(
+  c: SnapshotComponent,
+  snapshot?: DesignSnapshot,
+): boolean {
+  if (pinCount(c) <= 20) return false;
+  if (isConnectorCandidate(c) || isTestPoint(c)) return false;
+  if (POWER_FLAG_REF_RE.test(c.refdes) || PASSIVE_REF_RE.test(c.refdes)) {
+    return false;
+  }
+  const lib = libId(c);
+  if (/^(Device|power|Mechanical|LED):/i.test(lib)) return false;
+  if (matchesMcuIdentity(c)) return true;
+  if (!snapshot) return false;
+  const { railFanIn, connectorFanOut } = mcuStructuralSignals(c, snapshot);
+  return railFanIn >= 2 && (connectorFanOut >= 1 || pinCount(c) >= 48);
 }
 
 export function isI2cNet(name: string): boolean {
@@ -133,7 +176,7 @@ export function isConnectorCandidate(c: SnapshotComponent): boolean {
 
 /**
  * Parse an explicit voltage from a net name when unambiguous.
- * Returns null (never guesses) for names like VCC/VDD without digits.
+ * Sign and comma decimals are kept; ranges (3,3-5V) and bare VCC/VDD return null.
  */
 export function parseNominalVolts(
   name: string,
@@ -141,20 +184,35 @@ export function parseNominalVolts(
   if (/^(GND|AGND|PGND|DGND|VSS)$/i.test(name)) {
     return { volts: 0 };
   }
-  // 3V3 / +3V3 / VDD_3V3
-  const vStyle = name.match(/(?:^|[^0-9])(\d+)V(\d+)\b/i);
+  // Two numeric voltages joined by a hyphen — a range, not a signed rail.
+  if (/(?:^|[^0-9])\d+(?:[.,]\d+)?\s*V?\s*-\s*\d/i.test(name)) {
+    return {
+      volts: null,
+      note: {
+        field: "nominalVolts",
+        reason: `Net name "${name}" encodes a voltage range; left null`,
+      },
+    };
+  }
+  const afterV = String.raw`V(?![A-Za-z])`;
+  const signedDecimal = name.match(
+    new RegExp(String.raw`(?:^|[^0-9])([+-])?(\d+)[.,](\d+)\s*${afterV}`, "i"),
+  );
+  if (signedDecimal) {
+    const mag = Number(`${signedDecimal[2]}.${signedDecimal[3]}`);
+    return { volts: signedDecimal[1] === "-" ? -mag : mag };
+  }
+  const vStyle = name.match(/(?:^|[^0-9])([+-])?(\d+)V(\d+)(?![A-Za-z])/i);
   if (vStyle) {
-    return { volts: Number(`${vStyle[1]}.${vStyle[2]}`) };
+    const mag = Number(`${vStyle[2]}.${vStyle[3]}`);
+    return { volts: vStyle[1] === "-" ? -mag : mag };
   }
-  // 3.3V / +3.3V
-  const dotted = name.match(/(?:^|[^0-9])(\d+\.\d+)\s*V\b/i);
-  if (dotted) {
-    return { volts: Number(dotted[1]) };
-  }
-  // 5V / 12V
-  const whole = name.match(/(?:^|[^0-9])(\d+)\s*V\b/i);
+  const whole = name.match(
+    new RegExp(String.raw`(?:^|[^0-9])([+-])?(\d+)\s*${afterV}`, "i"),
+  );
   if (whole) {
-    return { volts: Number(whole[1]) };
+    const mag = Number(whole[2]);
+    return { volts: whole[1] === "-" ? -mag : mag };
   }
   return {
     volts: null,
@@ -194,11 +252,11 @@ function primaryNetForComponent(
 export const mcuRule: DetectionRule<BscMcu> = {
   id: "mcu",
   description:
-    "MCU: pin count > 20 and library category or MPN/value prefix in known MCU list",
+    "MCU: pin count > 20, not a connector/passive/power-flag; known lib/MPN or (rail fan-in ≥ 2 and connector fan-out ≥ 1 or ≥ 48 pins)",
   match(ctx) {
     const out: BscMcu[] = [];
     for (const c of ctx.snapshot.components) {
-      if (!isMcuCandidate(c)) continue;
+      if (!isMcuCandidate(c, ctx.snapshot)) continue;
       const notes: ConfidenceNote[] = [];
       const mpn = c.mpn || c.value || null;
       if (!c.mpn) {
@@ -321,8 +379,13 @@ export const powerRailRule: DetectionRule<BscPowerRail> = {
     'Power rail: net matching /^(VCC|VDD|V?\\d+V\\d+|GND|VSS)/i or class "power"/"ground"',
   match(ctx) {
     const out: BscPowerRail[] = [];
+    const seen = new Set<string>();
     for (const net of ctx.snapshot.nets) {
+      if (!net.nodes.length) continue;
       if (!isPowerRailNet(net)) continue;
+      const key = `${net.boardKey ?? ""}\0${net.name}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
       const { volts, note } = parseNominalVolts(net.name);
       const notes: ConfidenceNote[] = [];
       if (note) notes.push(note);

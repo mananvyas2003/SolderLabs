@@ -194,7 +194,7 @@ export function generateBSC(
     confidenceNotes.push({
       field: "mcus",
       reason:
-        "No component matched MCU rule (pin count > 20 + known MCU lib/MPN)",
+        "No component matched MCU rule (pin count > 20 plus identity or rail/connector structure)",
     });
   }
 

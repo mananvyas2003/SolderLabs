@@ -78,29 +78,7 @@ export function parseKicadSchematicText(src: string): DesignSnapshot {
   );
 
   const resolved = resolveConnectivity(src, uniq);
-  let nets = resolved.nets;
-  if (!nets.length) {
-    const labelNames = new Set<string>();
-    for (const m of src.matchAll(/\(label\s+"([^"]+)"/g)) labelNames.add(m[1]!);
-    for (const m of src.matchAll(/\(global_label\s+"([^"]+)"/g))
-      labelNames.add(m[1]!);
-    for (const m of src.matchAll(/\(hierarchical_label\s+"([^"]+)"/g))
-      labelNames.add(m[1]!);
-    nets = [...labelNames].sort().map((name) => {
-      const canonical = name.replace(/\{slash\}/gi, "/").replace(/~\{([^}]*)\}/g, "$1");
-      const cls = /GND|VSS/i.test(canonical)
-        ? ("ground" as const)
-        : /(VCC|VDD|VBUS)/i.test(canonical)
-          ? ("power" as const)
-          : ("signal" as const);
-      return {
-        name: canonical,
-        class: cls,
-        nodes: [] as string[],
-        isNamed: true,
-      };
-    });
-  }
+  const nets = resolved.nets;
 
   return {
     schemaVersion: 1,

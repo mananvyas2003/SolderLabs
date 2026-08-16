@@ -21,25 +21,15 @@ export default async function TwinPage({
     : undefined;
   if (!org || !project) notFound();
 
-  let unit = db.boardUnits.find(
+  const unit = db.boardUnits.find(
     (u) => u.projectId === project.id && u.serial === serial,
   );
-  // Allow resolving by revision id / tag as fallback for demo QR
-  const release = db.releases.find(
-    (r) => r.projectId === project.id && (r.tag === serial || r.id === serial),
-  );
-  const revisionId =
-    unit?.revisionId ??
-    release?.revisionId ??
-    db.branches.find((b) => b.projectId === project.id)?.headRevisionId;
-  if (!revisionId) notFound();
+  if (!unit) notFound();
+
+  const revisionId = unit.revisionId;
 
   const revision = db.revisions.find((r) => r.id === revisionId);
   if (!revision) notFound();
-
-  if (!unit) {
-    // ephemeral view without persisted unit row still works for released tags
-  }
 
   const bom = db.bomLines.filter((l) => l.revisionId === revisionId);
   const pinout = db.firmwarePinouts.find((p) => p.revisionId === revisionId);

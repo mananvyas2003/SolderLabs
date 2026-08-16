@@ -58,7 +58,7 @@ test("DETECTION_RULES table lists every rule id exactly once", () => {
   ]);
 });
 
-test("rule:mcu — requires pin count > 20 AND known MCU identity", () => {
+test("rule:mcu — requires pin count > 20 AND known MCU identity or structure", () => {
   const stm: SnapshotComponent = {
     refdes: "U1",
     value: "STM32F407VGT6",
@@ -86,6 +86,16 @@ test("rule:mcu — requires pin count > 20 AND known MCU identity", () => {
   assert.equal(isMcuCandidate(small), false);
   assert.equal(matchesMcuIdentity(bigUnknown), false);
   assert.equal(isMcuCandidate(bigUnknown), false);
+  assert.equal(
+    isMcuCandidate(
+      bigUnknown,
+      snap({
+        components: [bigUnknown],
+        nets: [{ name: "DATA", nodes: ["U3.1"] }],
+      }),
+    ),
+    false,
+  );
 
   const hit = mcuRule.match({ snapshot: snap({ components: [stm, small, bigUnknown] }) });
   assert.equal(hit.length, 1);
@@ -107,6 +117,37 @@ test("rule:mcu — Cypress CY7C matched via MPN prefix without inventing package
   assert.ok(mcu);
   assert.equal(mcu!.package, null);
   assert.ok(mcu!.confidenceNotes.some((n) => n.field === "package"));
+});
+
+test("rule:mcu — unknown high-pin IC with rail fan-in and connector fan-out", () => {
+  const u: SnapshotComponent = {
+    refdes: "U3",
+    value: "MysterySoC",
+    footprint: "BGA-256",
+    libId: "Custom:Mystery",
+    sheetId: "root",
+    pins: pins(100),
+  };
+  const j: SnapshotComponent = {
+    refdes: "J1",
+    value: "USB",
+    footprint: "USB_C",
+    libId: "Connector:USB_C",
+    sheetId: "root",
+    pins: pins(24),
+  };
+  const snapshot = snap({
+    components: [u, j],
+    nets: [
+      { name: "VDD", class: "power", nodes: ["U3.1", "J1.1"] },
+      { name: "GND", class: "ground", nodes: ["U3.2", "J1.2"] },
+      { name: "USB_DP", nodes: ["U3.10", "J1.3"] },
+    ],
+  });
+  assert.equal(isMcuCandidate(u, snapshot), true);
+  const hit = mcuRule.match({ snapshot });
+  assert.equal(hit.some((m) => m.refdes === "U3"), true);
+  assert.equal(hit.some((m) => m.refdes === "J1"), false);
 });
 
 test("rule:i2c_bus — detects SDA/SCL and I2C1_SDA patterns; address stays null", () => {
@@ -198,6 +239,11 @@ test("rule:power_rail — class/name match; voltage parsed only when unambiguous
   assert.equal(parseNominalVolts("3V3").volts, 3.3);
   assert.equal(parseNominalVolts("VDD_3V3").volts, 3.3);
   assert.equal(parseNominalVolts("+5V").volts, 5);
+  assert.equal(parseNominalVolts("-5V").volts, -5);
+  assert.equal(parseNominalVolts("PWR_3,3-5V").volts, null);
+  assert.ok(parseNominalVolts("PWR_3,3-5V").note);
+  assert.equal(parseNominalVolts("Vpil_0_3,3V").volts, 3.3);
+  assert.equal(parseNominalVolts("+3,3V_OUT").volts, 3.3);
   assert.equal(parseNominalVolts("VCC").volts, null);
   assert.ok(parseNominalVolts("VCC").note);
 
@@ -205,17 +251,21 @@ test("rule:power_rail — class/name match; voltage parsed only when unambiguous
     snapshot: snap({
       components: [],
       nets: [
-        { name: "VCC", class: "power", nodes: [] },
-        { name: "3V3", class: "power", nodes: [] },
-        { name: "USB_DP", nodes: [] },
+        { name: "VCC", class: "power", nodes: ["U1.1"] },
+        { name: "3V3", class: "power", nodes: ["U1.2"] },
+        { name: "3V3", class: "power", nodes: ["U1.2"], boardKey: "a.kicad_pro" },
+        { name: "3V3", class: "power", nodes: ["U1.99"], boardKey: "a.kicad_pro" },
+        { name: "USB_DP", nodes: ["U1.3"] },
+        { name: "PHANTOM", class: "power", nodes: [] },
       ],
     }),
   });
-  assert.equal(rails.length, 2);
+  assert.equal(rails.length, 3);
   const vcc = rails.find((r) => r.name === "VCC")!;
-  const v33 = rails.find((r) => r.name === "3V3")!;
+  const v33 = rails.filter((r) => r.name === "3V3");
+  assert.equal(v33.length, 2);
   assert.equal(vcc.nominalVolts, null);
-  assert.equal(v33.nominalVolts, 3.3);
+  assert.equal(v33[0]!.nominalVolts, 3.3);
   assert.equal(vcc.tolerancePct, null);
 });
 

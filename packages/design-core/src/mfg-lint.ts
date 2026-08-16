@@ -141,14 +141,13 @@ export function lintManufacturingPackage(input: MfgLintInput): MfgLintResult {
     }
   }
 
-  const errors = findings.filter((f) => f.severity === "error").length;
   const warns = findings.filter((f) => f.severity === "warn").length;
   const blocking = findings.filter(
     (f) => f.severity === "error" && f.code !== "bom_missing_mpn",
   ).length;
   const notes = findings.length - blocking;
   return {
-    ok: errors === 0,
+    ok: blocking === 0,
     findings,
     summary:
       blocking === 0 && notes === 0

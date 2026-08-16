@@ -304,6 +304,7 @@ export function resolveConnectivity(
 ): { components: SnapshotComponent[]; nets: SnapshotNet[] } {
   const uf = new UnionFind();
   const libPins = extractLibSymbolsPins(src);
+  const segments: Array<{ a: Pt; b: Pt }> = [];
 
   for (const wire of extractBlocks(src, "wire")) {
     const pts = [...wire.matchAll(/\(xy\s+([-\d.]+)\s+([-\d.]+)\)/g)].map(
@@ -311,12 +312,44 @@ export function resolveConnectivity(
     );
     for (let i = 0; i + 1 < pts.length; i++) {
       uf.union(`p:${roundKey(pts[i])}`, `p:${roundKey(pts[i + 1])}`);
+      segments.push({ a: pts[i]!, b: pts[i + 1]! });
+    }
+  }
+  for (const s of segments) {
+    stitchToWires(s.a);
+    stitchToWires(s.b);
+  }
+
+  function pointOnSegment(p: Pt, a: Pt, b: Pt): boolean {
+    const vx = b.x - a.x;
+    const vy = b.y - a.y;
+    const len2 = vx * vx + vy * vy;
+    if (len2 < 1e-12) {
+      return Math.hypot(p.x - a.x, p.y - a.y) <= TOL * 2;
+    }
+    const t = ((p.x - a.x) * vx + (p.y - a.y) * vy) / len2;
+    if (t < -0.02 || t > 1.02) return false;
+    const qx = a.x + t * vx;
+    const qy = a.y + t * vy;
+    return Math.hypot(p.x - qx, p.y - qy) <= TOL * 2;
+  }
+
+  function stitchToWires(p: Pt) {
+    const key = `p:${roundKey(p)}`;
+    for (const s of segments) {
+      if (pointOnSegment(p, s.a, s.b)) {
+        uf.union(key, `p:${roundKey(s.a)}`);
+        uf.union(key, `p:${roundKey(s.b)}`);
+      }
     }
   }
 
   for (const j of extractBlocks(src, "junction")) {
     const at = parseAt(j);
-    if (at) uf.find(`p:${roundKey(at)}`);
+    if (at) {
+      uf.find(`p:${roundKey(at)}`);
+      stitchToWires(at);
+    }
   }
 
   const namedPoints: Array<{ key: string; name: string; display: string }> = [];
@@ -325,6 +358,7 @@ export function resolveConnectivity(
     const name = normalizeNetName(raw);
     const key = `p:${roundKey(at)}`;
     uf.find(key);
+    stitchToWires(at);
     namedPoints.push({ key, name, display });
   };
   for (const lab of extractBlocks(src, "label")) {
@@ -399,6 +433,7 @@ export function resolveConnectivity(
       const pinId = `${c.refdes}.${pin.number}`;
       uf.find(key);
       uf.union(key, `pin:${pinId}`);
+      stitchToWires(world);
       pinPoints.push({
         pinId,
         key,
@@ -464,17 +499,7 @@ export function resolveConnectivity(
     }
     const members = expandBusMembers(name);
     if (members && !g.pins.length) {
-      for (const member of members) {
-        const cls = classifyNet(member);
-        upsertNet({
-          name: member,
-          displayName: member,
-          class: cls,
-          nodes: [],
-          isNamed: true,
-          isPower: cls !== "signal",
-        });
-      }
+      // Bus vector with no attached pins — do not emit phantom member nets.
       continue;
     }
     const nodes = [...new Set(g.pins.map((p) => p.pinId))].sort((a, b) =>
@@ -523,7 +548,9 @@ export function resolveConnectivity(
 
   return {
     components: enriched,
-    nets: [...netMap.values()].sort((a, b) => a.name.localeCompare(b.name)),
+    nets: [...netMap.values()]
+      .filter((n) => n.nodes.length > 0)
+      .sort((a, b) => a.name.localeCompare(b.name)),
   };
 }
 

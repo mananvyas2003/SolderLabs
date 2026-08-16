@@ -222,23 +222,48 @@ export function schematicPathFromProjectRoot(
   absDir: string,
   projectRoot: string | undefined,
 ): string | null {
-  if (!projectRoot) return null;
-  const first = projectRoot.split(",")[0]!;
-  const resolved = path.resolve(absDir, first);
-  if (resolved.endsWith(".kicad_sch") && fs.existsSync(resolved)) return resolved;
-  if (resolved.endsWith(".kicad_pro")) {
-    const sch = resolved.replace(/\.kicad_pro$/i, ".kicad_sch");
-    if (fs.existsSync(sch)) return sch;
-    if (fs.existsSync(resolved)) {
-      try {
-        const sibling = fs
-          .readdirSync(path.dirname(resolved))
-          .find((n) => n.endsWith(".kicad_sch"));
-        if (sibling) return path.join(path.dirname(resolved), sibling);
-      } catch {
-        /* ignore */
+  if (projectRoot) {
+    const first = projectRoot.split(",")[0]!;
+    const resolved = path.resolve(absDir, first);
+    if (resolved.endsWith(".kicad_sch") && fs.existsSync(resolved)) return resolved;
+    if (resolved.endsWith(".kicad_pro")) {
+      const sch = resolved.replace(/\.kicad_pro$/i, ".kicad_sch");
+      if (fs.existsSync(sch)) return sch;
+      if (fs.existsSync(resolved)) {
+        try {
+          const sibling = fs
+            .readdirSync(path.dirname(resolved))
+            .find((n) => n.endsWith(".kicad_sch"));
+          if (sibling) return path.join(path.dirname(resolved), sibling);
+        } catch {
+          /* ignore */
+        }
       }
     }
+    if (fs.existsSync(resolved) && resolved.endsWith(".kicad_sch")) return resolved;
   }
-  return fs.existsSync(resolved) ? resolved : null;
+  const walk = (d: string): string | null => {
+    let ents: fs.Dirent[];
+    try {
+      ents = fs.readdirSync(d, { withFileTypes: true });
+    } catch {
+      return null;
+    }
+    const sch = ents.find((e) => e.isFile() && e.name.endsWith(".kicad_sch"));
+    if (sch) return path.join(d, sch.name);
+    const pro = ents.find((e) => e.isFile() && e.name.endsWith(".kicad_pro"));
+    if (pro) {
+      const p = path.join(d, pro.name);
+      const candid = p.replace(/\.kicad_pro$/i, ".kicad_sch");
+      if (fs.existsSync(candid)) return candid;
+    }
+    for (const ent of ents) {
+      if (!ent.isDirectory()) continue;
+      if (ent.name === "node_modules" || ent.name.startsWith(".")) continue;
+      const hit = walk(path.join(d, ent.name));
+      if (hit) return hit;
+    }
+    return null;
+  };
+  return walk(absDir);
 }

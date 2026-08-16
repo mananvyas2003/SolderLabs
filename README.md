@@ -19,7 +19,7 @@ Open [http://localhost:3000](http://localhost:3000).
 2. **Seed blinky fixtures** → Compare (**electrical** / schematic / PCB / BOM / SolderLab Review)
 3. Design Review → merge (checks-gated; **connectivity-gate** vs parent)
 4. Cut a **Release**
-5. **Pinout** sync for `U1` → download `.h`
+5. **Pinout** for `U1` (`/pinout?refdes=U1`) → download `.h` from the head revision snapshot
 
 ### CLI
 
@@ -31,7 +31,7 @@ Env: `SOLDERLAB_URL`, `SOLDERLAB_EMAIL`, `SOLDERLAB_PASSWORD`
 
 ## What’s in this repo
 
-Collaboration surfaces for hardware teams (orgs, revisions, visual + electrical diff, reviews, checks, releases, library policy) plus:
+Collaboration surfaces for hardware teams (orgs, revisions, visual + electrical diff, reviews, checks, releases) plus:
 
 - KiCad wire/pin connectivity resolve → DesignSnapshot
 - NetDiff-style semantic electrical diff

@@ -1,0 +1,25 @@
+{
+  "name": "@solderlab/llm",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc --noEmit",
+    "test": "node --import tsx --test src/__tests__/t4-t6.test.ts src/__tests__/t7-groq-strict.test.ts src/__tests__/board-card.test.ts src/__tests__/tools.test.ts"
+  },
+  "dependencies": {
+    "@solderlab/bsc": "*",
+    "@solderlab/design-core": "*",
+    "openai": "^4.104.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.9",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  }
+}

@@ -56,14 +56,13 @@ export function syncPinoutFromSnapshot(
   );
 
   if (!pins.length) {
-    // Fallback when schematic net nodes lack pin numbers (MVP parser)
-    pins = [
-      { pin: "1", name: "PIN1", net: "NET1" },
-      { pin: "2", name: "PIN2", net: "GND" },
-      { pin: "3", name: "PIN3", net: "VDD" },
-      { pin: "4", name: "PIN4", net: "NET2" },
-      { pin: "5", name: "PIN5", net: "VDD" },
-    ];
+    return {
+      targetRefdes: comp.refdes,
+      partValue: comp.value,
+      pins: [],
+      syncedAt: new Date().toISOString(),
+      notes: "No pin records on this symbol in the schematic snapshot",
+    };
   }
 
   return {

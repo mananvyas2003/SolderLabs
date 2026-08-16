@@ -112,3 +112,12 @@ test("mfg linter catches PnP ref missing from BOM and missing MPN", () => {
   assert.ok(r.findings.some((f) => f.code === "pnp_unknown_refdes" && f.ref === "U99"));
   assert.ok(r.findings.some((f) => f.code === "bom_missing_mpn" && f.ref === "R1"));
 });
+
+test("mfg linter passes when the only errors are missing MPNs", () => {
+  const r = lintManufacturingPackage({
+    bom: [{ refdes: "R1", mpn: null, value: "10k" }],
+    placement: [{ refdes: "R1" }],
+  });
+  assert.equal(r.ok, true);
+  assert.match(r.summary, /Pass with/);
+});

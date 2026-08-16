@@ -116,10 +116,10 @@ test("VPP{slash}MCLR and VPP/MCLR collapse to one net", () => {
 	(uuid "00000000-0000-0000-0000-000000000010")
 	(label "VPP{slash}MCLR" (at 0 0 0) (effects (font (size 1.27 1.27))))
 	(label "VPP/MCLR" (at 0 0 0) (effects (font (size 1.27 1.27))))
-	(symbol (lib_id "Device:R") (at 0 0 0) (unit 1)
+	(symbol (lib_id "Device:R") (at 0 3.81 0) (unit 1)
 		(uuid "00000000-0000-0000-0000-000000000011")
-		(property "Reference" "R1" (at 0 0 0) (effects (font (size 1.27 1.27))))
-		(property "Value" "10k" (at 0 0 0) (effects (font (size 1.27 1.27))))
+		(property "Reference" "R1" (at 0 3.81 0) (effects (font (size 1.27 1.27))))
+		(property "Value" "10k" (at 0 3.81 0) (effects (font (size 1.27 1.27))))
 	)
 )`;
   const { nets } = resolveConnectivity(src, [
@@ -130,7 +130,7 @@ test("VPP{slash}MCLR and VPP/MCLR collapse to one net", () => {
       sheetId: "root",
       libId: "Device:R",
       x: 0,
-      y: 0,
+      y: 3.81,
       rotation: 0,
     },
   ]);
@@ -144,7 +144,7 @@ test("VPP{slash}MCLR and VPP/MCLR collapse to one net", () => {
   );
 });
 
-test("bus vector labels expand to member nets", () => {
+test("bus vector labels without pins do not emit phantom member nets", () => {
   const src = `(kicad_sch (version 20231120)
 	(uuid "00000000-0000-0000-0000-000000000020")
 	(global_label "ANALOG{A[0..5]}" (at 1 1 0) (shape input)
@@ -153,15 +153,37 @@ test("bus vector labels expand to member nets", () => {
 		(effects (font (size 1.27 1.27))))
 )`;
   const { nets } = resolveConnectivity(src, []);
-  for (let i = 0; i <= 5; i++) {
-    assert.ok(
-      nets.some((n) => n.name === `ANALOG{A${i}}`),
-      `missing ANALOG{A${i}}`,
-    );
-  }
-  assert.ok(nets.some((n) => n.name === "USB{VBUS}"));
-  assert.ok(nets.some((n) => n.name === "USB{CC1}"));
-  assert.ok(nets.some((n) => n.name === "USB{CC2}"));
+  assert.equal(nets.filter((n) => n.name.startsWith("ANALOG")).length, 0);
+  assert.equal(nets.filter((n) => n.name.startsWith("USB")).length, 0);
+});
+
+test("T-junction: pin on a wire midpoint joins the net", () => {
+  const src = `(kicad_sch (version 20231120)
+	(uuid "00000000-0000-0000-0000-000000000030")
+	(wire (pts (xy 0 0) (xy 20 0)))
+	(wire (pts (xy 10 0) (xy 10 10)))
+	(label "GND" (at 0 0 0)
+		(effects (font (size 1.27 1.27))))
+	(symbol (lib_id "Device:R") (at 10 3.81 0) (unit 1)
+		(uuid "00000000-0000-0000-0000-000000000031")
+		(property "Reference" "R9" (at 10 3.81 0) (effects (font (size 1.27 1.27))))
+		(property "Value" "10k" (at 10 3.81 0) (effects (font (size 1.27 1.27))))
+	)
+)`;
+  const { nets } = resolveConnectivity(src, [
+    {
+      refdes: "R9",
+      value: "10k",
+      footprint: "",
+      sheetId: "root",
+      libId: "Device:R",
+      x: 10,
+      y: 3.81,
+      rotation: 0,
+    },
+  ]);
+  const gnd = nets.find((n) => n.name === "GND");
+  assert.ok(gnd?.nodes.some((n) => n.startsWith("R9.")), `GND nodes=${gnd?.nodes.join(",")}`);
 });
 
 test("PCB-only project emits empty nets with a warning", () => {
@@ -174,4 +196,31 @@ test("PCB-only project emits empty nets with a warning", () => {
   assert.equal(snap.components.length, 0);
   assert.equal(snap.nets.length, 0);
   assert.ok(snap.warnings?.some((w) => w.code === "pcb-only"));
+});
+
+test("sheetId is namespaced with board key on single- and multi-board paths", () => {
+  const sch = fs.readFileSync(path.join(root, "r1/blinky.kicad_sch"), "utf8");
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "solderlab-sheetid-"));
+  const boardA = path.join(dir, "pic_programmer");
+  const boardB = path.join(dir, "other");
+  fs.mkdirSync(boardA);
+  fs.mkdirSync(boardB);
+  fs.writeFileSync(path.join(boardA, "pic_programmer.kicad_sch"), sch);
+  fs.writeFileSync(path.join(boardA, "pic_programmer.kicad_pro"), "(kicad_pro (version 1))\n");
+  fs.writeFileSync(path.join(boardB, "other.kicad_sch"), sch);
+  fs.writeFileSync(path.join(boardB, "other.kicad_pro"), "(kicad_pro (version 1))\n");
+
+  const alone = parseKicadProjectDir(path.join(boardA, "pic_programmer.kicad_pro"));
+  const tree = parseKicadProjectDir(dir);
+  const idsAlone = [...new Set(alone.components.map((c) => c.sheetId))].sort();
+  const idsTree = [
+    ...new Set(
+      tree.components
+        .filter((c) => c.boardKey === "pic_programmer.kicad_pro")
+        .map((c) => c.sheetId),
+    ),
+  ].sort();
+  assert.ok(idsAlone.length);
+  assert.deepEqual(idsAlone, idsTree);
+  assert.ok(idsAlone.every((id) => id.startsWith("pic_programmer.kicad_pro:")));
 });

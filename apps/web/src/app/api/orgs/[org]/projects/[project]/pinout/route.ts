@@ -33,21 +33,41 @@ export async function GET(
   const url = new URL(req.url);
   const revisionId = url.searchParams.get("revisionId");
   const compare = url.searchParams.get("compare");
-  const target = url.searchParams.get("target") ?? "U1";
+  const target =
+    url.searchParams.get("target") ?? url.searchParams.get("refdes") ?? "U1";
   const format = url.searchParams.get("format");
 
   const db = getDb();
-  let pinouts = db.firmwarePinouts.filter((p) => p.projectId === project.id);
-  if (revisionId) {
-    pinouts = pinouts.filter((p) => p.revisionId === revisionId);
-  }
+  const headRevisionId = db.branches.find((b) => b.projectId === project.id)
+    ?.headRevisionId;
+  const rid = revisionId ?? headRevisionId;
 
-  if (format === "h" && pinouts[0]) {
-    const doc = JSON.parse(pinouts[0].dataJson) as PinoutDocument;
-    return new NextResponse(pinoutToHeader(doc), {
+  let pinouts = db.firmwarePinouts.filter((p) => p.projectId === project.id);
+  if (rid) {
+    pinouts = pinouts.filter((p) => p.revisionId === rid);
+  }
+  pinouts = pinouts.filter(
+    (p) => p.targetRefdes.toUpperCase() === target.toUpperCase(),
+  );
+
+  const snapshotRow = rid
+    ? db.designSnapshots.find((s) => s.revisionId === rid)
+    : undefined;
+  const liveDoc =
+    !pinouts.length && snapshotRow
+      ? syncPinoutFromSnapshot(
+          JSON.parse(snapshotRow.dataJson) as DesignSnapshot,
+          target,
+        )
+      : null;
+  const resolved =
+    pinouts[0] ? (JSON.parse(pinouts[0].dataJson) as PinoutDocument) : liveDoc;
+
+  if (format === "h" && resolved) {
+    return new NextResponse(pinoutToHeader(resolved), {
       headers: {
         "Content-Type": "text/x-c",
-        "Content-Disposition": `attachment; filename="${doc.targetRefdes}_pinout.h"`,
+        "Content-Disposition": `attachment; filename="${resolved.targetRefdes}_pinout.h"`,
       },
     });
   }
@@ -72,7 +92,22 @@ export async function GET(
     );
   }
 
-  return NextResponse.json({ pinouts, diff, target });
+  return NextResponse.json({
+    pinouts: resolved
+      ? pinouts.length
+        ? pinouts
+        : [
+            {
+              targetRefdes: resolved.targetRefdes,
+              source: "schematic-live",
+              dataJson: JSON.stringify(resolved),
+            },
+          ]
+      : [],
+    pinout: resolved,
+    diff,
+    target,
+  });
 }
 
 export async function POST(
