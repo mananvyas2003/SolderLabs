@@ -23,6 +23,6 @@
     "parts:watch": "npm run watch -w @solderlab/parts"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.13"
   }
 }
