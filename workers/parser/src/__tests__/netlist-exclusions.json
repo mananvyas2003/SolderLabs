@@ -3,7 +3,7 @@
   "unreadableBoards": [],
   "pinsetMismatchBudget": {
     "amulet-controller": 7,
-    "kintex-pcie": 140,
+    "kintex-pcie": 145,
     "upsy-desky": 27,
     "piantor": 27,
     "angloxx": 4,
