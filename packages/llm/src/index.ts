@@ -23,7 +23,9 @@ export {
   parseStructuredFindings,
   findingsToClaims,
   formatImpactHttpBody,
+  runChat,
 } from "./run.ts";
+export type { RunChatOptions, RunChatResult } from "./run.ts";
 export { buildBoardCard, boardCardBytes, type BoardCard } from "./board-card.ts";
 export {
   BOARD_TOOL_SPECS,
@@ -49,5 +51,6 @@ export {
   SYSTEM_PROMPT,
   SYSTEM_PROMPT_TOOLS,
   SYSTEM_PROMPT_STRUCTURED,
+  SYSTEM_PROMPT_CHAT,
 } from "./schema.ts";
 export type { LlmProvider as GroqLlmProvider } from "./provider.ts";

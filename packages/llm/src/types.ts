@@ -43,6 +43,12 @@ export interface CompleteStructuredInput {
   signal?: AbortSignal;
 }
 
+export interface CompleteTextInput {
+  system: string;
+  messages: LlmMessage[];
+  signal?: AbortSignal;
+}
+
 export interface LlmProvider {
   completeWithTools(
     o: CompleteWithToolsInput,
@@ -53,6 +59,9 @@ export interface LlmProvider {
   completeStructured(
     o: CompleteStructuredInput,
   ): Promise<ProviderOk<{ data: unknown; usage: LlmUsage }> | ProviderErr>;
+  completeText(
+    o: CompleteTextInput,
+  ): Promise<ProviderOk<{ text: string; usage: LlmUsage }> | ProviderErr>;
 }
 
 export interface LlmEnv {

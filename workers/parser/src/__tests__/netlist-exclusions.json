@@ -1,6 +1,6 @@
 {
-  "_comment": "Shrinking budgets from CI run 31942239446. Fail if a count grows, or if kicad-cli can load a board listed in unreadableBoards. Lower pinsetMismatchBudget as the resolver improves.",
-  "unreadableBoards": ["zynq-som", "glasgow"],
+  "_comment": "Shrinking budgets. Fail if a count grows, or if kicad-cli can load a board listed in unreadableBoards. zynq-som and glasgow now load — they must match oracle (budget 0) or get an explicit pinsetMismatchBudget.",
+  "unreadableBoards": [],
   "pinsetMismatchBudget": {
     "amulet-controller": 7,
     "kintex-pcie": 122,

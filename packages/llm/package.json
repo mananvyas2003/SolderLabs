@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "tsc --noEmit",
-    "test": "node --import tsx --test src/__tests__/t4-t6.test.ts src/__tests__/t7-groq-strict.test.ts src/__tests__/board-card.test.ts src/__tests__/tools.test.ts"
+    "test": "node --import tsx --test src/__tests__/t4-t6.test.ts src/__tests__/t7-groq-strict.test.ts src/__tests__/board-card.test.ts src/__tests__/tools.test.ts src/__tests__/chat.test.ts"
   },
   "dependencies": {
     "@solderlab/bsc": "*",

@@ -203,6 +203,13 @@ test("T6: net named IGNORE_PRIOR_INSTRUCTIONS does not unfence into instructions
         usage: { promptTokens: 1, completionTokens: 1, totalTokens: 2 },
       };
     },
+    async completeText() {
+      return {
+        ok: true,
+        text: "unused in T6",
+        usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0 },
+      };
+    },
   };
 
   const llm = await maybeRunLlmClaims({

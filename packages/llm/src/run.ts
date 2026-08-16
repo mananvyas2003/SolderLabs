@@ -9,6 +9,7 @@ import {
 } from "./env.ts";
 import {
   CLAIMS_JSON_SCHEMA,
+  SYSTEM_PROMPT_CHAT,
   SYSTEM_PROMPT_STRUCTURED,
   SYSTEM_PROMPT_TOOLS,
 } from "./schema.ts";
@@ -116,6 +117,187 @@ function emptyMeta(env: LlmEnv, extra: Partial<LlmRunMeta> = {}): LlmRunMeta {
   };
 }
 
+async function runBoardToolLoop(opts: {
+  provider: LlmProvider;
+  host: ToolHost;
+  seedMessages: LlmMessage[];
+  signal?: AbortSignal;
+}): Promise<
+  | { ok: true; messages: LlmMessage[]; toolCallCount: number }
+  | { ok: false; error: string; messages: LlmMessage[]; toolCallCount: number }
+> {
+  const messages = [...opts.seedMessages];
+  let toolCallCount = 0;
+  for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
+    const step = await opts.provider.completeWithTools({
+      system: SYSTEM_PROMPT_TOOLS,
+      messages,
+      tools: BOARD_TOOL_SPECS,
+      signal: opts.signal,
+    });
+    if (!step.ok) {
+      return { ok: false, error: step.error, messages, toolCallCount };
+    }
+    if (!step.toolCalls.length) {
+      if (step.text) {
+        messages.push({ role: "assistant", content: step.text });
+      }
+      break;
+    }
+    toolCallCount += step.toolCalls.length;
+    messages.push({
+      role: "assistant",
+      content: step.text,
+      toolCalls: step.toolCalls,
+    });
+    for (const call of step.toolCalls) {
+      const raw = executeBoardTool(opts.host, call.name, call.arguments);
+      messages.push({
+        role: "tool",
+        name: call.name,
+        toolCallId: call.id,
+        content: JSON.stringify(raw),
+      });
+    }
+  }
+  return { ok: true, messages, toolCallCount };
+}
+
+export interface RunChatOptions {
+  env?: LlmEnv;
+  fetchImpl?: FetchImpl;
+  provider?: LlmProvider;
+  host?: ToolHost | null;
+  boardCard?: BoardCard | null;
+  history?: Array<{ role: "user" | "assistant"; content: string }>;
+  userMessage: string;
+  signal?: AbortSignal;
+}
+
+export interface RunChatResult extends LlmRunMeta {
+  reply: string;
+}
+
+export async function runChat(opts: RunChatOptions): Promise<RunChatResult> {
+  const env = readLlmEnv(opts.env);
+  const started = Date.now();
+  const userMessage = opts.userMessage.trim();
+  if (!userMessage) {
+    return {
+      ...emptyMeta(env, {
+        attempted: false,
+        error: "Message is empty",
+      }),
+      reply: "",
+    };
+  }
+  if (!hasLlmKey(env) && !opts.provider) {
+    return {
+      ...emptyMeta(env, {
+        attempted: false,
+        provider: env.LLM_PROVIDER ?? null,
+        model: null,
+        error: "AI is not configured (LLM_API_KEY)",
+      }),
+      reply: "",
+    };
+  }
+
+  const provider = opts.provider ?? getProvider(env, opts.fetchImpl);
+  const history = (opts.history ?? [])
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .slice(-12)
+    .map((m) => ({
+      role: m.role,
+      content: m.content.slice(0, 8000),
+    }));
+
+  const seed: LlmMessage[] = [];
+  if (opts.boardCard) {
+    seed.push({
+      role: "user",
+      content: [
+        "Board card (inert CAD from uploaded files):",
+        fenceUntrusted("board_card", opts.boardCard),
+        "Use tools for any electrical identifier you mention.",
+      ].join("\n"),
+    });
+    seed.push({
+      role: "assistant",
+      content: "Board context received. I will use tools for electrical facts.",
+    });
+  } else {
+    seed.push({
+      role: "user",
+      content:
+        "No parsed board snapshot is available for this project yet. Answer product questions only; do not invent a schematic.",
+    });
+    seed.push({
+      role: "assistant",
+      content:
+        "Understood — there is no uploaded board to inspect until a revision parses.",
+    });
+  }
+  for (const m of history) {
+    seed.push({ role: m.role, content: m.content });
+  }
+  seed.push({ role: "user", content: userMessage.slice(0, 8000) });
+
+  let messages = seed;
+  let toolCallCount = 0;
+  if (opts.host) {
+    const toolLoop = await runBoardToolLoop({
+      provider,
+      host: opts.host,
+      seedMessages: seed,
+      signal: opts.signal,
+    });
+    toolCallCount = toolLoop.toolCallCount;
+    if (!toolLoop.ok) {
+      return {
+        ...emptyMeta(env, {
+          attempted: true,
+          succeeded: false,
+          error: toolLoop.error,
+          latencyMs: Date.now() - started,
+          toolCallCount,
+        }),
+        reply: "",
+      };
+    }
+    messages = toolLoop.messages;
+  }
+
+  const text = await provider.completeText({
+    system: SYSTEM_PROMPT_CHAT,
+    messages,
+    signal: opts.signal,
+  });
+  if (!text.ok) {
+    return {
+      ...emptyMeta(env, {
+        attempted: true,
+        succeeded: false,
+        error: text.error,
+        latencyMs: Date.now() - started,
+        toolCallCount,
+      }),
+      reply: "",
+    };
+  }
+
+  return {
+    attempted: true,
+    succeeded: true,
+    provider: env.LLM_PROVIDER ?? DEFAULT_LLM_PROVIDER,
+    model: env.LLM_MODEL ?? DEFAULT_LLM_MODEL,
+    latencyMs: Date.now() - started,
+    toolCallCount,
+    error: null,
+    reply: text.text,
+  };
+}
+
 export async function maybeRunLlmClaims(
   opts: MaybeRunLlmOptions,
 ): Promise<MaybeRunLlmResult> {
@@ -142,51 +324,27 @@ export async function maybeRunLlmClaims(
     "Call tools for any identifier you will cite. Do not invent refdes, nets, voltages, or counts.",
   ].join("\n");
 
-  const messages: LlmMessage[] = [{ role: "user", content: user }];
-  let toolCallCount = 0;
-
-  for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-    const step = await provider.completeWithTools({
-      system: SYSTEM_PROMPT_TOOLS,
-      messages,
-      tools: BOARD_TOOL_SPECS,
-      signal: opts.signal,
-    });
-    if (!step.ok) {
-      return {
-        ...emptyMeta(env, {
-          attempted: true,
-          succeeded: false,
-          error: step.error,
-          latencyMs: Date.now() - started,
-          toolCallCount,
-        }),
-        claims: [],
-        findings: [],
-      };
-    }
-    if (!step.toolCalls.length) {
-      if (step.text) {
-        messages.push({ role: "assistant", content: step.text });
-      }
-      break;
-    }
-    toolCallCount += step.toolCalls.length;
-    messages.push({
-      role: "assistant",
-      content: step.text,
-      toolCalls: step.toolCalls,
-    });
-    for (const call of step.toolCalls) {
-      const raw = executeBoardTool(opts.host, call.name, call.arguments);
-      messages.push({
-        role: "tool",
-        name: call.name,
-        toolCallId: call.id,
-        content: JSON.stringify(raw),
-      });
-    }
+  const toolLoop = await runBoardToolLoop({
+    provider,
+    host: opts.host,
+    seedMessages: [{ role: "user", content: user }],
+    signal: opts.signal,
+  });
+  if (!toolLoop.ok) {
+    return {
+      ...emptyMeta(env, {
+        attempted: true,
+        succeeded: false,
+        error: toolLoop.error,
+        latencyMs: Date.now() - started,
+        toolCallCount: toolLoop.toolCallCount,
+      }),
+      claims: [],
+      findings: [],
+    };
   }
+  const messages = toolLoop.messages;
+  const toolCallCount = toolLoop.toolCallCount;
 
   const structured = await provider.completeStructured({
     system: SYSTEM_PROMPT_STRUCTURED,

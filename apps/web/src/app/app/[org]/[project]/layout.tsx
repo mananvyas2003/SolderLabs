@@ -6,6 +6,7 @@ import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
 import { ProjectTabs } from "@/components/project-tabs";
 import { ReviewRail } from "@/components/review-rail";
+import { AiAssistantDock } from "@/components/ai-assistant-dock";
 
 export default async function ProjectLayout({
   children,
@@ -82,6 +83,7 @@ export default async function ProjectLayout({
           orgId={org.id}
         />
       </div>
+      <AiAssistantDock orgSlug={orgSlug} projectSlug={projectSlug} />
     </div>
   );
 }

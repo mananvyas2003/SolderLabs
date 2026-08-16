@@ -42,6 +42,7 @@ export default async function AppLayout({
           >
             Home
           </Link>
+          <div id="solderlab-assistant-slot" className="flex items-center" />
           <SignOutControl />
         </header>
         <div className="min-w-0 flex-1 px-4 py-5 md:px-6">{children}</div>

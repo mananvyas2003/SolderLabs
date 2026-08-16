@@ -13,6 +13,7 @@ const TABS = [
   { id: "checks", label: "Checks", suffix: "/checks" },
   { id: "pinout", label: "Pinout", suffix: "/pinout" },
   { id: "reviews", label: "Reviews", suffix: "/reviews" },
+  { id: "assistant", label: "Copilot", suffix: "/assistant" },
   { id: "releases", label: "Releases", suffix: "/releases" },
   { id: "settings", label: "Settings", suffix: "/settings" },
 ] as const;

@@ -42,9 +42,10 @@ export default async function ProjectPage({
       <aside className="rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-4 py-3 lg:hidden">
         <p className="text-sm font-semibold">SolderLab Review</p>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Open the <span className="font-medium text-[var(--text)]">Review · AI</span>{" "}
-          button (bottom-right) for risk suggestions on your latest diff. On desktop
-          the Review rail is always on the right.
+          Open the sparkle icon in the top-right header for Copilot chat while
+          you keep working. Use{" "}
+          <span className="font-medium text-[var(--text)]">Review · AI</span>{" "}
+          (bottom-right) for rule-based risk suggestions.
         </p>
       </aside>
 

@@ -6,6 +6,7 @@ import {
 } from "./env.ts";
 import type {
   CompleteStructuredInput,
+  CompleteTextInput,
   CompleteWithToolsInput,
   FetchImpl,
   LlmEnv,
@@ -186,6 +187,31 @@ export function createGroqProvider(
         return {
           ok: true as const,
           data,
+          usage: usageFrom(completion.usage),
+        };
+      } catch (e) {
+        return fail(e);
+      }
+    },
+
+    async completeText(o: CompleteTextInput) {
+      try {
+        const completion = await client.chat.completions.create(
+          {
+            model,
+            temperature: 0.2,
+            max_tokens: 2048,
+            messages: toOpenAIMessages(o.system, o.messages),
+          },
+          { signal: o.signal, timeout: TIMEOUT_MS },
+        );
+        const text = completion.choices[0]?.message?.content ?? "";
+        if (!text.trim()) {
+          return { ok: false, error: "Groq returned an empty reply" };
+        }
+        return {
+          ok: true as const,
+          text,
           usage: usageFrom(completion.usage),
         };
       } catch (e) {

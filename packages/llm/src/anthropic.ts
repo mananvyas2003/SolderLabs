@@ -19,5 +19,8 @@ export function createAnthropicProvider(): LlmProvider {
     async completeStructured(_o: CompleteStructuredInput) {
       return unsupported;
     },
+    async completeText() {
+      return unsupported;
+    },
   };
 }

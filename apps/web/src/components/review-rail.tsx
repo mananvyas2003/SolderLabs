@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import type { CopilotFinding } from "@solderlab/design-core";
 import { Badge, Button, Input, cx } from "@solderlab/ui";
 import { runCopilot } from "@/lib/copilot-client";
@@ -169,9 +170,15 @@ export function ReviewRail({
           <p className="text-[11px] text-[var(--text-subtle)]">
             Rule-based review with evidence links
           </p>
-          <div className="text-[11px] text-[var(--text-subtle)]">
+          <p className="text-[11px] text-[var(--text-subtle)]">
             Local grounded assistant · Ctrl+`
-          </div>
+          </p>
+          <Link
+            href={`/app/${orgSlug}/${projectSlug}/assistant`}
+            className="text-[11px] text-[var(--accent-2)] hover:underline"
+          >
+            Groq chat
+          </Link>
         </div>
         <button
           type="button"
