@@ -19,7 +19,9 @@ export default async function AppHome() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Organizations</h1>
+          <h1 className="text-2xl font-medium tracking-tight text-[var(--text)]">
+            Organizations
+          </h1>
           <p className="mt-1 text-sm text-[var(--text-muted)]">
             Choose a workspace to open projects.
           </p>
@@ -46,7 +48,7 @@ export default async function AppHome() {
                     {o.slug}
                   </div>
                 </div>
-                <span className="shrink-0 text-sm font-medium text-[var(--accent)]">
+                <span className="shrink-0 text-sm font-medium text-[var(--accent-2)]">
                   Open →
                 </span>
               </Link>

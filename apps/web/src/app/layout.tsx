@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { Source_Sans_3, IBM_Plex_Mono } from "next/font/google";
+import { Geist, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const sourceSans = Source_Sans_3({
+const geist = Geist({
   subsets: ["latin"],
-  weight: ["400", "600"],
-  variable: "--font-source-sans",
+  weight: ["400", "500", "600"],
+  variable: "--font-geist",
 });
 
-const plexMono = IBM_Plex_Mono({
+const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "500"],
-  variable: "--font-plex-mono",
+  variable: "--font-jetbrains",
 });
 
 export const metadata: Metadata = {
@@ -26,10 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="en"
-      className={`${sourceSans.variable} ${plexMono.variable}`}
-    >
+    <html lang="en" className={`${geist.variable} ${jetbrains.variable} dark`}>
       <body
         className="antialiased"
         style={{ fontFamily: "var(--font-sans)" }}

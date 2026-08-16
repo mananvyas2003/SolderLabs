@@ -33,25 +33,27 @@ export default function SignInPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[var(--surface-0)]">
-      <header className="border-b border-[var(--border)] bg-[var(--surface-1)]">
-        <div className="mx-auto flex h-14 max-w-5xl items-center px-6">
-          <BrandMark />
-        </div>
+      <header className="sl-glass flex h-16 items-center border-b border-[var(--border)] px-4 md:px-16">
+        <BrandMark />
       </header>
-      <div className="flex flex-1 items-start justify-center px-6 pt-16">
-        <div className="w-full max-w-[380px]">
-          <h1 className="text-2xl font-semibold tracking-tight">Sign in</h1>
+      <div className="flex flex-1 items-start justify-center px-6 pt-20">
+        <div className="w-full max-w-[400px]">
+          <h1 className="text-2xl font-medium tracking-tight text-[var(--text)]">
+            Sign in
+          </h1>
           <p className="mt-2 text-sm text-[var(--text-muted)]">
-            Use{" "}
-            <span className="font-mono text-[var(--text)]">demo@solderlab.dev</span>{" "}
-            / <span className="font-mono text-[var(--text)]">demo</span>
+            Demo:{" "}
+            <span className="font-mono text-[13px] text-[var(--accent-2)]">
+              demo@solderlab.dev
+            </span>{" "}
+            / <span className="font-mono text-[13px] text-[var(--accent-2)]">demo</span>
           </p>
           <form
             onSubmit={onSubmit}
-            className="mt-8 space-y-4 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-5"
+            className="mt-8 space-y-4 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-6"
           >
             <div>
-              <label className="mb-1 block text-xs font-semibold text-[var(--text-muted)]">
+              <label className="mb-1 block font-mono text-[10px] font-medium uppercase tracking-widest text-[var(--text-subtle)]">
                 Email
               </label>
               <Input
@@ -64,7 +66,7 @@ export default function SignInPage() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold text-[var(--text-muted)]">
+              <label className="mb-1 block font-mono text-[10px] font-medium uppercase tracking-widest text-[var(--text-subtle)]">
                 Password
               </label>
               <Input

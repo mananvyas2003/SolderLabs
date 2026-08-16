@@ -2,14 +2,14 @@
 @import "@solderlab/ui/tokens.css";
 
 @theme {
-  --font-sans: var(--font-source-sans), "Source Sans 3", "Segoe UI", sans-serif;
-  --font-mono: var(--font-plex-mono), "IBM Plex Mono", "Consolas", monospace;
+  --font-sans: var(--font-geist), "Geist", "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", "Consolas", monospace;
 }
 
 body {
   min-height: 100vh;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--text-soft);
 }
 
 a {
@@ -18,7 +18,8 @@ a {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--accent) 24%, transparent);
+  background: color-mix(in srgb, var(--accent) 35%, transparent);
+  color: var(--accent-fg);
 }
 
 .sl-panel {
@@ -27,11 +28,48 @@ a {
   border-radius: var(--radius);
 }
 
+.sl-bento {
+  border: 1px solid var(--border);
+  background: var(--surface-1);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.sl-bento:hover {
+  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sl-glass {
+  background: rgba(10, 10, 10, 0.72);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-color: var(--border);
+}
+
 .sl-link {
-  color: var(--accent);
+  color: var(--accent-2);
 }
 
 .sl-link:hover {
   text-decoration: underline;
   text-underline-offset: 2px;
+}
+
+.sl-pulse-dot {
+  box-shadow: 0 0 0 0 var(--accent-glow);
+  animation: sl-pulse 2s infinite;
+}
+
+@keyframes sl-pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--accent-glow);
+  }
+  70% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
 }

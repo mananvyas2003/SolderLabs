@@ -1,41 +1,26 @@
-# SolderLab brand kit — “Slate + Ember”
+# SolderLab brand kit — SolderLabs Core
 
-Industrial and assured. Cool slate chrome; one warm ember for action.
+Derived from `stitch_solderlabs_minimalist_redesign` DESIGN.md.
+High-end technical minimalism for hardware collaboration.
 
-## Principles
+## Colors
 
-1. Flat identity — no gradients as brand.
-2. Ember is scarce — primary buttons, active tab underline, focus, brand mark.
-3. Navigation is a tab bar, not a chip pile.
-
-## Wordmark
-
-- **SolderLab** mixed case + 8×8 ember square (2px radius)
-- Type: Source Sans 3 Semibold
-
-## Color
-
-| Token | Hex | Use |
+| Token | Value | Use |
 | --- | --- | --- |
-| `--surface-0` | `#f4f4f5` | Page canvas |
-| `--surface-1` | `#ffffff` | Panels / header |
-| `--surface-2` | `#e4e4e7` | Hover |
-| `--text` | `#18181b` | Body |
-| `--text-muted` | `#52525b` | Secondary |
-| `--border` | `#d4d4d8` | Rules |
-| `--accent` | `#c2410c` | Primary CTA / active |
-| `--accent-hover` | `#9a3412` | Primary hover |
-| `--accent-fg` | `#ffffff` | On primary |
-
-Source: `packages/ui/src/tokens.css`
+| `--surface-0` | `#0A0A0A` | Page canvas |
+| `--border` | `#262626` | 1px rules / card edges |
+| `--accent` | `#5E5CE6` | Primary CTA / active |
+| `--accent-2` | `#C2C1FF` | Soft highlight / links |
+| `--text` | `#FFFFFF` | Headlines |
+| `--text-muted` | `#A1A1AA` | Secondary |
 
 ## Type
 
-- UI: Source Sans 3 (400 / 600)
-- Code: IBM Plex Mono
+- UI: Geist 400 / 500 / 600
+- Mono labels: JetBrains Mono 500
 
-## Navigation pattern
+## Chrome
 
-- Sticky app header: brand · user
-- Project header: breadcrumb · title · **Compare** (right) · underline tabs
-- One obvious primary per view
+- Glass nav: `backdrop-filter: blur(24px)` + translucent fill
+- Bento cards: 1px `#262626`, `rgba(255,255,255,0.02)`, 24px padding
+- No heavy drop shadows on cards

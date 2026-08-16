@@ -148,7 +148,7 @@ export function ReviewRail({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-5 right-5 z-30 rounded-[var(--radius)] bg-[var(--accent)] px-3.5 py-2 text-sm font-semibold text-[var(--accent-fg)] shadow-sm hover:bg-[var(--accent-hover)]"
+        className="fixed bottom-5 right-5 z-30 rounded-[var(--radius)] bg-[var(--accent)] px-3.5 py-2 font-mono text-[11px] font-medium uppercase tracking-wider text-[var(--accent-fg)] shadow-[var(--shadow-modal)] hover:bg-[var(--accent-hover)]"
       >
         Review · AI
       </button>
@@ -158,7 +158,7 @@ export function ReviewRail({
   return (
     <aside
       className={cx(
-        "sticky top-14 z-10 flex h-[calc(100vh-3.5rem)] w-full shrink-0 flex-col border-l border-[var(--border)] bg-[var(--surface-1)] lg:w-[320px]",
+        "sticky top-14 z-10 flex h-[calc(100vh-3.5rem)] w-full shrink-0 flex-col border-l border-[var(--border)] bg-[var(--surface-inset)] lg:w-[320px]",
         pathname.includes("/compare") ? "hidden xl:flex" : "flex",
       )}
       aria-label="SolderLab Review"
@@ -201,7 +201,7 @@ export function ReviewRail({
                   "rounded-[var(--radius-sm)] px-2 py-1 text-xs font-medium disabled:opacity-50",
                   activeCmd.startsWith(c.cmd)
                     ? "bg-[var(--accent-muted)] text-[var(--accent-2)]"
-                    : "bg-[var(--surface-2)] text-[var(--text-muted)] hover:text-[var(--text)]",
+                    : "bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--text)]",
                 )}
               >
                 {c.label}
@@ -217,7 +217,7 @@ export function ReviewRail({
               <p className="text-sm text-[var(--danger)]">{error}</p>
             ) : null}
             {markdown ? (
-              <div className="whitespace-pre-wrap rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-0)] p-3 text-[13px] leading-relaxed text-[var(--text)]">
+              <div className="whitespace-pre-wrap rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-elevated)] p-3 text-[13px] leading-relaxed text-[var(--text-soft)]">
                 {markdown}
               </div>
             ) : null}

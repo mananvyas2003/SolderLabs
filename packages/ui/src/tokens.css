@@ -1,59 +1,67 @@
 /**
- * SolderLab brand kit — “Slate + Ember”
+ * SolderLab brand kit — “SolderLabs Core” (from stitch minimalist redesign)
  *
- * Personality: industrial and assured. Cool slate chrome, one warm ember
- * for primary action. Flat — no gradients as identity.
- *
- * Accent: Ember (#c2410c) — heat of solder, used sparingly.
- * Neutrals: zinc slate paper & near-black ink.
+ * High-end technical minimalism: true dark canvas, 1px borders, slate-blue
+ * accent. Depth via glass / tonal stacking — not heavy shadows.
  */
 
 :root {
   /* Surfaces */
-  --surface-0: #f4f4f5;
-  --surface-1: #ffffff;
-  --surface-2: #e4e4e7;
-  --surface-inset: #ebebec;
+  --surface-0: #0a0a0a;
+  --surface-1: rgba(255, 255, 255, 0.02);
+  --surface-2: #1c1b1b;
+  --surface-inset: #0e0e0e;
+  --surface-elevated: rgba(255, 255, 255, 0.03);
+  --surface-solid: #131313;
+  --surface-panel: #161616;
 
   /* Ink */
-  --text: #18181b;
-  --text-muted: #52525b;
+  --text: #ffffff;
+  --text-muted: #a1a1aa;
   --text-subtle: #71717a;
+  --text-soft: #e5e2e1;
 
   /* Lines */
-  --border: #d4d4d8;
-  --border-muted: #e4e4e7;
-  --border-strong: #a1a1aa;
+  --border: #262626;
+  --border-muted: #1a1a1a;
+  --border-strong: #444444;
 
-  /* Brand */
-  --accent: #c2410c;
-  --accent-hover: #9a3412;
-  --accent-muted: #ffedd5;
-  --accent-fg: #ffffff;
-  --accent-2: #9a3412;
+  /* Brand — slate blue */
+  --accent: #5e5ce6;
+  --accent-hover: #4d4ad5;
+  --accent-muted: rgba(94, 92, 230, 0.18);
+  --accent-fg: #f4f1ff;
+  --accent-2: #c2c1ff;
+  --accent-glow: rgba(194, 193, 255, 0.35);
 
   /* Status */
-  --danger: #b91c1c;
-  --warn: #a16207;
-  --success: #15803d;
-  --info: #1d4ed8;
+  --danger: #ffb4ab;
+  --danger-bg: rgba(147, 0, 10, 0.35);
+  --warn: #ffb786;
+  --warn-bg: rgba(174, 86, 0, 0.28);
+  --success: #86efac;
+  --success-bg: rgba(22, 101, 52, 0.35);
+  --info: #c2c1ff;
+  --info-bg: rgba(94, 92, 230, 0.2);
 
   /* Diff */
-  --diff-add: #dcfce7;
-  --diff-add-fg: #166534;
-  --diff-del: #fee2e2;
-  --diff-del-fg: #991b1b;
-  --diff-chg: #fef9c3;
-  --diff-chg-fg: #854d0e;
+  --diff-add: rgba(22, 101, 52, 0.35);
+  --diff-add-fg: #86efac;
+  --diff-del: rgba(147, 0, 10, 0.35);
+  --diff-del-fg: #ffb4ab;
+  --diff-chg: rgba(174, 86, 0, 0.28);
+  --diff-chg-fg: #ffb786;
 
   /* Type */
-  --font-sans: var(--font-source-sans), "Source Sans 3", "Segoe UI", sans-serif;
-  --font-mono: var(--font-plex-mono), "IBM Plex Mono", "Consolas", monospace;
+  --font-sans: var(--font-geist), "Geist", "Segoe UI", sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", "Consolas", monospace;
 
   /* Shape */
-  --radius: 6px;
+  --radius: 8px;
   --radius-sm: 4px;
-  --shadow-sm: 0 1px 0 rgba(24, 24, 27, 0.04);
+  --radius-lg: 16px;
+  --shadow-sm: none;
+  --shadow-modal: 0 20px 40px rgba(0, 0, 0, 0.5);
 }
 
 * {
@@ -65,7 +73,22 @@ body {
   margin: 0;
   padding: 0;
   background: var(--surface-0);
-  color: var(--text);
+  color: var(--text-soft);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #131313;
+}
+::-webkit-scrollbar-thumb {
+  background: #262626;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #444444;
 }

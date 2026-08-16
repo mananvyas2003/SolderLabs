@@ -48,13 +48,13 @@ export default async function ProjectPage({
         </p>
       </aside>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-4">
+      <section className="grid gap-[var(--bento-gap,12px)] md:grid-cols-2">
+        <div className="sl-bento space-y-3">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm font-semibold">Revisions</h2>
+            <h2 className="text-sm font-medium text-[var(--text)]">Revisions</h2>
             <Link
               href={`/app/${orgSlug}/${projectSlug}/history`}
-              className="text-xs font-medium text-[var(--accent)] hover:underline"
+              className="text-xs font-medium text-[var(--accent-2)] hover:underline"
             >
               Full history
             </Link>
@@ -91,8 +91,8 @@ export default async function ProjectPage({
           </div>
         </div>
 
-        <div className="space-y-3 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] p-4">
-          <h2 className="text-sm font-semibold">Upload revision</h2>
+        <div className="sl-bento space-y-3">
+          <h2 className="text-sm font-medium text-[var(--text)]">Upload revision</h2>
           <UploadRevisionForm orgSlug={orgSlug} projectSlug={projectSlug} />
           {checks.length ? (
             <div className="border-t border-[var(--border)] pt-3">
@@ -118,10 +118,10 @@ export default async function ProjectPage({
 
       <section>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold">Design reviews</h2>
+          <h2 className="text-sm font-medium text-[var(--text)]">Design reviews</h2>
           <Link
             href={`/app/${orgSlug}/${projectSlug}/reviews`}
-            className="text-xs font-medium text-[var(--accent)] hover:underline"
+            className="text-xs font-medium text-[var(--accent-2)] hover:underline"
           >
             View all
           </Link>

@@ -88,7 +88,7 @@ export function ProjectTabs({
             className={cx(
               "shrink-0 border-b-2 px-3 py-2.5 text-sm transition-colors",
               active
-                ? "border-[var(--accent)] font-semibold text-[var(--text)]"
+                ? "border-[var(--accent)] font-medium text-[var(--accent-2)]"
                 : "border-transparent text-[var(--text-muted)] hover:border-[var(--border-strong)] hover:text-[var(--text)]",
               (isPending || pendingHref) && !active ? "opacity-60" : null,
             )}

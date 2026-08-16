@@ -62,7 +62,7 @@ export default async function ProjectLayout({
             <Link
               href={compareHref}
               prefetch
-              className="shrink-0 rounded-[var(--radius)] bg-[var(--accent)] px-3.5 py-1.5 text-sm font-semibold text-[var(--accent-fg)] hover:bg-[var(--accent-hover)] active:opacity-90"
+              className="shrink-0 rounded-[var(--radius)] bg-[var(--accent)] px-3.5 py-1.5 font-mono text-[11px] font-medium uppercase tracking-wider text-[var(--accent-fg)] hover:bg-[var(--accent-hover)] active:opacity-90"
             >
               Compare latest
             </Link>

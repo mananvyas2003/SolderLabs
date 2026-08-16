@@ -52,7 +52,7 @@ export default function Board3D({
               ? "#b91c1c"
               : kind === "changed"
                 ? "#a16207"
-                : "#c2410c";
+                : "#5e5ce6";
         return (
           <mesh
             key={f.refdes}

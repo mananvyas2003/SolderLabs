@@ -27,7 +27,7 @@ export function SignOutControl() {
       type="button"
       onClick={() => void signOut()}
       disabled={busy || pending}
-      className="rounded-[var(--radius-sm)] px-2.5 py-1 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)] disabled:opacity-50"
+      className="rounded-[var(--radius-sm)] px-2.5 py-1 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text)] disabled:opacity-50"
     >
       {busy || pending ? "Signing out…" : "Sign out"}
     </button>

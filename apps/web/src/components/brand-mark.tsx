@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cx } from "@solderlab/ui";
 
-/** Wordmark — ember mark + ink name. */
+/** Wordmark — soft primary square + ink name. */
 export function BrandMark({
   href = "/",
   size = "md",
@@ -26,7 +26,7 @@ export function BrandMark({
     <Link
       href={href}
       className={cx(
-        "inline-flex items-center gap-2 font-semibold tracking-tight text-[var(--text)] hover:opacity-80",
+        "inline-flex items-center gap-2 font-semibold tracking-tight text-[var(--text)] hover:opacity-90",
         sizes[size],
         className,
       )}

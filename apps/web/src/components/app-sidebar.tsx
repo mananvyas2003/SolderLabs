@@ -43,12 +43,12 @@ export function AppSidebar({ orgs }: { orgs: SidebarOrg[] }) {
 
   const nav = (
     <div className="flex h-full flex-col">
-      <div className="flex h-12 items-center border-b border-[var(--border)] px-3">
+      <div className="flex h-14 items-center border-b border-[var(--border)] px-4">
         <BrandMark href="/app" size="sm" />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-2 py-3">
-        <p className="mb-1.5 px-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--text-subtle)]">
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
+        <p className="mb-2 px-2 font-mono text-[10px] font-medium uppercase tracking-widest text-[var(--text-subtle)]">
           Organizations
         </p>
         {orgs.length === 0 ? (
@@ -65,10 +65,10 @@ export function AppSidebar({ orgs }: { orgs: SidebarOrg[] }) {
                     prefetch
                     onClick={(e) => navigate(e, orgHref)}
                     className={cx(
-                      "flex items-center rounded-[var(--radius-sm)] px-2 py-1.5 text-sm font-semibold",
+                      "flex items-center rounded-[var(--radius-sm)] px-2 py-1.5 text-sm font-medium",
                       orgOpen && (pendingHref ?? pathname) === orgHref
                         ? "bg-[var(--surface-2)] text-[var(--text)]"
-                        : "text-[var(--text)] hover:bg-[var(--surface-2)]",
+                        : "text-[var(--text-soft)] hover:bg-[var(--surface-elevated)]",
                     )}
                   >
                     {org.name}
@@ -84,10 +84,10 @@ export function AppSidebar({ orgs }: { orgs: SidebarOrg[] }) {
                             prefetch
                             onClick={(e) => navigate(e, href)}
                             className={cx(
-                              "block truncate rounded-[var(--radius-sm)] px-2 py-1 text-[13px]",
+                              "block truncate rounded-[var(--radius-sm)] px-2 py-1.5 text-[13px]",
                               active
-                                ? "bg-[var(--accent-muted)] font-semibold text-[var(--accent-2)]"
-                                : "text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]",
+                                ? "border-r-2 border-[var(--accent)] bg-[var(--accent-muted)] font-medium text-[var(--accent-2)]"
+                                : "text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text)]",
                               isPending && !active ? "opacity-60" : null,
                             )}
                           >
@@ -116,7 +116,7 @@ export function AppSidebar({ orgs }: { orgs: SidebarOrg[] }) {
                                 "block rounded-[var(--radius-sm)] px-2 py-1 text-[12px]",
                                 isActive(href)
                                   ? "font-medium text-[var(--text)]"
-                                  : "text-[var(--text-subtle)] hover:text-[var(--text)]",
+                                  : "text-[var(--text-subtle)] hover:text-[var(--text-muted)]",
                               )}
                             >
                               {label}
@@ -133,16 +133,16 @@ export function AppSidebar({ orgs }: { orgs: SidebarOrg[] }) {
         )}
       </div>
 
-      <div className="space-y-0.5 border-t border-[var(--border)] p-2">
+      <div className="space-y-0.5 border-t border-[var(--border)] p-3">
         <Link
           href="/docs"
-          className="block rounded-[var(--radius-sm)] px-2 py-1.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+          className="block rounded-[var(--radius-sm)] px-2 py-1.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text)]"
         >
           Docs
         </Link>
         <Link
           href="/admin/metrics"
-          className="block rounded-[var(--radius-sm)] px-2 py-1.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-2)] hover:text-[var(--text)]"
+          className="block rounded-[var(--radius-sm)] px-2 py-1.5 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text)]"
         >
           Metrics
         </Link>
@@ -154,7 +154,7 @@ export function AppSidebar({ orgs }: { orgs: SidebarOrg[] }) {
     <>
       <button
         type="button"
-        className="fixed left-3 top-3 z-40 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-1)] px-2.5 py-1.5 text-xs font-medium md:hidden"
+        className="fixed left-3 top-3 z-40 rounded-[var(--radius)] border border-[var(--border)] bg-[var(--surface-panel)] px-2.5 py-1.5 text-xs font-medium text-[var(--text-soft)] md:hidden"
         onClick={() => setMobileOpen(true)}
       >
         Menu
@@ -165,16 +165,16 @@ export function AppSidebar({ orgs }: { orgs: SidebarOrg[] }) {
           <button
             type="button"
             aria-label="Close menu"
-            className="absolute inset-0 bg-black/30"
+            className="absolute inset-0 bg-black/60"
             onClick={() => setMobileOpen(false)}
           />
-          <div className="absolute left-0 top-0 h-full w-64 border-r border-[var(--border)] bg-[var(--surface-1)] shadow-sm">
+          <div className="absolute left-0 top-0 h-full w-64 border-r border-[var(--border)] bg-[var(--surface-inset)]">
             {nav}
           </div>
         </div>
       ) : null}
 
-      <aside className="sticky top-0 hidden h-screen w-56 shrink-0 border-r border-[var(--border)] bg-[var(--surface-1)] md:block">
+      <aside className="sticky top-0 hidden h-screen w-60 shrink-0 border-r border-[var(--border)] bg-[var(--surface-inset)] md:block">
         {nav}
       </aside>
     </>
