@@ -134,6 +134,22 @@ function isGlobalPowerPinType(electrical: string | undefined): boolean {
   return t === "power_in" || t === "power_out";
 }
 
+/**
+ * Pin names that participate in KiCad's implicit global power net.
+ * Only voltage-notation labels (+12V, 3V3, …). Do NOT include GND/VCC/VIN:
+ * globally unioning every FPGA GND power_in pin amplifies a single
+ * geometric near-miss into a board-wide rail merge.
+ */
+function isImplicitGlobalPowerName(name: string): boolean {
+  const n = name.trim();
+  if (!n || n === "~") return false;
+  // +12V, -5V, +3.3V
+  if (/^[+\-]\d/.test(n)) return true;
+  // 3V3, 1V0, 3.3V
+  if (/^\d+(\.\d+)?V\d*$/i.test(n)) return true;
+  return false;
+}
+
 export function extractLibSymbolsPins(src: string): Map<string, LibPinDef[]> {
   const map = new Map<string, LibPinDef[]>();
   const libSec = extractBlocks(src, "lib_symbols")[0] ?? src;
@@ -536,11 +552,10 @@ export function resolveConnectivity(
         });
       } else if (
         isGlobalPowerPinType(pin.electrical) &&
-        pin.name &&
-        pin.name !== "~"
+        isImplicitGlobalPowerName(pin.name)
       ) {
-        // KiCad: power_in/out pins with the same name are globally connected
-        // even without wires (e.g. PCIe connector +12V pins → +12V net).
+        // KiCad: power_in/out pins with the same rail name are globally
+        // connected even without wires (e.g. PCIe +12V → +12V net).
         const netName = normalizeNetName(pin.name);
         uf.union(`pin:${pinId}`, `name:${netName}`);
         namedPoints.push({
@@ -610,7 +625,13 @@ export function resolveConnectivity(
     for (let i = 0; i < g.names.length; i++) {
       const n = g.names[i]!;
       const pri = g.priorities[i] ?? 0;
-      const railBonus = /GND|VDD|VCC|^[+\-]?\d/i.test(n) ? 0.5 : 0;
+      // Prefer ground tokens over voltage rails when a group was over-merged;
+      // power flags (pri 3) still dominate either way.
+      const railBonus = /^(A?GND|PGND|DGND|VSS)$/i.test(n)
+        ? 1.0
+        : /VDD|VCC|^[+\-]?\d/i.test(n)
+          ? 0.5
+          : 0;
       const score = pri + railBonus;
       if (!name || score > bestPri) {
         bestPri = score;

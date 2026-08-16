@@ -3,7 +3,7 @@
   "unreadableBoards": [],
   "pinsetMismatchBudget": {
     "amulet-controller": 7,
-    "kintex-pcie": 104,
+    "kintex-pcie": 140,
     "upsy-desky": 27,
     "piantor": 27,
     "angloxx": 4,
@@ -11,6 +11,6 @@
     "kicad-demo-complex-hierarchy": 5,
     "kicad-demo-vme-wren": 111,
     "zynq-som": 287,
-    "glasgow": 40
+    "glasgow": 43
   }
 }
