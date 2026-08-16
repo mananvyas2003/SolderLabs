@@ -119,7 +119,20 @@ function extractBlocks(src: string, tag: string): string[] {
   return blocks;
 }
 
-type LibPinDef = { number: string; name: string; x: number; y: number };
+type LibPinDef = {
+  number: string;
+  name: string;
+  x: number;
+  y: number;
+  /** KiCad electrical type: `passive`, `power_in`, `power_out`, … */
+  electrical?: string;
+};
+
+/** Hidden global power nets: power_in/out pins share a net named after the pin. */
+function isGlobalPowerPinType(electrical: string | undefined): boolean {
+  const t = (electrical ?? "").toLowerCase();
+  return t === "power_in" || t === "power_out";
+}
 
 export function extractLibSymbolsPins(src: string): Map<string, LibPinDef[]> {
   const map = new Map<string, LibPinDef[]>();
@@ -140,8 +153,9 @@ export function extractLibSymbolsPins(src: string): Map<string, LibPinDef[]> {
       if (!at) continue;
       const num = pb.match(/\(number\s+"([^"]+)"/)?.[1];
       const name = pb.match(/\(name\s+"([^"]+)"/)?.[1] ?? "~";
+      const electrical = pb.match(/^\(pin\s+(\w+)/)?.[1];
       if (!num) continue;
-      pins.push({ number: num, name, x: at.x, y: at.y });
+      pins.push({ number: num, name, x: at.x, y: at.y, electrical });
     }
     if (pins.length) map.set(starts[i].name, pins);
   }
@@ -194,9 +208,10 @@ export function lookupLibPins(
   if (!libId) return undefined;
   const short = libId.includes(":") ? libId.slice(libId.indexOf(":") + 1) : libId;
   if (unit != null && unit > 0) {
+    // Prefer this unit's body over unit-0 on pin-number collisions.
     const keys = [
-      ...libPinKeysForUnit(short, libId, 0),
       ...libPinKeysForUnit(short, libId, unit),
+      ...libPinKeysForUnit(short, libId, 0),
     ];
     const pins = mergePinsFromKeys(libPins, keys);
     if (pins.length) return pins;
@@ -410,14 +425,20 @@ export function resolveConnectivity(
     }
   }
 
-  const namedPoints: Array<{ key: string; name: string; display: string }> = [];
+  const namedPoints: Array<{
+    key: string;
+    name: string;
+    display: string;
+    /** Labels / power flags outrank IC power_in pin names when naming a net. */
+    priority: number;
+  }> = [];
   const rememberLabel = (raw: string, at: Pt) => {
     const display = raw;
     const name = normalizeNetName(raw);
     const key = `p:${roundKey(at)}`;
     uf.find(key);
     stitchToWires(at);
-    namedPoints.push({ key, name, display });
+    namedPoints.push({ key, name, display, priority: 2 });
   };
   for (const lab of extractBlocks(src, "label")) {
     const name =
@@ -466,6 +487,7 @@ export function resolveConnectivity(
     name: string;
     refdes: string;
     sheetPath: string;
+    unit?: number;
   }> = [];
 
   const powerMeta = new Map<string, { libId?: string; value: string }>();
@@ -501,11 +523,32 @@ export function resolveConnectivity(
         name: pin.name,
         refdes: c.refdes,
         sheetPath: c.sheetPath ?? "",
+        unit: c.unit,
       });
       if (power) {
         const netName = normalizeNetName(c.value || pin.name || "GND");
         uf.union(`pin:${pinId}`, `name:${netName}`);
-        namedPoints.push({ key, name: netName, display: c.value || netName });
+        namedPoints.push({
+          key,
+          name: netName,
+          display: c.value || netName,
+          priority: 3,
+        });
+      } else if (
+        isGlobalPowerPinType(pin.electrical) &&
+        pin.name &&
+        pin.name !== "~"
+      ) {
+        // KiCad: power_in/out pins with the same name are globally connected
+        // even without wires (e.g. PCIe connector +12V pins → +12V net).
+        const netName = normalizeNetName(pin.name);
+        uf.union(`pin:${pinId}`, `name:${netName}`);
+        namedPoints.push({
+          key,
+          name: netName,
+          display: pin.name,
+          priority: 1,
+        });
       }
     }
   }
@@ -516,18 +559,28 @@ export function resolveConnectivity(
 
   const groups = new Map<
     string,
-    { pins: typeof pinPoints; names: string[]; displays: string[] }
+    {
+      pins: typeof pinPoints;
+      names: string[];
+      displays: string[];
+      priorities: number[];
+    }
   >();
   for (const pp of pinPoints) {
     const root = uf.find(pp.key);
-    if (!groups.has(root)) groups.set(root, { pins: [], names: [], displays: [] });
+    if (!groups.has(root)) {
+      groups.set(root, { pins: [], names: [], displays: [], priorities: [] });
+    }
     groups.get(root)!.pins.push(pp);
   }
   for (const np of namedPoints) {
     const root = uf.find(np.key);
-    if (!groups.has(root)) groups.set(root, { pins: [], names: [], displays: [] });
+    if (!groups.has(root)) {
+      groups.set(root, { pins: [], names: [], displays: [], priorities: [] });
+    }
     groups.get(root)!.names.push(np.name);
     groups.get(root)!.displays.push(np.display);
+    groups.get(root)!.priorities.push(np.priority);
   }
 
   const nets: SnapshotNet[] = [];
@@ -550,8 +603,21 @@ export function resolveConnectivity(
 
   for (const g of groups.values()) {
     if (!g.pins.length && !g.names.length) continue;
-    let name = g.names.find((n) => /GND|VDD|VCC/i.test(n)) ?? g.names[0];
-    const display = g.displays[g.names.indexOf(name ?? "")] ?? g.displays[0];
+    // Prefer power-flag / label names over IC power_in pin names (VIN vs +12V).
+    let bestPri = -1;
+    let name: string | undefined;
+    let display: string | undefined;
+    for (let i = 0; i < g.names.length; i++) {
+      const n = g.names[i]!;
+      const pri = g.priorities[i] ?? 0;
+      const railBonus = /GND|VDD|VCC|^[+\-]?\d/i.test(n) ? 0.5 : 0;
+      const score = pri + railBonus;
+      if (!name || score > bestPri) {
+        bestPri = score;
+        name = n;
+        display = g.displays[i];
+      }
+    }
     if (!name) {
       const first = g.pins[0];
       name = first
@@ -597,7 +663,8 @@ export function resolveConnectivity(
     for (const pp of pinPoints.filter(
       (p) =>
         p.refdes === c.refdes &&
-        (p.sheetPath ?? "") === (c.sheetPath ?? ""),
+        (p.sheetPath ?? "") === (c.sheetPath ?? "") &&
+        (p.unit ?? 1) === (c.unit ?? 1),
     )) {
       pins.push({
         number: pp.number,

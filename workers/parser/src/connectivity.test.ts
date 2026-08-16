@@ -227,6 +227,58 @@ test("lookupLibPins merges unit-0 shared pins and body style _0", async () => {
   assert.ok(pins?.some((p) => p.number === "2" && p.name === "VDD"));
 });
 
+test("power_in pins join a global net by pin name without wires", () => {
+  const src = `
+(kicad_sch
+  (lib_symbols
+    (symbol "Connector:PCIe"
+      (symbol "PCIe_1_1"
+        (pin power_in line (at 0 0 0) (length 2.54)
+          (name "+12V" (effects (font (size 1.27 1.27))))
+          (number "A2" (effects (font (size 1.27 1.27))))
+        )
+        (pin power_in line (at 0 2.54 0) (length 2.54)
+          (name "+12V" (effects (font (size 1.27 1.27))))
+          (number "B1" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+    (symbol "Device:R"
+      (symbol "R_1_1"
+        (pin passive line (at 0 3.81 270) (length 2.54)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "1" (effects (font (size 1.27 1.27))))
+        )
+        (pin passive line (at 0 -3.81 90) (length 2.54)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "2" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+  )
+  (symbol (lib_id "Connector:PCIe") (at 0 0 0) (unit 1)
+    (property "Reference" "J1" (at 0 0 0))
+    (property "Value" "PCIe" (at 0 0 0))
+  )
+  (symbol (lib_id "power:+12V") (at 50 50 0) (unit 1)
+    (property "Reference" "#PWR1" (at 50 50 0))
+    (property "Value" "+12V" (at 50 50 0))
+  )
+  (symbol (lib_id "Device:R") (at 50 53.81 0) (unit 1)
+    (property "Reference" "R1" (at 50 50 0))
+    (property "Value" "10k" (at 50 50 0))
+  )
+  (wire (pts (xy 50 50) (xy 50 53.81)))
+)
+`;
+  const snap = parseKicadSchematicText(src);
+  const net = snap.nets.find((n) => n.name === "+12V");
+  assert.ok(net, `nets=${snap.nets.map((n) => n.name).join(",")}`);
+  assert.ok(net!.nodes.includes("J1.A2"), `nodes=${net!.nodes.join(",")}`);
+  assert.ok(net!.nodes.includes("J1.B1"));
+  assert.ok(net!.nodes.includes("R1.1") || net!.nodes.includes("R1.2"));
+});
+
 test("mirror y flips capacitor pin world positions onto the correct net", () => {
   const src = `
 (kicad_sch
