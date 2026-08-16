@@ -50,6 +50,9 @@ export async function POST(
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "file required" }, { status: 400 });
   }
+  if (file.size > 80 * 1024 * 1024) {
+    return NextResponse.json({ error: "Upload exceeds 80 MB" }, { status: 413 });
+  }
   const buf = Buffer.from(await file.arrayBuffer());
   let zipBuffer: Buffer;
   try {

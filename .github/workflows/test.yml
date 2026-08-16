@@ -6,6 +6,8 @@ on:
       - "packages/**"
       - "workers/**"
       - "scripts/run-tests.mjs"
+      - "scripts/fetch-corpus.mjs"
+      - "scripts/corpus-sources.json"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/test.yml"
@@ -14,6 +16,8 @@ on:
       - "packages/**"
       - "workers/**"
       - "scripts/run-tests.mjs"
+      - "scripts/fetch-corpus.mjs"
+      - "scripts/corpus-sources.json"
       - "package.json"
       - "package-lock.json"
       - ".github/workflows/test.yml"
@@ -28,8 +32,22 @@ jobs:
           node-version: "20"
       - name: Install workspace
         run: npm install
+      - name: Cache KiCad corpus
+        id: corpus
+        uses: actions/cache@v4
+        with:
+          path: fixtures/corpus
+          key: corpus-${{ hashFiles('scripts/corpus-sources.json') }}
+      - name: Fetch corpus
+        if: steps.corpus.outputs.cache-hit != 'true'
+        run: npm run corpus:fetch
+      - name: Install KiCad CLI
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends kicad
       - name: Run all package tests
         run: npm test
         env:
-          # Font downloads are not required for unit tests.
           NEXT_TELEMETRY_DISABLED: "1"
+          CORPUS_REQUIRED: "1"
+          CORPUS_REQUIRE_KICAD: "1"

@@ -59,6 +59,7 @@ export async function POST(
     defaultBranch: "main",
     requireGreenChecks: true,
     requireApproval: false,
+    requiredApprovals: 1,
     createdAt: nowIso(),
   });
   db.branches.push({

@@ -40,8 +40,8 @@ export default function LandingPage() {
             SolderLab
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--text-muted)] md:text-xl">
-            Version, review, and release boards — with evidence-linked review that
-            understands your schematic, not just filenames.
+            Version, review, and release boards — with rule-based review and
+            evidence links, not just filenames.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link
@@ -70,7 +70,7 @@ export default function LandingPage() {
             },
             {
               title: "SolderLab Review",
-              body: "Risks and suggested actions grounded in the Design Context Graph.",
+              body: "Rule-based review with evidence links into the Design Context Graph.",
             },
             {
               title: "Release with evidence",

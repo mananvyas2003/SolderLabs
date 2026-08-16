@@ -3,7 +3,6 @@ import { getSessionUser } from "@/lib/auth";
 import { assertOrgAccess, getProject } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
 import { ProjectSettingsForm } from "@/components/project-settings-form";
-import { ImportAltiumForm } from "@/components/import-altium-form";
 
 export default async function ProjectSettingsPage({
   params,
@@ -28,14 +27,9 @@ export default async function ProjectSettingsPage({
         projectSlug={projectSlug}
         requireGreenChecks={project.requireGreenChecks}
         requireApproval={project.requireApproval}
+        requiredApprovals={project.requiredApprovals}
         visibility={project.visibility}
       />
-      <section>
-        <h3 className="mb-2 text-sm font-semibold text-[var(--text-muted)]">
-          Altium / CSV import
-        </h3>
-        <ImportAltiumForm orgSlug={orgSlug} projectSlug={projectSlug} />
-      </section>
     </div>
   );
 }

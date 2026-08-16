@@ -1,6 +1,8 @@
 import { nanoid } from "nanoid";
 import { getDb, persist, nowIso } from "./index";
 
+import { hashPassword } from "./password";
+
 const db = getDb();
 if (db.users.some((u) => u.email === "demo@solderlab.dev")) {
   console.log("Already seeded (demo@solderlab.dev exists).");
@@ -17,7 +19,7 @@ db.users.push({
   id: userId,
   email: "demo@solderlab.dev",
   name: "Demo Engineer",
-  passwordHash: "demo",
+  passwordHash: hashPassword("demo"),
   avatarUrl: null,
   createdAt: now,
 });
@@ -43,6 +45,7 @@ db.projects.push({
   defaultBranch: "main",
   requireGreenChecks: true,
   requireApproval: false,
+  requiredApprovals: 1,
   createdAt: now,
 });
 db.branches.push({

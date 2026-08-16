@@ -143,12 +143,18 @@ export function lintManufacturingPackage(input: MfgLintInput): MfgLintResult {
 
   const errors = findings.filter((f) => f.severity === "error").length;
   const warns = findings.filter((f) => f.severity === "warn").length;
+  const blocking = findings.filter(
+    (f) => f.severity === "error" && f.code !== "bom_missing_mpn",
+  ).length;
+  const notes = findings.length - blocking;
   return {
     ok: errors === 0,
     findings,
     summary:
-      errors === 0 && warns === 0
+      blocking === 0 && notes === 0
         ? "Manufacturing package OK"
-        : `${errors} error(s), ${warns} warning(s)`,
+        : blocking === 0
+          ? `Pass with ${notes} note(s); MPN gaps are tracked by bom-mpn`
+          : `${blocking} error(s), ${warns} warning(s)`,
   };
 }

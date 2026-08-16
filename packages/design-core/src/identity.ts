@@ -20,7 +20,7 @@ export interface IdentityResolveResult {
 }
 
 function sheetRefdesKey(c: SnapshotComponent): string {
-  return `${c.sheetPath ?? c.sheetId}\u0000${c.refdes}`;
+  return `${c.boardKey ?? ""}\u0000${c.sheetPath ?? c.sheetId}\u0000${c.refdes}`;
 }
 
 /**
@@ -30,8 +30,9 @@ function sheetRefdesKey(c: SnapshotComponent): string {
 function uuidIdentityKey(c: SnapshotComponent): string | undefined {
   const u = c.uuid?.trim();
   if (!u) return undefined;
-  if (c.sheetPath) return `${c.sheetPath}\u0000${u}`;
-  return u;
+  const board = c.boardKey ?? "";
+  if (c.sheetPath) return `${board}\u0000${c.sheetPath}\u0000${u}`;
+  return `${board}\u0000${u}`;
 }
 
 /**
@@ -95,15 +96,16 @@ export function resolveIdentity(
     claim(b, h, "sheet_refdes");
   }
 
-  // Tier 3 — refdes alone
+  // Tier 3 — refdes alone (within the same board)
   const headByRef = new Map<string, SnapshotComponent[]>();
   for (const h of headRemaining) {
-    const list = headByRef.get(h.refdes) ?? [];
+    const k = `${h.boardKey ?? ""}\u0000${h.refdes}`;
+    const list = headByRef.get(k) ?? [];
     list.push(h);
-    headByRef.set(h.refdes, list);
+    headByRef.set(k, list);
   }
   for (const b of [...baseRemaining]) {
-    const candidates = headByRef.get(b.refdes);
+    const candidates = headByRef.get(`${b.boardKey ?? ""}\u0000${b.refdes}`);
     if (!candidates?.length) continue;
     const h = candidates.shift()!;
     if (candidates.length === 0) headByRef.delete(b.refdes);

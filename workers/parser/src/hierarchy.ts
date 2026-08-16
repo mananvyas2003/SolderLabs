@@ -1,5 +1,6 @@
 import type {
   DesignSnapshot,
+  ParseWarning,
   SnapshotComponent,
   SnapshotNet,
   SnapshotSheet,
@@ -236,6 +237,9 @@ function mergeNets(into: Map<string, SnapshotNet>, nets: SnapshotNet[]) {
       existing.nodes = [...new Set([...existing.nodes, ...n.nodes])].sort(
         (a, b) => a.localeCompare(b, undefined, { numeric: true }),
       );
+      if (!existing.displayName && n.displayName) {
+        existing.displayName = n.displayName;
+      }
     }
   }
 }
@@ -264,57 +268,9 @@ function applyHierarchicalNetMerge(
   return [...byName.values()];
 }
 
-function scoreProjectCandidate(proPath: string): number {
-  const lower = proPath.replace(/\\/g, "/").toLowerCase();
-  const base = path.basename(proPath, ".kicad_pro").toLowerCase();
-  let score = 0;
-  if (lower.includes("/production/")) score += 50;
-  if (lower.includes("template")) score -= 100;
-  if (lower.includes("/scripts/")) score -= 80;
-  if (lower.includes("/development/")) score += 10;
-  // Prefer top-level board projects over reusable subsheet projects
-  if (["pcb", "board", "main", "root", "schematic"].includes(base)) score += 80;
-  if (base.includes("module") || base.includes("column") || base.includes("cell"))
-    score -= 40;
-
-  try {
-    const sch = proPath.replace(/\.kicad_pro$/i, ".kicad_sch");
-    if (fs.existsSync(sch)) {
-      score += Math.min(40, fs.statSync(sch).size / 50_000);
-      // Reachable hierarchy size is the strongest signal
-      score += countReachableSheets(sch) * 15;
-    }
-  } catch {
-    /* ignore */
-  }
-  return score;
-}
-
-function countReachableSheets(rootSch: string, limit = 200): number {
-  const seen = new Set<string>();
-  const queue = [path.normalize(rootSch)];
-  while (queue.length && seen.size < limit) {
-    const cur = queue.pop()!;
-    if (seen.has(cur)) continue;
-    seen.add(cur);
-    let src: string;
-    try {
-      src = readText(cur);
-    } catch {
-      continue;
-    }
-    for (const ref of parseSheetRefs(src)) {
-      const child = resolveSheetFile(cur, ref.file);
-      if (child) queue.push(path.normalize(child));
-    }
-  }
-  return seen.size;
-}
-
 export function discoverProjectRoots(dir: string): string[] {
-  const pros = findFiles(dir, (n) => n.endsWith(".kicad_pro"));
-  return [...pros].sort(
-    (a, b) => scoreProjectCandidate(b) - scoreProjectCandidate(a),
+  return findFiles(dir, (n) => n.endsWith(".kicad_pro")).sort((a, b) =>
+    a.replace(/\\/g, "/").localeCompare(b.replace(/\\/g, "/")),
   );
 }
 
@@ -334,7 +290,11 @@ function resolveSheetFile(fromSch: string, sheetfile: string): string | null {
  * Hierarchical project parse starting at a directory or `.kicad_pro`.
  * Walks sheet instances (multi-instance subsheets produce distinct components).
  */
-export function parseKicadProject(projectDirOrPro: string): DesignSnapshot {
+/**
+ * Parse a single `.kicad_pro` (or a directory that contains one schematic root).
+ * Multi-board trees are handled by `parseKicadProject`.
+ */
+function parseSingleKicadProject(projectDirOrPro: string): DesignSnapshot {
   let proPath: string | null = null;
   let rootSch: string | null = null;
   let projectDir: string;
@@ -360,7 +320,36 @@ export function parseKicadProject(projectDirOrPro: string): DesignSnapshot {
 
   if (!rootSch) {
     const all = findFiles(searchRoot, (n) => n.endsWith(".kicad_sch"));
-    if (!all.length) throw new Error("No .kicad_sch files found in upload");
+    if (!all.length) {
+      const pcbs = findFiles(searchRoot, (n) => n.endsWith(".kicad_pcb"));
+      if (pcbs.length) {
+        const rel = path
+          .relative(searchRoot, pcbs[0]!)
+          .replace(/\\/g, "/");
+        return {
+          schemaVersion: 1,
+          tool: { name: "kicad" },
+          sheets: [],
+          components: [],
+          nets: [],
+          warnings: [
+            {
+              code: "pcb-only",
+              message: `No .kicad_sch files found; PCB-only snapshot (${rel})`,
+            },
+          ],
+          parseStatus: "ok",
+          meta: {
+            sheetCount: 0,
+            componentCount: 0,
+            netCount: 0,
+            unresolvedLibs: [],
+            projectRoot: rel,
+          },
+        };
+      }
+      throw new Error("No .kicad_sch files found in upload");
+    }
     const referenced = new Set<string>();
     for (const f of all) {
       for (const ref of parseSheetRefs(readText(f))) {
@@ -377,7 +366,7 @@ export function parseKicadProject(projectDirOrPro: string): DesignSnapshot {
 
   const libTables = loadProjectLibTables(projectDir).symbol;
   const unresolved = new Set<string>();
-  const warnings: string[] = [];
+  const warnings: ParseWarning[] = [];
   const rootSrc = readText(rootSch);
   const rootUuid = sheetFileUuid(rootSrc);
   const rootPath = `/${rootUuid}`;
@@ -409,7 +398,10 @@ export function parseKicadProject(projectDirOrPro: string): DesignSnapshot {
     for (const child of parseSheetRefs(src)) {
       const childFile = resolveSheetFile(schPath, child.file);
       if (!childFile) {
-        warnings.push(`Missing sheet file: ${child.file} from ${schPath}`);
+        warnings.push({
+          code: "missing-sheet",
+          message: `Missing sheet file: ${child.file} from ${schPath}`,
+        });
         continue;
       }
       const childPath = `${sheetPath}/${child.uuid}`;
@@ -435,24 +427,104 @@ export function parseKicadProject(projectDirOrPro: string): DesignSnapshot {
   );
 
   const unresolvedLibs = [...unresolved].sort();
-  void warnings;
+  const missingSheet = warnings.some((w) => w.code === "missing-sheet");
+  const boardKey = path
+    .relative(searchRoot, proPath ?? rootSch)
+    .replace(/\\/g, "/");
 
   return {
     schemaVersion: 1,
     tool: { name: "kicad", version: extractQuoted(rootSrc, "version") },
     sheets,
-    components: uniq,
-    nets: [...netMap.values()].sort((a, b) => a.name.localeCompare(b.name)),
+    components: uniq.map((c) => ({ ...c, boardKey })),
+    nets: [...netMap.values()]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map((n) => ({ ...n, boardKey })),
+    boards: [{ key: boardKey, name: path.basename(boardKey, path.extname(boardKey)) }],
+    warnings,
+    parseStatus: missingSheet ? "partial" : "ok",
     meta: {
       sheetCount: sheets.length,
       componentCount: uniq.length,
       netCount: netMap.size,
       unresolvedLibs,
-      projectRoot: path
-        .relative(searchRoot, proPath ?? rootSch)
-        .replace(/\\/g, "/"),
+      projectRoot: boardKey,
     },
   };
+}
+
+function mergeBoardSnapshots(
+  searchRoot: string,
+  snaps: DesignSnapshot[],
+  proPaths: string[],
+): DesignSnapshot {
+  const boards = snaps.map((s, i) => {
+    const key = path.relative(searchRoot, proPaths[i]!).replace(/\\/g, "/");
+    return {
+      key,
+      name: path.basename(proPaths[i]!, ".kicad_pro"),
+      snap: s,
+    };
+  });
+  const warnings: ParseWarning[] = [
+    ...snaps.flatMap((s) => s.warnings ?? []),
+    {
+      code: "multi-board",
+      message: `Parsed ${boards.length} board roots`,
+    },
+  ];
+  const components = boards.flatMap((b) =>
+    b.snap.components.map((c) => ({
+      ...c,
+      boardKey: b.key,
+      sheetId: `${b.key}:${c.sheetId}`,
+    })),
+  );
+  const nets = boards.flatMap((b) =>
+    b.snap.nets.map((n) => ({ ...n, boardKey: b.key })),
+  );
+  const sheets = boards.flatMap((b) =>
+    b.snap.sheets.map((sh) => ({
+      ...sh,
+      id: `${b.key}:${sh.id}`,
+    })),
+  );
+  const unresolvedLibs = [
+    ...new Set(snaps.flatMap((s) => s.meta.unresolvedLibs ?? [])),
+  ].sort();
+  const missingSheet = warnings.some((w) => w.code === "missing-sheet");
+  return {
+    schemaVersion: 1,
+    tool: snaps[0]?.tool ?? { name: "kicad" },
+    sheets,
+    components,
+    nets,
+    boards: boards.map((b) => ({ key: b.key, name: b.name })),
+    warnings,
+    parseStatus: missingSheet ? "partial" : "ok",
+    meta: {
+      sheetCount: sheets.length,
+      componentCount: components.length,
+      netCount: nets.length,
+      unresolvedLibs,
+      projectRoot: boards.map((b) => b.key).join(","),
+    },
+  };
+}
+
+export function parseKicadProject(projectDirOrPro: string): DesignSnapshot {
+  if (projectDirOrPro.endsWith(".kicad_pro")) {
+    return parseSingleKicadProject(projectDirOrPro);
+  }
+  const pros = discoverProjectRoots(projectDirOrPro);
+  if (pros.length > 1) {
+    return mergeBoardSnapshots(
+      projectDirOrPro,
+      pros.map((p) => parseSingleKicadProject(p)),
+      pros,
+    );
+  }
+  return parseSingleKicadProject(pros[0] ?? projectDirOrPro);
 }
 
 export function parseKicadProjectDirHierarchical(dir: string): DesignSnapshot {

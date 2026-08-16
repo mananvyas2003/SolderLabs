@@ -1,8 +1,15 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { getDb, persist, nowIso } from "@solderlab/db";
+import {
+  getDb,
+  persist,
+  nowIso,
+  hashPassword,
+  verifyPassword,
+  isHashedPassword,
+} from "@solderlab/db";
 import { ensureDb } from "@/lib/ensure-db";
-import { COOKIE } from "@/lib/auth";
+import { COOKIE, cookieOptions, issueSession } from "@/lib/auth";
 
 export async function POST(req: Request) {
   ensureDb();
@@ -19,11 +26,7 @@ export async function POST(req: Request) {
   const db = getDb();
   let user = db.users.find((u) => u.email === email);
 
-  if (
-    !user &&
-    (email === "demo@solderlab.dev" || email === "demo@solderlab.dev") &&
-    password === "demo"
-  ) {
+  if (!user && email === "demo@solderlab.dev" && password === "demo") {
     const now = nowIso();
     const userId = nanoid();
     const orgId = nanoid();
@@ -32,7 +35,7 @@ export async function POST(req: Request) {
       id: userId,
       email: "demo@solderlab.dev",
       name: "Demo Engineer",
-      passwordHash: "demo",
+      passwordHash: hashPassword("demo"),
       avatarUrl: null,
       createdAt: now,
     });
@@ -58,6 +61,7 @@ export async function POST(req: Request) {
       defaultBranch: "main",
       requireGreenChecks: true,
       requireApproval: false,
+      requiredApprovals: 1,
       createdAt: now,
     });
     db.branches.push({
@@ -70,19 +74,20 @@ export async function POST(req: Request) {
     user = db.users.find((u) => u.id === userId)!;
   }
 
-  if (!user || user.passwordHash !== password) {
+  if (!user || !verifyPassword(password, user.passwordHash)) {
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
+  if (user.passwordHash && !isHashedPassword(user.passwordHash)) {
+    user.passwordHash = hashPassword(password);
+    persist();
+  }
+
+  const token = issueSession(user.id);
   const res = NextResponse.json({
     ok: true,
     user: { id: user.id, email: user.email, name: user.name },
   });
-  res.cookies.set(COOKIE, user.id, {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24 * 30,
-  });
+  res.cookies.set(COOKIE, token, cookieOptions(60 * 60 * 24 * 30));
   return res;
 }

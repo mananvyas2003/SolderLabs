@@ -15,7 +15,6 @@ import {
   type SemanticDiffResult,
 } from "./semantic-diff";
 import {
-  formatIdentityCoverage,
   resolveIdentity,
   type IdentityMatch,
 } from "./identity";
@@ -78,7 +77,10 @@ export interface DiffBundleData {
     significantElectrical?: number;
     criticalElectrical?: number;
     electricalGate?: "PASS" | "FAIL";
+    boardsAdded?: number;
+    boardsRemoved?: number;
   };
+  boards?: Array<{ key: string; kind: "added" | "removed" | "unchanged" }>;
 }
 
 export interface CopilotFinding {
@@ -93,7 +95,6 @@ export interface CopilotFinding {
     deepLink: string;
   }>;
   suggestedAction?: string;
-  confidence: number;
 }
 
 export function snapshotToBom(snapshot: DesignSnapshot): BomLineLike[] {
@@ -166,17 +167,32 @@ export function diffSnapshots(
   cfg?: SnapshotDiffOptions,
 ): DiffBundleData {
   const includePower = cfg?.includePowerSymbols === true;
-  const baseComps = includePower
+  const baseCompsAll = includePower
     ? base.components
     : base.components.filter((c) => !isPowerSymbol(c));
-  const headComps = includePower
+  const headCompsAll = includePower
     ? head.components
     : head.components.filter((c) => !isPowerSymbol(c));
 
+  const baseBoardKeys = new Set(baseCompsAll.map((c) => c.boardKey ?? ""));
+  const headBoardKeys = new Set(headCompsAll.map((c) => c.boardKey ?? ""));
+  const addedBoardKeys = [...headBoardKeys].filter(
+    (k) => k && !baseBoardKeys.has(k),
+  );
+  const removedBoardKeys = [...baseBoardKeys].filter(
+    (k) => k && !headBoardKeys.has(k),
+  );
+  const addedBoardSet = new Set(addedBoardKeys);
+  const removedBoardSet = new Set(removedBoardKeys);
+
+  const baseComps = baseCompsAll.filter(
+    (c) => !removedBoardSet.has(c.boardKey ?? ""),
+  );
+  const headComps = headCompsAll.filter(
+    (c) => !addedBoardSet.has(c.boardKey ?? ""),
+  );
+
   const identity = resolveIdentity(baseComps, headComps);
-  // Tier coverage is the product metric the prompt asked for — keep visible in logs.
-  // Use stderr so JSON CLI output on stdout stays machine-parseable.
-  console.warn(`[diffSnapshots] ${formatIdentityCoverage(identity)}`);
 
   const components: ComponentDiff[] = [];
   for (const m of identity.matched) {
@@ -220,8 +236,12 @@ export function diffSnapshots(
     snapshotToBom({ ...head, components: headComps }),
   );
 
-  const baseNets = [...base.nets];
-  const headNets = [...head.nets];
+  const baseNets = [...base.nets].filter(
+    (n) => !removedBoardSet.has(n.boardKey ?? ""),
+  );
+  const headNets = [...head.nets].filter(
+    (n) => !addedBoardSet.has(n.boardKey ?? ""),
+  );
   const headNetUsed = new Set<number>();
   const nets: NetDiff[] = [];
 
@@ -267,7 +287,10 @@ export function diffSnapshots(
   baseNets.forEach((b, bi) => {
     if (baseUsed.has(bi)) return;
     const hSameName = headNets.findIndex(
-      (h, hi) => !headNetUsed.has(hi) && h.name === b.name,
+      (h, hi) =>
+        !headNetUsed.has(hi) &&
+        h.name === b.name &&
+        (h.boardKey ?? "") === (b.boardKey ?? ""),
     );
     if (hSameName >= 0) {
       headNetUsed.add(hSameName);
@@ -327,7 +350,13 @@ export function diffSnapshots(
       significantElectrical: electrical.summary.significantCount,
       criticalElectrical: electrical.summary.criticalCount,
       electricalGate: electrical.summary.gate,
+      boardsAdded: addedBoardKeys.length,
+      boardsRemoved: removedBoardKeys.length,
     },
+    boards: [
+      ...addedBoardKeys.map((key) => ({ key, kind: "added" as const })),
+      ...removedBoardKeys.map((key) => ({ key, kind: "removed" as const })),
+    ],
   };
 }
 
@@ -497,7 +526,6 @@ export function localCopilotFindings(
             deepLink: `#elec-${encodeURIComponent(ref)}`,
           },
         ],
-        confidence: 0.95,
       });
       return { markdown: findings[0].body, findings };
     }
@@ -518,7 +546,6 @@ export function localCopilotFindings(
           deepLink: `#comp-${ref}`,
         },
       ],
-      confidence: 0.95,
     });
     return { markdown: findings[0].body, findings };
   }
@@ -583,7 +610,6 @@ export function localCopilotFindings(
               deepLink: `#bom-${row.refdes}`,
             },
           ],
-          confidence: 0.6,
         },
       ],
     };
@@ -616,7 +642,6 @@ export function localCopilotFindings(
           suggestedAction: row.after?.mpn
             ? undefined
             : "Assign an approved MPN before release",
-          confidence: 0.9,
         });
       } else if (row.kind === "removed") {
         findings.push({
@@ -632,7 +657,6 @@ export function localCopilotFindings(
               deepLink: `#bom-${row.refdes}`,
             },
           ],
-          confidence: 0.92,
         });
       } else if (row.kind === "changed") {
         const fields = row.fields ?? [];
@@ -669,7 +693,6 @@ export function localCopilotFindings(
           suggestedAction: fields.includes("footprint")
             ? "Re-verify land pattern and courtyard"
             : undefined,
-          confidence: 0.93,
         });
       }
     }
@@ -703,7 +726,6 @@ export function localCopilotFindings(
           ch.type === "NetMerged" && ch.significance === "critical"
             ? "Power nets shorted — do not merge until verified"
             : undefined,
-        confidence: 0.9,
       });
     }
 
@@ -725,7 +747,6 @@ export function localCopilotFindings(
               deepLink: `#net-${encodeURIComponent(n.name)}`,
             },
           ],
-          confidence: 0.85,
         });
       }
     }

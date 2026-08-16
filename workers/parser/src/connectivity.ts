@@ -199,9 +199,98 @@ function extractQuoted(block: string, key: string): string | undefined {
   return block.match(re)?.[1];
 }
 
-function classifyNet(name: string): SnapshotNet["class"] {
-  if (/GND|AGND|PGND|VSS/i.test(name)) return "ground";
-  if (/^(VCC|VDD|VBUS|\+|[0-9]+V)/i.test(name)) return "power";
+const GROUND_TOKEN =
+  /^(A?GND|PGND|DGND|CGND|GNDA|GNDD|VSS|VSSA|VSSD)$/i;
+const POWER_TOKEN =
+  /^(VCC|VDD|VBUS|VBAT|VPP|AVDD|DVDD|VDDA|VDDQ|VDDIO|VDDH|VIN|VOUT|\+?BATT|\+?(?:3V3|5V|1V8|1V2|1V0)|[0-9]+V[0-9]*)$/i;
+
+/** KiCad stores `/` in net names as `{slash}`. */
+export function unescapeKiCadNetName(name: string): string {
+  return name.replace(/\{slash\}/gi, "/");
+}
+
+/** Overbar `~{RESET}` → `RESET`. Raw form is kept as `displayName`. */
+export function stripOverbarSyntax(name: string): string {
+  return name.replace(/~\{([^}]*)\}/g, "$1");
+}
+
+export function normalizeNetName(name: string): string {
+  return stripOverbarSyntax(unescapeKiCadNetName(name)).trim();
+}
+
+/**
+ * `ANALOG{A[0..5]}` → six members; `USB{VBUS, CC1, CC2}` → three.
+ * Returns null when the name is not a bus vector.
+ */
+export function expandBusMembers(name: string): string[] | null {
+  const canonical = normalizeNetName(name);
+  const m = canonical.match(/^(.+)\{(.+)\}$/);
+  if (!m) return null;
+  const prefix = m[1]!;
+  const inner = m[2]!.trim();
+  const range = inner.match(/^([A-Za-z_]*)\[(\d+)\.\.(\d+)\]$/);
+  if (range) {
+    const stem = range[1] ?? "";
+    const a = Number(range[2]);
+    const b = Number(range[3]);
+    const lo = Math.min(a, b);
+    const hi = Math.max(a, b);
+    const out: string[] = [];
+    for (let i = lo; i <= hi; i++) out.push(`${prefix}{${stem}${i}}`);
+    return out;
+  }
+  if (inner.includes(",")) {
+    const parts = inner
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (parts.length < 2) return null;
+    return parts.map((p) => `${prefix}{${p}}`);
+  }
+  return null;
+}
+
+export function isPowerFlagComponent(c: {
+  refdes: string;
+  libId?: string;
+}): boolean {
+  if (/^#PWR/i.test(c.refdes) || /^#FLG/i.test(c.refdes)) return true;
+  const lib = (c.libId ?? "").toLowerCase();
+  return (
+    lib.startsWith("power:") ||
+    lib.includes("power:") ||
+    lib.startsWith("power/")
+  );
+}
+
+/**
+ * Token-boundary classification. `nRF52_VDD`, `AVDD`, `MCU_VDD`, `DDR_VDDQ`
+ * are power. A `power:GND` (or GND-valued power flag) is ground regardless of
+ * the net's display name.
+ */
+export function classifyNet(
+  name: string,
+  origin?: { libId?: string; value?: string },
+): SnapshotNet["class"] {
+  const lib = (origin?.libId ?? "").toLowerCase();
+  if (
+    lib.includes("power:gnd") ||
+    /:gnd(?:\/|$)/i.test(lib) ||
+    (lib.includes("power:") &&
+      GROUND_TOKEN.test((origin?.value ?? "").trim()))
+  ) {
+    return "ground";
+  }
+  if (lib.startsWith("power:") || lib.includes("power:")) {
+    const hint = (origin?.value || name).trim();
+    if (GROUND_TOKEN.test(hint) || /(^|[^A-Za-z])GND([^A-Za-z]|$)/i.test(hint)) {
+      return "ground";
+    }
+    return "power";
+  }
+  const tokens = name.split(/[^A-Za-z0-9+]+/).filter(Boolean);
+  if (tokens.some((t) => GROUND_TOKEN.test(t))) return "ground";
+  if (tokens.some((t) => POWER_TOKEN.test(t))) return "power";
   return "signal";
 }
 
@@ -230,27 +319,26 @@ export function resolveConnectivity(
     if (at) uf.find(`p:${roundKey(at)}`);
   }
 
-  const namedPoints: Array<{ key: string; name: string }> = [];
+  const namedPoints: Array<{ key: string; name: string; display: string }> = [];
+  const rememberLabel = (raw: string, at: Pt) => {
+    const display = raw;
+    const name = normalizeNetName(raw);
+    const key = `p:${roundKey(at)}`;
+    uf.find(key);
+    namedPoints.push({ key, name, display });
+  };
   for (const lab of extractBlocks(src, "label")) {
     const name =
       extractQuoted(lab, "label") ?? lab.match(/\(label\s+"([^"]+)"/)?.[1];
     const at = parseAt(lab);
-    if (name && at) {
-      const key = `p:${roundKey(at)}`;
-      uf.find(key);
-      namedPoints.push({ key, name });
-    }
+    if (name && at) rememberLabel(name, at);
   }
   for (const lab of extractBlocks(src, "global_label")) {
     const name =
       extractQuoted(lab, "global_label") ??
       lab.match(/\(global_label\s+"([^"]+)"/)?.[1];
     const at = parseAt(lab);
-    if (name && at) {
-      const key = `p:${roundKey(at)}`;
-      uf.find(key);
-      namedPoints.push({ key, name });
-    }
+    if (name && at) rememberLabel(name, at);
   }
   // Hierarchical labels (child → parent sheet pin of same name)
   for (const lab of extractBlocks(src, "hierarchical_label")) {
@@ -258,11 +346,7 @@ export function resolveConnectivity(
       extractQuoted(lab, "hierarchical_label") ??
       lab.match(/\(hierarchical_label\s+"([^"]+)"/)?.[1];
     const at = parseAt(lab);
-    if (name && at) {
-      const key = `p:${roundKey(at)}`;
-      uf.find(key);
-      namedPoints.push({ key, name });
-    }
+    if (name && at) rememberLabel(name, at);
   }
   // Sheet box pins on the parent (KiCad 7+ `(pin "N" …)` inside `(sheet …)`)
   for (const sheet of extractBlocks(src, "sheet")) {
@@ -272,20 +356,14 @@ export function resolveConnectivity(
     for (const m of sheet.matchAll(
       /\(pin\s+"([^"]+)"\s+\w+[\s\S]*?\(at\s+([-\d.]+)\s+([-\d.]+)/g,
     )) {
-      const key = `p:${roundKey({ x: Number(m[2]), y: Number(m[3]) })}`;
-      uf.find(key);
-      namedPoints.push({ key, name: m[1]! });
+      rememberLabel(m[1]!, { x: Number(m[2]), y: Number(m[3]) });
     }
     for (const sp of extractBlocks(sheet, "sheet_pin")) {
       const pname =
         extractQuoted(sp, "sheet_pin") ??
         sp.match(/\(sheet_pin\s+"([^"]+)"/)?.[1];
       const at = parseAt(sp);
-      if (pname && at) {
-        const key = `p:${roundKey(at)}`;
-        uf.find(key);
-        namedPoints.push({ key, name: pname });
-      }
+      if (pname && at) rememberLabel(pname, at);
     }
   }
 
@@ -297,10 +375,20 @@ export function resolveConnectivity(
     refdes: string;
   }> = [];
 
+  const powerMeta = new Map<string, { libId?: string; value: string }>();
+
   for (const c of components) {
     const libId = c.libId ?? "";
+    const power = isPowerFlagComponent(c);
+    if (power) {
+      powerMeta.set(c.refdes, { libId: c.libId, value: c.value });
+    }
     let pins = lookupLibPins(libPins, libId);
-    if (!pins?.length) pins = heuristicPins(libId || "Device:R");
+    if (!pins?.length) {
+      pins = power
+        ? [{ number: "1", name: c.value || "1", x: 0, y: 0 }]
+        : heuristicPins(libId || "Device:R");
+    }
 
     const ax = c.x ?? 0;
     const ay = c.y ?? 0;
@@ -318,6 +406,11 @@ export function resolveConnectivity(
         name: pin.name,
         refdes: c.refdes,
       });
+      if (power) {
+        const netName = normalizeNetName(c.value || pin.name || "GND");
+        uf.union(`pin:${pinId}`, `name:${netName}`);
+        namedPoints.push({ key, name: netName, display: c.value || netName });
+      }
     }
   }
 
@@ -327,50 +420,78 @@ export function resolveConnectivity(
 
   const groups = new Map<
     string,
-    { pins: typeof pinPoints; names: string[] }
+    { pins: typeof pinPoints; names: string[]; displays: string[] }
   >();
   for (const pp of pinPoints) {
     const root = uf.find(pp.key);
-    if (!groups.has(root)) groups.set(root, { pins: [], names: [] });
+    if (!groups.has(root)) groups.set(root, { pins: [], names: [], displays: [] });
     groups.get(root)!.pins.push(pp);
   }
   for (const np of namedPoints) {
     const root = uf.find(np.key);
-    if (!groups.has(root)) groups.set(root, { pins: [], names: [] });
+    if (!groups.has(root)) groups.set(root, { pins: [], names: [], displays: [] });
     groups.get(root)!.names.push(np.name);
+    groups.get(root)!.displays.push(np.display);
   }
 
   const nets: SnapshotNet[] = [];
   const pinNet = new Map<string, string>();
   let anon = 1;
 
+  const upsertNet = (net: SnapshotNet) => {
+    const existing = nets.find((x) => x.name === net.name);
+    if (existing) {
+      existing.nodes = [...new Set([...existing.nodes, ...net.nodes])].sort(
+        (a, b) => a.localeCompare(b, undefined, { numeric: true }),
+      );
+      if (!existing.displayName && net.displayName) {
+        existing.displayName = net.displayName;
+      }
+    } else {
+      nets.push(net);
+    }
+  };
+
   for (const g of groups.values()) {
     if (!g.pins.length && !g.names.length) continue;
     let name = g.names.find((n) => /GND|VDD|VCC/i.test(n)) ?? g.names[0];
+    const display = g.displays[g.names.indexOf(name ?? "")] ?? g.displays[0];
     if (!name) {
       const first = g.pins[0];
       name = first
         ? `Net-(${first.refdes}-Pad${first.number})`
         : `N$${anon++}`;
     }
+    const members = expandBusMembers(name);
+    if (members && !g.pins.length) {
+      for (const member of members) {
+        const cls = classifyNet(member);
+        upsertNet({
+          name: member,
+          displayName: member,
+          class: cls,
+          nodes: [],
+          isNamed: true,
+          isPower: cls !== "signal",
+        });
+      }
+      continue;
+    }
     const nodes = [...new Set(g.pins.map((p) => p.pinId))].sort((a, b) =>
       a.localeCompare(b, undefined, { numeric: true }),
     );
     for (const n of nodes) pinNet.set(n, name);
-    const existing = nets.find((x) => x.name === name);
-    if (existing) {
-      existing.nodes = [...new Set([...existing.nodes, ...nodes])].sort((a, b) =>
-        a.localeCompare(b, undefined, { numeric: true }),
-      );
-    } else {
-      nets.push({
-        name,
-        class: classifyNet(name),
-        nodes,
-        isNamed: !/^N\$|^Net-\(/i.test(name),
-        isPower: classifyNet(name) !== "signal",
-      });
-    }
+    const originPin = g.pins.find((p) => powerMeta.has(p.refdes));
+    const origin = originPin ? powerMeta.get(originPin.refdes) : undefined;
+    const cls = classifyNet(name, origin);
+    upsertNet({
+      name,
+      displayName: display && display !== name ? display : undefined,
+      class: cls,
+      nodes,
+      isNamed: !/^N\$|^Net-\(/i.test(name),
+      isPower: cls !== "signal",
+    });
   }
 
   const netMap = new Map<string, SnapshotNet>();
@@ -381,6 +502,7 @@ export function resolveConnectivity(
       e.nodes = [...new Set([...e.nodes, ...n.nodes])].sort((a, b) =>
         a.localeCompare(b, undefined, { numeric: true }),
       );
+      if (!e.displayName && n.displayName) e.displayName = n.displayName;
     }
   }
 

@@ -11,6 +11,7 @@ import {
 } from "./schema";
 
 export * from "./schema";
+export * from "./password";
 
 function resolveDbPath() {
   const url =
@@ -54,6 +55,7 @@ function migrate(raw: Partial<SolderLabDb> & Record<string, unknown>): SolderLab
       ...rest,
       requireGreenChecks: proj.requireGreenChecks ?? true,
       requireApproval: proj.requireApproval ?? false,
+      requiredApprovals: proj.requiredApprovals ?? 1,
       visibility:
         proj.visibility === "public" ? "internal" : (proj.visibility ?? "private"),
     };
@@ -90,6 +92,14 @@ function migrate(raw: Partial<SolderLabDb> & Record<string, unknown>): SolderLab
       anchorMetaJson: row.anchorMetaJson ?? null,
     };
   });
+  merged.designReviews = (merged.designReviews ?? []).map((r) => ({
+    ...r,
+    targetBranchId: r.targetBranchId ?? null,
+  }));
+  merged.checkRuns = (merged.checkRuns ?? []).map((c) => ({
+    ...c,
+    severity: c.severity ?? null,
+  }));
   return merged as SolderLabDb;
 }
 

@@ -42,7 +42,17 @@ export default async function ChecksPage({
                 rev {c.revisionId.slice(0, 8)}
               </div>
             </div>
-            <Badge tone={c.status === "pass" ? "success" : "danger"}>
+            <Badge
+              tone={
+                c.status === "pass"
+                  ? "success"
+                  : c.status === "skipped"
+                    ? "neutral"
+                    : c.status === "pending" || c.status === "running"
+                      ? "warn"
+                      : "danger"
+              }
+            >
               {c.status}
             </Badge>
           </li>

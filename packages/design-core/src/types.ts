@@ -32,14 +32,20 @@ export interface SnapshotComponent {
   x?: number;
   y?: number;
   rotation?: number;
+  /** Stable key: path of the owning `.kicad_pro` relative to the upload root. */
+  boardKey?: string;
 }
 
 export interface SnapshotNet {
   name: string;
+  /** Raw KiCad spelling when it differs from the canonical `name`. */
+  displayName?: string;
   class?: "power" | "signal" | "ground" | string;
   nodes: string[];
   isNamed?: boolean;
   isPower?: boolean;
+  /** Set when the snapshot contains multiple `.kicad_pro` roots. */
+  boardKey?: string;
 }
 
 export interface SnapshotSheet {
@@ -48,12 +54,22 @@ export interface SnapshotSheet {
   title?: string;
 }
 
+export type ParseWarningCode = "missing-sheet" | "pcb-only" | "multi-board";
+
+export interface ParseWarning {
+  code: ParseWarningCode;
+  message: string;
+}
+
 export interface DesignSnapshot {
   schemaVersion: 1;
   tool: { name: string; version?: string };
   sheets: SnapshotSheet[];
   components: SnapshotComponent[];
   nets: SnapshotNet[];
+  boards?: Array<{ key: string; name: string }>;
+  warnings?: ParseWarning[];
+  parseStatus?: "ok" | "partial";
   meta: {
     sheetCount: number;
     componentCount: number;

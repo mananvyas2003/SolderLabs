@@ -26,6 +26,7 @@ export async function PATCH(
   const body = (await req.json()) as {
     requireGreenChecks?: boolean;
     requireApproval?: boolean;
+    requiredApprovals?: number;
   };
   const row = getDb().projects.find((p) => p.id === project.id)!;
   if (typeof body.requireGreenChecks === "boolean") {
@@ -33,6 +34,9 @@ export async function PATCH(
   }
   if (typeof body.requireApproval === "boolean") {
     row.requireApproval = body.requireApproval;
+  }
+  if (typeof body.requiredApprovals === "number" && body.requiredApprovals >= 1) {
+    row.requiredApprovals = Math.floor(body.requiredApprovals);
   }
   persist();
   return NextResponse.json({ ok: true });

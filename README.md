@@ -1,6 +1,6 @@
 # SolderLab
 
-Version, review, and release electronics designs — with evidence-linked review that understands the schematic.
+Version, review, and release electronics designs — with rule-based review and evidence links.
 
 ## Local development
 

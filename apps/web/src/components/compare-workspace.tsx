@@ -371,6 +371,7 @@ export function CompareWorkspace({
                         : "warn"
                   }
                 >
+                  {c.kind === "added" ? "+" : c.kind === "removed" ? "−" : "~"}{" "}
                   {c.kind}
                   {c.fields ? `: ${c.fields.join(",")}` : ""}
                 </Badge>
@@ -409,6 +410,7 @@ export function CompareWorkspace({
                             : "warn"
                       }
                     >
+                      {row.kind === "added" ? "+" : row.kind === "removed" ? "−" : "~"}{" "}
                       {row.kind}
                     </Badge>
                   </td>

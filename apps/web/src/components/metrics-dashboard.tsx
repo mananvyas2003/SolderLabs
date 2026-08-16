@@ -19,7 +19,6 @@ type Row = {
 
 export function MetricsDashboard() {
   const [rows, setRows] = useState<Row[]>([]);
-  const [note, setNote] = useState("");
   const [eventCount, setEventCount] = useState(0);
   const [err, setErr] = useState<string | null>(null);
 
@@ -31,7 +30,6 @@ export function MetricsDashboard() {
       })
       .then((j) => {
         setRows(j.metrics ?? []);
-        setNote(j.northStarNote ?? "");
         setEventCount(j.eventCount ?? 0);
       })
       .catch((e) => setErr(String(e.message ?? e)));
@@ -52,7 +50,7 @@ export function MetricsDashboard() {
         <Stat
           label="bsc_check_failed"
           value={String(totalFailed)}
-          hint="North-star: wedge caught a real firmware bug"
+          hint="Caught firmware/pinout mismatches"
           emphasis
         />
         <Stat
@@ -66,12 +64,6 @@ export function MetricsDashboard() {
           hint="Append-only product analytics log"
         />
       </div>
-
-      {note ? (
-        <p className="border-l-2 border-[var(--accent)] pl-3 text-sm text-[var(--text-muted)]">
-          {note}
-        </p>
-      ) : null}
 
       <div className="overflow-x-auto border border-[var(--border)]">
         <table className="w-full min-w-[640px] text-left text-sm">

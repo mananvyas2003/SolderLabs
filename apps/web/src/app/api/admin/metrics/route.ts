@@ -44,7 +44,5 @@ export async function GET() {
   return NextResponse.json({
     metrics: labeled,
     eventCount: readEvents().length,
-    northStarNote:
-      "bsc_check_failed (especially with callSitesFound > 0) is the wedge signal.",
   });
 }

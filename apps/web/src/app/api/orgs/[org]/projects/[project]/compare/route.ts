@@ -35,16 +35,56 @@ export async function GET(
   if (!project) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const db = getDb();
+  const baseRev = db.revisions.find((r) => r.id === base && r.projectId === project.id);
+  const headRev = db.revisions.find((r) => r.id === head && r.projectId === project.id);
+
+  if (
+    baseRev?.parseStatus === "partial" ||
+    headRev?.parseStatus === "partial"
+  ) {
+    return NextResponse.json(
+      {
+        error: "Revision is a partial parse and cannot be used as a diff base",
+        parseStatus: "partial",
+      },
+      { status: 409 },
+    );
+  }
+
   const cached = db.diffBundles.find(
     (d) =>
       d.projectId === project.id &&
       d.baseRevisionId === base &&
       d.headRevisionId === head,
   );
+  const paginate = (data: ReturnType<typeof diffSnapshots>) => {
+    const limit = Math.min(
+      Math.max(Number(url.searchParams.get("limit") ?? 800), 1),
+      2000,
+    );
+    const cOff = Math.max(Number(url.searchParams.get("componentsOffset") ?? 0), 0);
+    const nOff = Math.max(Number(url.searchParams.get("netsOffset") ?? 0), 0);
+    const componentsTotal = data.components.length;
+    const netsTotal = data.nets.length;
+    return {
+      ...data,
+      components: data.components.slice(cOff, cOff + limit),
+      nets: data.nets.slice(nOff, nOff + limit),
+      page: {
+        limit,
+        componentsOffset: cOff,
+        netsOffset: nOff,
+        componentsTotal,
+        netsTotal,
+        truncated: cOff + limit < componentsTotal || nOff + limit < netsTotal,
+      },
+    };
+  };
+
   if (cached) {
     return NextResponse.json({
       id: cached.id,
-      data: JSON.parse(cached.dataJson),
+      data: paginate(JSON.parse(cached.dataJson)),
     });
   }
 
@@ -57,11 +97,26 @@ export async function GET(
     );
   }
 
-  let data = diffSnapshots(
-    JSON.parse(baseSnap.dataJson) as DesignSnapshot,
-    JSON.parse(headSnap.dataJson) as DesignSnapshot,
-    { baseRevisionId: base, headRevisionId: head },
-  );
+  const baseData = JSON.parse(baseSnap.dataJson) as DesignSnapshot;
+  const headData = JSON.parse(headSnap.dataJson) as DesignSnapshot;
+  const unusable = (snap: DesignSnapshot, parseStatus?: string) =>
+    parseStatus === "partial" ||
+    snap.parseStatus === "partial" ||
+    Boolean(snap.warnings?.some((w) => w.code === "missing-sheet"));
+  if (unusable(baseData, baseRev?.parseStatus) || unusable(headData, headRev?.parseStatus)) {
+    return NextResponse.json(
+      {
+        error: "Revision is a partial parse and cannot be used as a diff base",
+        parseStatus: "partial",
+      },
+      { status: 409 },
+    );
+  }
+
+  let data = diffSnapshots(baseData, headData, {
+    baseRevisionId: base,
+    headRevisionId: head,
+  });
 
   const basePcb = db.pcbSnapshots.find((s) => s.revisionId === base);
   const headPcb = db.pcbSnapshots.find((s) => s.revisionId === head);
@@ -82,5 +137,5 @@ export async function GET(
   });
   persist();
 
-  return NextResponse.json({ id, data });
+  return NextResponse.json({ id, data: paginate(data) });
 }

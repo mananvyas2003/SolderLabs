@@ -17,7 +17,7 @@
     "@solderlab/bsc": "*",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.7.0",
-    "adm-zip": "^0.5.16",
+    "adm-zip": "0.5.18",
     "framer-motion": "^12.4.10",
     "nanoid": "^5.1.2",
     "next": "^15.2.1",

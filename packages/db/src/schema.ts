@@ -41,6 +41,8 @@ export interface Project {
   defaultBranch: string;
   requireGreenChecks: boolean;
   requireApproval: boolean;
+  /** How many distinct approvers (not the author) must sign the current head. */
+  requiredApprovals: number;
   createdAt: string;
 }
 
@@ -134,8 +136,28 @@ export interface DesignReview {
   headRevisionId: string;
   state: string;
   authorId: string;
+  /** Branch whose head is updated on merge. */
+  targetBranchId: string | null;
   createdAt: string;
   mergedAt: string | null;
+}
+
+export interface ReviewApproval {
+  id: string;
+  reviewId: string;
+  userId: string;
+  state: "approved" | "changes_requested";
+  /** Head revision id at the time of the record — stale when head moves. */
+  headRevisionSha: string;
+  createdAt: string;
+}
+
+export interface Session {
+  id: string;
+  userId: string;
+  tokenHash: string;
+  createdAt: string;
+  expiresAt: string;
 }
 
 export interface Comment {
@@ -159,6 +181,8 @@ export interface CheckRun {
   reviewId: string | null;
   name: string;
   status: string;
+  /** Typed gate signal — never parse English summaries. */
+  severity?: string | null;
   summary: string | null;
   detailsJson: string | null;
   createdAt: string;
@@ -301,6 +325,8 @@ export interface SolderLabDb {
   designReviews: DesignReview[];
   comments: Comment[];
   checkRuns: CheckRun[];
+  reviewApprovals: ReviewApproval[];
+  sessions: Session[];
   libraryParts: LibraryPart[];
   releases: Release[];
   releaseArtifacts: ReleaseArtifact[];
@@ -334,6 +360,8 @@ export function emptyDb(): SolderLabDb {
     designReviews: [],
     comments: [],
     checkRuns: [],
+    reviewApprovals: [],
+    sessions: [],
     libraryParts: [],
     releases: [],
     releaseArtifacts: [],

@@ -102,7 +102,17 @@ export default async function ProjectPage({
               <ul className="space-y-1.5">
                 {checks.map((c) => (
                   <li key={c.id} className="flex items-center gap-2 text-sm">
-                    <Badge tone={c.status === "pass" ? "success" : "danger"}>
+                    <Badge
+                      tone={
+                        c.status === "pass"
+                          ? "success"
+                          : c.status === "skipped"
+                            ? "neutral"
+                            : c.status === "pending" || c.status === "running"
+                              ? "warn"
+                              : "danger"
+                      }
+                    >
                       {c.status}
                     </Badge>
                     <span className="truncate">

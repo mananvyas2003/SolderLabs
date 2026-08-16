@@ -171,7 +171,7 @@ export function parseAltiumLikeText(src: string): {
     components,
     note:
       components.length > 0
-        ? "Imported via best-effort Altium/CSV text netlist path"
+        ? "CSV BOM import only — not an Altium schematic/netlist"
         : "No parseable components — provide CSV Ref,Value,Footprint,MPN",
   };
 }

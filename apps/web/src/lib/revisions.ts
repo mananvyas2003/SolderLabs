@@ -90,8 +90,9 @@ function runPolicyChecks(opts: {
       revisionId: opts.revisionId,
       reviewId: null,
       name: "erc",
-      status: "pass",
-      summary: "No ERC report uploaded — skipped (soft pass)",
+      status: "skipped",
+      severity: "info",
+      summary: "No ERC report uploaded — skipped",
       detailsJson: JSON.stringify({ skipped: true }),
       createdAt: now,
     });
@@ -163,6 +164,28 @@ export async function createRevisionFromZip(opts: {
   const db = getDb();
   const project = db.projects.find((p) => p.id === opts.projectId);
   const orgId = opts.orgId ?? project?.orgId ?? "";
+
+  const zip = new AdmZip(opts.zipBuffer);
+  const entries = zip.getEntries();
+  if (entries.length > 8000) {
+    throw new Error("Zip has too many entries");
+  }
+  let uncompressed = 0;
+  for (const e of entries) {
+    const name = e.entryName.replace(/\\/g, "/");
+    if (
+      name.includes("..") ||
+      name.startsWith("/") ||
+      /^[a-zA-Z]:/.test(name)
+    ) {
+      throw new Error(`Illegal zip path: ${name}`);
+    }
+    uncompressed += e.header.size;
+    if (uncompressed > 400 * 1024 * 1024) {
+      throw new Error("Decompressed zip exceeds size limit");
+    }
+  }
+
   const revisionId = nanoid();
   const now = nowIso();
 
@@ -191,7 +214,6 @@ export async function createRevisionFromZip(opts: {
 
   const extractDir = storagePath(`${opts.projectId}/${revisionId}/extracted`);
   fs.mkdirSync(extractDir, { recursive: true });
-  const zip = new AdmZip(opts.zipBuffer);
   zip.extractAllTo(extractDir, true);
 
   let parseRoot = extractDir;
@@ -326,6 +348,12 @@ export async function createRevisionFromZip(opts: {
             reviewId: null,
             name: "connectivity-gate",
             status: elec.summary.gate === "FAIL" ? "fail" : "pass",
+            severity:
+              elec.summary.criticalCount > 0
+                ? "critical"
+                : elec.summary.gate === "FAIL"
+                  ? "significant"
+                  : "ok",
             summary:
               elec.summary.gate === "FAIL"
                 ? `${elec.summary.significantCount} significant electrical change(s)` +
@@ -359,7 +387,29 @@ export async function createRevisionFromZip(opts: {
             createdAt: now,
           });
         } catch {
-          /* ignore bad parent snapshot */
+          db.checkRuns.push({
+            id: nanoid(),
+            projectId: opts.projectId,
+            revisionId,
+            reviewId: null,
+            name: "connectivity-gate",
+            status: "error",
+            severity: "critical",
+            summary: "Could not compute electrical diff vs parent",
+            detailsJson: null,
+            createdAt: now,
+          });
+          db.checkRuns.push({
+            id: nanoid(),
+            projectId: opts.projectId,
+            revisionId,
+            reviewId: null,
+            name: "unintended-connectivity",
+            status: "error",
+            summary: "Could not compute net-diff vs parent",
+            detailsJson: null,
+            createdAt: now,
+          });
         }
       }
     } else {
@@ -369,6 +419,18 @@ export async function createRevisionFromZip(opts: {
         revisionId,
         reviewId: null,
         name: "connectivity-gate",
+        status: "pass",
+        severity: "ok",
+        summary: "Root revision — no parent to diff",
+        detailsJson: JSON.stringify({ skipped: true }),
+        createdAt: now,
+      });
+      db.checkRuns.push({
+        id: nanoid(),
+        projectId: opts.projectId,
+        revisionId,
+        reviewId: null,
+        name: "unintended-connectivity",
         status: "pass",
         summary: "Root revision — no parent to diff",
         detailsJson: JSON.stringify({ skipped: true }),
@@ -469,7 +531,9 @@ export async function createRevisionFromZip(opts: {
     });
 
     const rev = db.revisions.find((r) => r.id === revisionId)!;
-    rev.parseStatus = "succeeded";
+    const missingSheet = snapshot.warnings?.some((w) => w.code === "missing-sheet");
+    rev.parseStatus =
+      snapshot.parseStatus === "partial" || missingSheet ? "partial" : "succeeded";
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Parse failed";
     const rev = db.revisions.find((r) => r.id === revisionId)!;
@@ -564,23 +628,32 @@ export function revisionChecksPassing(projectId: string, revisionId: string) {
   const db = getDb();
   const project = db.projects.find((p) => p.id === projectId);
   const checks = db.checkRuns.filter((c) => c.revisionId === revisionId);
-  const required = ["bom-mpn", "bom-policy", "erc", "drc"].filter((name) =>
-    checks.some((c) => c.name === name),
-  );
-  // soft pass: only fail hard on fail status for existing required-ish checks
-  const hardFails = checks.filter(
-    (c) =>
-      c.status === "fail" &&
-      (c.name === "bom-policy" ||
-        c.name === "drc" ||
-        (c.name === "connectivity-gate" &&
-          /critical/i.test(c.summary ?? "")) ||
-        (c.name === "erc" && !c.summary?.includes("skipped"))),
-  );
-  if (project?.requireGreenChecks && hardFails.length) {
-    return { ok: false as const, failing: hardFails };
+  const declaredRequired = ["bom-mpn", "connectivity-gate", "unintended-connectivity"];
+  const blockingStatus = new Set(["fail", "error", "pending", "running"]);
+
+  const failing = checks.filter((c) => blockingStatus.has(c.status));
+  const missing = declaredRequired.filter((name) => !checks.some((c) => c.name === name));
+  const missingAsFails = missing.map((name) => ({
+    name,
+    summary: `Required check never ran: ${name}`,
+    status: "missing",
+  }));
+
+  if (project?.requireGreenChecks && (failing.length || missing.length)) {
+    return {
+      ok: false as const,
+      failing: [
+        ...failing,
+        ...missingAsFails.map((m) => ({
+          name: m.name,
+          summary: m.summary,
+          status: m.status,
+        })),
+      ],
+      required: declaredRequired,
+    };
   }
-  return { ok: true as const, failing: [], required };
+  return { ok: true as const, failing: [], required: declaredRequired };
 }
 
 function countBscNulls(value: unknown): number {

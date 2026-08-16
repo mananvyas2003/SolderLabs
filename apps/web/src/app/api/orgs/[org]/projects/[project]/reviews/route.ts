@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import { getDb, persist, nowIso } from "@solderlab/db";
 import { getSessionUser } from "@/lib/auth";
-import { assertOrgAccess, getProject } from "@/lib/access";
+import { assertOrgAccess, getProject, getMainBranch } from "@/lib/access";
 import { ensureDb } from "@/lib/ensure-db";
+import { reviewDto } from "@/lib/review-dto";
 
 export async function GET(
   _req: Request,
@@ -23,7 +24,9 @@ export async function GET(
   const list = getDb()
     .designReviews.filter((r) => r.projectId === project.id)
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-  return NextResponse.json({ reviews: list });
+  return NextResponse.json({
+    reviews: list.map((r) => reviewDto(r, getDb())),
+  });
 }
 
 export async function POST(
@@ -54,6 +57,7 @@ export async function POST(
   const number =
     db.designReviews.filter((r) => r.projectId === project.id).length + 1;
   const id = nanoid();
+  const branch = getMainBranch(project.id);
   db.designReviews.push({
     id,
     projectId: project.id,
@@ -64,6 +68,7 @@ export async function POST(
     headRevisionId: body.headRevisionId,
     state: "open",
     authorId: user.id,
+    targetBranchId: branch?.id ?? null,
     createdAt: nowIso(),
     mergedAt: null,
   });

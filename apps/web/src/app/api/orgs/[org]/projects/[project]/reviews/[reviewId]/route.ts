@@ -8,6 +8,7 @@ import { ensureDb } from "@/lib/ensure-db";
 import { can } from "@/lib/rbac";
 import { revisionChecksPassing } from "@/lib/revisions";
 import { logActivity } from "@/lib/activity";
+import { checkDto, reviewDto, validApprovals } from "@/lib/review-dto";
 
 export async function GET(
   _req: Request,
@@ -31,7 +32,31 @@ export async function GET(
   if (!review) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const thread = db.comments.filter((c) => c.reviewId === reviewId);
   const checks = db.checkRuns.filter((c) => c.revisionId === review.headRevisionId);
-  return NextResponse.json({ review, comments: thread, checks, role: membership.role });
+  return NextResponse.json({
+    review: reviewDto(review, db),
+    comments: thread.map((c) => ({
+      id: c.id,
+      body: c.body,
+      createdAt: c.createdAt,
+      parentId: c.parentId,
+      anchorKind: c.anchorKind,
+      anchorRef: c.anchorRef,
+      anchorUuid: c.anchorUuid,
+      author: {
+        name: db.users.find((u) => u.id === c.authorId)?.name ?? "Unknown",
+      },
+    })),
+    checks: checks.map(checkDto),
+    approvals: validApprovals(db, reviewId, review.headRevisionId).map((a) => ({
+      state: a.state,
+      createdAt: a.createdAt,
+      headRevisionSha: a.headRevisionSha,
+      author: {
+        name: db.users.find((u) => u.id === a.userId)?.name ?? "Unknown",
+      },
+    })),
+    role: membership.role,
+  });
 }
 
 export async function POST(
@@ -124,7 +149,23 @@ export async function POST(
     if (!can(membership.role, "review.approve")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-    review.state = "approved";
+    if (user.id === review.authorId) {
+      return NextResponse.json(
+        { error: "Authors cannot approve their own review" },
+        { status: 409 },
+      );
+    }
+    db.reviewApprovals.push({
+      id: nanoid(),
+      reviewId,
+      userId: user.id,
+      state: "approved",
+      headRevisionSha: review.headRevisionId,
+      createdAt: nowIso(),
+    });
+    const needed = project.requiredApprovals ?? 1;
+    const n = validApprovals(db, reviewId, review.headRevisionId).length;
+    if (n >= needed) review.state = "approved";
     persist();
     logActivity({
       orgId: org.id,
@@ -141,6 +182,14 @@ export async function POST(
     if (!can(membership.role, "review.approve")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
+    db.reviewApprovals.push({
+      id: nanoid(),
+      reviewId,
+      userId: user.id,
+      state: "changes_requested",
+      headRevisionSha: review.headRevisionId,
+      createdAt: nowIso(),
+    });
     review.state = "changes_requested";
     persist();
     return NextResponse.json({ state: "changes_requested" });
@@ -150,11 +199,15 @@ export async function POST(
     if (!can(membership.role, "review.merge")) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
-    if (project.requireApproval && review.state !== "approved") {
-      return NextResponse.json(
-        { error: "Approval required before merge" },
-        { status: 409 },
-      );
+    if (project.requireApproval) {
+      const needed = project.requiredApprovals ?? 1;
+      const n = validApprovals(db, reviewId, review.headRevisionId).length;
+      if (n < needed) {
+        return NextResponse.json(
+          { error: `Need ${needed} approval(s) on the current head` },
+          { status: 409 },
+        );
+      }
     }
     const gate = revisionChecksPassing(project.id, review.headRevisionId);
     if (!gate.ok) {
@@ -171,9 +224,14 @@ export async function POST(
     }
     review.state = "merged";
     review.mergedAt = nowIso();
-    for (const b of db.branches.filter((x) => x.projectId === project.id)) {
-      b.headRevisionId = review.headRevisionId;
-    }
+    const target = db.branches.find(
+      (b) =>
+        b.projectId === project.id &&
+        (review.targetBranchId
+          ? b.id === review.targetBranchId
+          : b.name === project.defaultBranch),
+    );
+    if (target) target.headRevisionId = review.headRevisionId;
     persist();
     const opened = new Date(review.createdAt).getTime();
     const merged = new Date(review.mergedAt).getTime();

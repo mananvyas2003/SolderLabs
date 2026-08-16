@@ -1,0 +1,4 @@
+{
+  "_comment": "Nets whose membership may differ from kicad-cli. Must shrink: CI fails if a listed pair is no longer a mismatch, and fails if a new mismatch appears. Format: projectId/netName",
+  "allowed": []
+}

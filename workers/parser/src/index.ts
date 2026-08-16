@@ -19,7 +19,14 @@ export {
   parseKicadProjectDirHierarchical,
   discoverProjectRoots,
 };
-export { resolveConnectivity } from "./connectivity";
+export {
+  classifyNet,
+  expandBusMembers,
+  isPowerFlagComponent,
+  normalizeNetName,
+  resolveConnectivity,
+  unescapeKiCadNetName,
+} from "./connectivity";
 export * from "./pcb";
 export * from "./libs";
 
@@ -79,16 +86,20 @@ export function parseKicadSchematicText(src: string): DesignSnapshot {
       labelNames.add(m[1]!);
     for (const m of src.matchAll(/\(hierarchical_label\s+"([^"]+)"/g))
       labelNames.add(m[1]!);
-    nets = [...labelNames].sort().map((name) => ({
-      name,
-      class: /GND/i.test(name)
+    nets = [...labelNames].sort().map((name) => {
+      const canonical = name.replace(/\{slash\}/gi, "/").replace(/~\{([^}]*)\}/g, "$1");
+      const cls = /GND|VSS/i.test(canonical)
         ? ("ground" as const)
-        : /^(VCC|VDD)/i.test(name)
+        : /(VCC|VDD|VBUS)/i.test(canonical)
           ? ("power" as const)
-          : ("signal" as const),
-      nodes: [] as string[],
-      isNamed: true,
-    }));
+          : ("signal" as const);
+      return {
+        name: canonical,
+        class: cls,
+        nodes: [] as string[],
+        isNamed: true,
+      };
+    });
   }
 
   return {

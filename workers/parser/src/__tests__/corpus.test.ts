@@ -4,28 +4,28 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseKicadProjectDir } from "../index.ts";
-import { countProjectInstances } from "../instance-count.ts";
+import {
+  exportNetlistWithKicadCli,
+  findKicadCli,
+  parseKicadExportNetlist,
+  schematicPathFromProjectRoot,
+} from "../kicad-netlist-oracle.ts";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../../../../");
 const corpusRoot = path.join(repoRoot, "fixtures/corpus");
 const manifestPath = path.join(corpusRoot, "manifest.json");
+const exclusionsPath = path.join(here, "netlist-exclusions.json");
 
 interface ManifestRev {
   label: string;
   status: string;
   path: string;
-  componentCount: number;
-  instanceCount?: number;
-  instanceCountNonPower?: number;
-  sheetCount: number;
-  oracle?: string;
 }
 
 interface ManifestProject {
   id: string;
   revisions: ManifestRev[];
-  primary?: { componentCount: number; sheetCount: number };
 }
 
 function pickRevision(p: ManifestProject): ManifestRev | null {
@@ -34,151 +34,105 @@ function pickRevision(p: ManifestProject): ManifestRev | null {
   return p.revisions.find((r) => r.status === "ok") ?? null;
 }
 
-test("corpus hierarchical parse vs instance oracle", async (t) => {
+function nodeSet(nodes: string[]): string {
+  return [...nodes].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).join(",");
+}
+
+test("corpus net membership equals kicad-cli export netlist", async (t) => {
+  const required = Boolean(process.env.CI || process.env.CORPUS_REQUIRED);
   if (!fs.existsSync(manifestPath)) {
+    if (required) {
+      assert.fail("fixtures/corpus/manifest.json missing — run corpus:fetch");
+    }
     t.skip("manifest.json missing — run npm run corpus:fetch");
     return;
   }
-  const manifest = JSON.parse(
-    fs.readFileSync(manifestPath, "utf8"),
-  ) as { projects: ManifestProject[] };
-
-  type Row = {
-    project: string;
-    components: number;
-    oracle: number;
-    nets: number;
-    sheets: number;
-    parseMs: number;
-    nullUuid: number;
-    pinsMissingNet: number;
-    ok: boolean;
-    note: string;
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as {
+    projects: ManifestProject[];
   };
-  const rows: Row[] = [];
-
+  const missing: string[] = [];
+  const picked: Array<{ id: string; abs: string }> = [];
   for (const p of manifest.projects) {
     const rev = pickRevision(p);
     if (!rev) {
-      rows.push({
-        project: p.id,
-        components: 0,
-        oracle: 0,
-        nets: 0,
-        sheets: 0,
-        parseMs: 0,
-        nullUuid: 0,
-        pinsMissingNet: 0,
-        ok: false,
-        note: "no ok revision",
-      });
+      missing.push(`${p.id}: no ok revision`);
       continue;
     }
     const abs = path.resolve(repoRoot, rev.path);
-    if (!fs.existsSync(abs)) {
-      rows.push({
-        project: p.id,
-        components: 0,
-        oracle: rev.instanceCount ?? rev.componentCount,
-        nets: 0,
-        sheets: 0,
-        parseMs: 0,
-        nullUuid: 0,
-        pinsMissingNet: 0,
-        ok: false,
-        note: "path missing — run corpus:fetch",
-      });
-      continue;
+    if (!fs.existsSync(abs)) missing.push(`${p.id}: path missing (${rev.path})`);
+    else picked.push({ id: p.id, abs });
+  }
+  if (missing.length) {
+    if (required) {
+      assert.fail(`corpus incomplete:\n${missing.join("\n")}`);
     }
-    const t0 = performance.now();
-    let snap;
-    try {
-      snap = parseKicadProjectDir(abs);
-    } catch (e) {
-      rows.push({
-        project: p.id,
-        components: 0,
-        oracle: rev.instanceCount ?? rev.componentCount,
-        nets: 0,
-        sheets: 0,
-        parseMs: Math.round(performance.now() - t0),
-        nullUuid: 0,
-        pinsMissingNet: 0,
-        ok: false,
-        note: String((e as Error).message ?? e),
-      });
-      continue;
-    }
-    const parseMs = Math.round(performance.now() - t0);
-    const ind = countProjectInstances(abs);
-    const oracle = ind.total;
-    const nullUuid = snap.components.filter((c) => !c.uuid).length;
-    let pinsMissingNet = 0;
-    for (const c of snap.components) {
-      for (const pin of c.pins ?? []) {
-        if (!pin.net) pinsMissingNet++;
-      }
-    }
-    const bare = snap.components.filter(
-      (c) => !c.refdes.startsWith("#") && !(c.pins && c.pins.length),
-    ).length;
-
-    rows.push({
-      project: p.id,
-      components: snap.components.length,
-      oracle,
-      nets: snap.nets.length,
-      sheets: snap.sheets.length,
-      parseMs,
-      nullUuid,
-      pinsMissingNet: pinsMissingNet + bare,
-      ok:
-        snap.components.length === oracle &&
-        nullUuid === 0 &&
-        pinsMissingNet === 0 &&
-        bare === 0,
-      note: snap.meta.projectRoot ?? "",
-    });
+    t.skip(`corpus incomplete (${missing.length} boards) — run npm run corpus:fetch`);
+    return;
   }
 
-  console.log(
-    "\nproject                          comps oracle   nets sheets   ms nullUuid pinGap  ok  root",
+  const kicadRequired = Boolean(
+    process.env.CI || process.env.CORPUS_REQUIRE_KICAD,
   );
-  console.log("-".repeat(110));
-  for (const r of rows) {
-    console.log(
-      [
-        r.project.padEnd(32),
-        String(r.components).padStart(5),
-        String(r.oracle).padStart(6),
-        String(r.nets).padStart(6),
-        String(r.sheets).padStart(6),
-        String(r.parseMs).padStart(5),
-        String(r.nullUuid).padStart(8),
-        String(r.pinsMissingNet).padStart(6),
-        r.ok ? " ✓" : " ✗",
-        r.note,
-      ].join(" "),
-    );
+  if (!findKicadCli()) {
+    if (kicadRequired) {
+      assert.fail("kicad-cli is required for corpus net membership (set KICAD_CLI)");
+    }
+    t.skip("kicad-cli not installed — skipping netlist oracle");
+    return;
   }
-  console.log("");
 
-  for (const r of rows) {
-    if (r.note.includes("path missing") || r.note === "no ok revision") {
-      // Soft-skip unfetched boards so `npm test` works without 2.3GB corpus
+  const exclusions = JSON.parse(fs.readFileSync(exclusionsPath, "utf8")) as {
+    allowed: string[];
+  };
+  const allowed = new Set(exclusions.allowed);
+  const mismatches: string[] = [];
+  const stale: string[] = [];
+
+  for (const p of picked) {
+    const snap = parseKicadProjectDir(p.abs);
+    const sch = schematicPathFromProjectRoot(p.abs, snap.meta.projectRoot);
+    if (!sch) {
+      mismatches.push(`${p.id}: no schematic path from projectRoot=${snap.meta.projectRoot}`);
       continue;
     }
-    assert.notEqual(r.note.includes("fail") && r.components === 0, true, `${r.project}: ${r.note}`);
-    assert.equal(r.nullUuid, 0, `${r.project}: components with null UUID`);
-    assert.equal(
-      r.pinsMissingNet,
-      0,
-      `${r.project}: pins without net (or bare components)`,
-    );
-    assert.equal(
-      r.components,
-      r.oracle,
-      `${r.project}: parser ${r.components} != hierarchical instance oracle ${r.oracle}`,
-    );
+    let oracle: Map<string, string[]>;
+    try {
+      oracle = parseKicadExportNetlist(exportNetlistWithKicadCli(sch));
+    } catch (e) {
+      mismatches.push(`${p.id}: kicad-cli ${String((e as Error).message ?? e)}`);
+      continue;
+    }
+
+    const ours = new Map<string, string[]>();
+    for (const n of snap.nets) {
+      const prev = ours.get(n.name) ?? [];
+      ours.set(
+        n.name,
+        [...new Set([...prev, ...n.nodes])].sort((a, b) =>
+          a.localeCompare(b, undefined, { numeric: true }),
+        ),
+      );
+    }
+
+    const names = new Set([...oracle.keys(), ...ours.keys()]);
+    for (const name of names) {
+      const key = `${p.id}/${name}`;
+      const a = nodeSet(oracle.get(name) ?? []);
+      const b = nodeSet(ours.get(name) ?? []);
+      const differ = a !== b;
+      if (differ && !allowed.has(key)) mismatches.push(key);
+      if (!differ && allowed.has(key)) stale.push(key);
+    }
   }
+
+  assert.equal(
+    stale.length,
+    0,
+    `exclusion list must shrink — these now match kicad-cli, remove them: ${stale.join(", ")}`,
+  );
+  assert.equal(
+    mismatches.length,
+    0,
+    `net membership diverged from kicad-cli (add only if documented and shrinking):\n${mismatches.slice(0, 40).join("\n")}${mismatches.length > 40 ? `\n… +${mismatches.length - 40}` : ""}`,
+  );
 });
