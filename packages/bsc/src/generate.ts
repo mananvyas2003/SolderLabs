@@ -89,88 +89,85 @@ function buildMcuPins(
   mcuRefdes: string,
   boardKey?: string,
 ): BscPin[] {
-  const mcu = snapshot.components.find(
+  const units = snapshot.components.filter(
     (c) =>
       c.refdes === mcuRefdes &&
       (boardKey == null || (c.boardKey ?? "") === boardKey),
   );
-  if (!mcu) return [];
-  const pins: BscPin[] = [];
-
-  if (mcu.pins?.length) {
-    for (const p of mcu.pins) {
-      const notes: ConfidenceNote[] = [];
-      if (!p.net) {
-        notes.push({ field: "net", reason: "Pin has no resolved net" });
+  if (!units.length) return [];
+  const byNumber = new Map<
+    string,
+    { number: string; name: string; net: string }
+  >();
+  for (const mcu of units) {
+    for (const p of mcu.pins ?? []) {
+      const prev = byNumber.get(p.number);
+      if (!prev) {
+        byNumber.set(p.number, {
+          number: p.number,
+          name: p.name,
+          net: p.net || "",
+        });
+      } else if (!prev.net && p.net) {
+        prev.net = p.net;
+        if (p.name && p.name !== "~") prev.name = p.name;
       }
-      notes.push({
-        field: "function",
-        reason: "Pin mux / alternate function not in schematic; left null",
-      });
-      notes.push({
-        field: "direction",
-        reason: "Electrical direction not reliably in snapshot; left null",
-      });
-      notes.push({
-        field: "pullState",
-        reason: "Pull-up/down not encoded on pin; left null",
-      });
-      pins.push({
-        mcuRefdes,
-        pinNumber: p.number,
-        pinName: p.name && p.name !== "~" ? p.name : null,
-        net: p.net || null,
-        function: null,
-        connectedTo: p.net
-          ? connectedToOnNet(snapshot, p.net, mcuRefdes, p.number)
-          : [],
-        direction: null,
-        pullState: null,
-        confidenceNotes: notes,
-      });
     }
-  } else {
-    // Fall back to net nodes mentioning this MCU — still don't invent pin names beyond pad#
+  }
+  // Fall back to netlist nodes if symbol bodies carried no pins
+  if (!byNumber.size) {
     const prefix = `${mcuRefdes}.`;
     for (const net of snapshot.nets) {
+      if (boardKey != null && (net.boardKey ?? "") !== boardKey) continue;
       for (const node of net.nodes) {
         if (!node.startsWith(prefix)) continue;
         const pinNumber = node.slice(prefix.length);
-        pins.push({
-          mcuRefdes,
-          pinNumber,
-          pinName: null,
-          net: net.name,
-          function: null,
-          connectedTo: connectedToOnNet(snapshot, net.name, mcuRefdes, pinNumber),
-          direction: null,
-          pullState: null,
-          confidenceNotes: [
-            {
-              field: "pinName",
-              reason: "Symbol pin list empty; only pad number from netlist",
-            },
-            {
-              field: "function",
-              reason: "Pin mux / alternate function not in schematic; left null",
-            },
-            {
-              field: "direction",
-              reason: "Electrical direction not reliably in snapshot; left null",
-            },
-            {
-              field: "pullState",
-              reason: "Pull-up/down not encoded on pin; left null",
-            },
-          ],
-        });
+        if (!byNumber.has(pinNumber)) {
+          byNumber.set(pinNumber, {
+            number: pinNumber,
+            name: "~",
+            net: net.name,
+          });
+        }
       }
     }
   }
 
-  return pins.sort((a, b) =>
-    a.pinNumber.localeCompare(b.pinNumber, undefined, { numeric: true }),
-  );
+  const pins: BscPin[] = [];
+  for (const p of [...byNumber.values()].sort((a, b) =>
+    a.number.localeCompare(b.number, undefined, { numeric: true }),
+  )) {
+    const notes: ConfidenceNote[] = [];
+    if (!p.net) {
+      notes.push({ field: "net", reason: "Pin has no resolved net" });
+    }
+    notes.push({
+      field: "function",
+      reason: "Pin mux / alternate function not in schematic; left null",
+    });
+    notes.push({
+      field: "direction",
+      reason: "Electrical direction not reliably in snapshot; left null",
+    });
+    notes.push({
+      field: "pullState",
+      reason: "Pull-up/down not encoded on pin; left null",
+    });
+    pins.push({
+      mcuRefdes,
+      pinNumber: p.number,
+      pinName: p.name && p.name !== "~" ? p.name : null,
+      net: p.net || null,
+      function: null,
+      connectedTo: p.net
+        ? connectedToOnNet(snapshot, p.net, mcuRefdes, p.number)
+        : [],
+      direction: null,
+      pullState: null,
+      confidenceNotes: notes,
+    });
+  }
+  return pins;
 }
 
 /**
@@ -189,12 +186,7 @@ export function generateBSC(
   const busDevices = [...i2cBusRule.match(ctx), ...spiBusRule.match(ctx)].sort(
     (a, b) => a.refdes.localeCompare(b.refdes, undefined, { numeric: true }),
   );
-  const railSeen = new Set<string>();
-  const powerRails = powerRailRule.match(ctx).filter((r) => {
-    if (railSeen.has(r.name)) return false;
-    railSeen.add(r.name);
-    return true;
-  });
+  const powerRails = powerRailRule.match(ctx);
   const testPoints = testPointRule.match(ctx);
   const connectors = connectorRule.match(ctx);
   const revStraps = revStrapRule.match(ctx);

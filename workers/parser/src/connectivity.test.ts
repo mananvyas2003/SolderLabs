@@ -198,6 +198,80 @@ test("PCB-only project emits empty nets with a warning", () => {
   assert.ok(snap.warnings?.some((w) => w.code === "pcb-only"));
 });
 
+test("lookupLibPins merges unit-0 shared pins and body style _0", async () => {
+  const { lookupLibPins, extractLibSymbolsPins } = await import("./connectivity.ts");
+  const src = `
+(kicad_sch
+  (lib_symbols
+    (symbol "Vendor:WeirdIC"
+      (symbol "WeirdIC_0_0"
+        (pin passive line (at 0 2.54 270) (length 2.54)
+          (name "GND" (effects (font (size 1.27 1.27))))
+          (number "1" (effects (font (size 1.27 1.27))))
+        )
+      )
+      (symbol "WeirdIC_1_0"
+        (pin passive line (at 0 -2.54 90) (length 2.54)
+          (name "VDD" (effects (font (size 1.27 1.27))))
+          (number "2" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+  )
+)
+`;
+  const map = extractLibSymbolsPins(src);
+  const pins = lookupLibPins(map, "Vendor:WeirdIC", 1);
+  assert.equal(pins?.length, 2);
+  assert.ok(pins?.some((p) => p.number === "1" && p.name === "GND"));
+  assert.ok(pins?.some((p) => p.number === "2" && p.name === "VDD"));
+});
+
+test("mirror y flips capacitor pin world positions onto the correct net", () => {
+  const src = `
+(kicad_sch
+  (lib_symbols
+    (symbol "Device:C_Small"
+      (symbol "C_Small_1_1"
+        (pin passive line (at 0 2.54 270) (length 2.032)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "1" (effects (font (size 1.27 1.27))))
+        )
+        (pin passive line (at 0 -2.54 90) (length 2.032)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "2" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+  )
+  (wire (pts (xy 0 2.54) (xy 5 2.54)))
+  (wire (pts (xy 0 -2.54) (xy 5 -2.54)))
+  (symbol (lib_id "Device:C_Small") (at 0 0 0) (unit 1) (mirror y)
+    (property "Reference" "C9" (at 0 0 0))
+    (property "Value" "100n" (at 0 0 0))
+  )
+  (symbol (lib_id "power:GND") (at 5 2.54 0) (unit 1)
+    (property "Reference" "#PWR1" (at 5 2.54 0))
+    (property "Value" "GND" (at 5 2.54 0))
+  )
+  (symbol (lib_id "power:VDD") (at 5 -2.54 0) (unit 1)
+    (property "Reference" "#PWR2" (at 5 -2.54 0))
+    (property "Value" "VDD" (at 5 -2.54 0))
+  )
+)
+`;
+  // Without mirror, pin1 is at +y (GND). With mirror y on a vertical pin pair,
+  // X flips are no-ops; use mirror x so pin1 (+y) maps to -y (VDD side).
+  const srcX = src.replace("(mirror y)", "(mirror x)");
+  const snap = parseKicadSchematicText(srcX);
+  const c9 = snap.components.find((c) => c.refdes === "C9");
+  assert.equal(c9?.mirror, "x");
+  const p1 = c9?.pins?.find((p) => p.number === "1");
+  const p2 = c9?.pins?.find((p) => p.number === "2");
+  assert.equal(p1?.net, "VDD", `pin1 net=${p1?.net}`);
+  assert.equal(p2?.net, "GND", `pin2 net=${p2?.net}`);
+});
+
 test("sheetId is namespaced with board key on single- and multi-board paths", () => {
   const sch = fs.readFileSync(path.join(root, "r1/blinky.kicad_sch"), "utf8");
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "solderlab-sheetid-"));

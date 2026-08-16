@@ -44,6 +44,11 @@ function parseComponent(block: string): SnapshotComponent | null {
   const libId = extractQuoted(block, "lib_id");
   const uuid = extractUuid(block);
   const at = block.match(/\(at\s+([-\d.]+)\s+([-\d.]+)(?:\s+([-\d.]+))?/);
+  const unit = Number(block.match(/\(unit\s+(\d+)\)/)?.[1] ?? 1);
+  const mirrorX = /\(mirror\s+x\)/.test(block);
+  const mirrorY = /\(mirror\s+y\)/.test(block);
+  const mirror =
+    mirrorX && mirrorY ? "xy" : mirrorX ? "x" : mirrorY ? "y" : undefined;
   return {
     refdes,
     value,
@@ -55,9 +60,11 @@ function parseComponent(block: string): SnapshotComponent | null {
     sheetId: "root",
     sheetPath: "/root",
     libraryStatus: "ok",
+    unit,
     x: at ? Number(at[1]) : undefined,
     y: at ? Number(at[2]) : undefined,
     rotation: at?.[3] != null ? Number(at[3]) : 0,
+    mirror,
   };
 }
 

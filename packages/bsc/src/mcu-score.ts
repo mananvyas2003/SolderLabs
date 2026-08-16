@@ -175,14 +175,34 @@ function skipComponent(c: SnapshotComponent): boolean {
 }
 
 function uniqueIcs(snapshot: DesignSnapshot): SnapshotComponent[] {
-  const best = new Map<string, SnapshotComponent>();
+  const groups = new Map<string, SnapshotComponent[]>();
   for (const c of snapshot.components) {
     if (skipComponent(c)) continue;
     const k = compKey(c);
-    const prev = best.get(k);
-    if (!prev || pinCount(c) > pinCount(prev)) best.set(k, c);
+    const list = groups.get(k) ?? [];
+    list.push(c);
+    groups.set(k, list);
   }
-  return [...best.values()];
+  const out: SnapshotComponent[] = [];
+  for (const [, units] of groups) {
+    const byNumber = new Map<string, NonNullable<SnapshotComponent["pins"]>[number]>();
+    let best = units[0]!;
+    for (const u of units) {
+      if (pinCount(u) > pinCount(best)) best = u;
+      for (const p of u.pins ?? []) {
+        const prev = byNumber.get(p.number);
+        if (!prev) byNumber.set(p.number, { ...p });
+        else if (!prev.net && p.net) byNumber.set(p.number, { ...p });
+      }
+    }
+    out.push({
+      ...best,
+      pins: [...byNumber.values()].sort((a, b) =>
+        a.number.localeCompare(b.number, undefined, { numeric: true }),
+      ),
+    });
+  }
+  return out;
 }
 
 function nodeRef(node: string): string | null {

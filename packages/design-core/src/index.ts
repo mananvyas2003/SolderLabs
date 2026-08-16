@@ -320,8 +320,8 @@ export function diffSnapshots(
   const significant = components.filter((c) => c.kind !== "unchanged");
   const netSig = nets.filter((n) => n.kind !== "unchanged");
   const electrical = semanticDiff(
-    { ...base, components: baseComps },
-    { ...head, components: headComps },
+    { ...base, components: baseComps, nets: baseNets },
+    { ...head, components: headComps, nets: headNets },
     cfg,
   );
 

@@ -148,6 +148,7 @@ function parseComponentBlock(
       string,
       Array<{ number: string; name: string; x: number; y: number }>
     >;
+    unit?: number;
   },
 ): SnapshotComponent | null {
   if (!ctx.refdes || ctx.refdes.endsWith("?")) return null;
@@ -161,6 +162,10 @@ function parseComponentBlock(
   const libId = extractQuoted(block, "lib_id");
   const uuid = extractUuid(block);
   const at = block.match(/\(at\s+([-\d.]+)\s+([-\d.]+)(?:\s+([-\d.]+))?/);
+  const mirrorX = /\(mirror\s+x\)/.test(block);
+  const mirrorY = /\(mirror\s+y\)/.test(block);
+  const mirror =
+    mirrorX && mirrorY ? "xy" : mirrorX ? "x" : mirrorY ? "y" : undefined;
   const libRes = resolveLibId(
     libId,
     ctx.libTables,
@@ -187,9 +192,11 @@ function parseComponentBlock(
     sheetId: ctx.sheetId,
     sheetPath: ctx.sheetPath,
     libraryStatus: libRes.status === "unresolved" ? "unresolved" : "ok",
+    unit: ctx.unit,
     x: at ? Number(at[1]) : undefined,
     y: at ? Number(at[2]) : undefined,
     rotation: at?.[3] != null ? Number(at[3]) : 0,
+    mirror,
   };
 }
 
@@ -215,12 +222,14 @@ function componentsForSheetInstance(
     if (matching.length) {
       const seen = new Set<string>();
       for (const inst of matching) {
-        if (seen.has(inst.reference)) continue;
-        seen.add(inst.reference);
+        const key = `${inst.reference}\0${inst.unit}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
         const c = parseComponentBlock(block, {
           sheetId,
           sheetPath,
           refdes: inst.reference,
+          unit: inst.unit,
           libTables,
           projectDir,
           embedded,
@@ -230,10 +239,12 @@ function componentsForSheetInstance(
         if (c) out.push(c);
       }
     } else if (defaultRef) {
+      const unit = Number(block.match(/\(unit\s+(\d+)\)/)?.[1] ?? 1);
       const c = parseComponentBlock(block, {
         sheetId,
         sheetPath,
         refdes: defaultRef,
+        unit,
         libTables,
         projectDir,
         embedded,

@@ -72,9 +72,17 @@ for (const n of noMcu) {
 
 console.log("\n=== B4 pin counts ===");
 console.log(JSON.stringify(b4, null, 2));
-if (b4["vme-wren"] !== 2352) {
-  console.log("B4 FAIL vme-wren pins", b4["vme-wren"], "expected 2352");
+if (b4["vme-wren"] !== 784) {
+  console.log("B4 FAIL vme-wren pins", b4["vme-wren"], "expected 784 (SFVC784 unique balls)");
   process.exit(1);
+}
+if (b4["jetson-agx-thor-baseboard"] != null && b4["jetson-agx-thor-baseboard"] > 0) {
+  // Graphics-only SoM symbol — emitting pins/MCU here is a false positive.
+  console.log(
+    "B4 WARN jetson pins",
+    b4["jetson-agx-thor-baseboard"],
+    "(expected 0 — SoM body has no extractable pins)",
+  );
 }
 
 function timeParse(name) {

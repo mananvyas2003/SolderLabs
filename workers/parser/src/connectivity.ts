@@ -27,11 +27,17 @@ function transformLocal(
   ax: number,
   ay: number,
   rotDeg: number,
+  mirror?: "x" | "y" | "xy",
 ): Pt {
+  let x = lx;
+  let y = ly;
+  // KiCad applies mirror before rotation.
+  if (mirror === "y" || mirror === "xy") x = -x;
+  if (mirror === "x" || mirror === "xy") y = -y;
   const r = (rotDeg * Math.PI) / 180;
   const c = Math.cos(r);
   const s = Math.sin(r);
-  return { x: ax + lx * c - ly * s, y: ay + lx * s + ly * c };
+  return { x: ax + x * c - y * s, y: ay + x * s + y * c };
 }
 
 /** Common KiCad symbol pin endpoints (local coords) when lib_symbols absent */
@@ -142,40 +148,74 @@ export function extractLibSymbolsPins(src: string): Map<string, LibPinDef[]> {
   return map;
 }
 
-function lookupLibPins(
-  libPins: Map<
-    string,
-    Array<{ number: string; name: string; x: number; y: number }>
-  >,
-  libId: string,
-): Array<{ number: string; name: string; x: number; y: number }> | undefined {
-  if (!libId) return undefined;
-  const direct = libPins.get(libId);
-  if (direct?.length) return direct;
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
 
-  // KiCad unit sub-symbols are often "Part_1_1" without the "Lib:" nickname
-  const short = libId.includes(":") ? libId.slice(libId.indexOf(":") + 1) : libId;
-  const merged: Array<{
-    number: string;
-    name: string;
-    x: number;
-    y: number;
-  }> = [];
+/**
+ * Body-style keys for a KiCad unit. Style may be `_1` (normal) or `_0`
+ * (De Morgan / some vendor libs). Unit 0 holds pins shared across units.
+ */
+function libPinKeysForUnit(short: string, libId: string, unit: number): string[] {
+  return [
+    `${short}_${unit}_1`,
+    `${short}_${unit}_0`,
+    `${libId}_${unit}_1`,
+    `${libId}_${unit}_0`,
+  ];
+}
+
+function mergePinsFromKeys(
+  libPins: Map<string, LibPinDef[]>,
+  keys: string[],
+): LibPinDef[] {
+  const merged: LibPinDef[] = [];
   const seen = new Set<string>();
-  for (const [k, pins] of libPins) {
-    if (
-      k === libId ||
-      k === short ||
-      k.startsWith(`${libId}_`) ||
-      k.startsWith(`${short}_`)
-    ) {
-      for (const p of pins) {
-        if (seen.has(p.number)) continue;
-        seen.add(p.number);
-        merged.push(p);
-      }
+  for (const k of keys) {
+    for (const p of libPins.get(k) ?? []) {
+      if (seen.has(p.number)) continue;
+      seen.add(p.number);
+      merged.push(p);
     }
   }
+  return merged;
+}
+
+/**
+ * Pins for a lib_id. When `unit` is set, includes that unit's bodies plus
+ * unit-0 shared pins. Accepts body styles `_N_1` and `_N_0`. Never merges
+ * aliased embeds like `Name_1_5_1`.
+ */
+export function lookupLibPins(
+  libPins: Map<string, LibPinDef[]>,
+  libId: string,
+  unit?: number,
+): LibPinDef[] | undefined {
+  if (!libId) return undefined;
+  const short = libId.includes(":") ? libId.slice(libId.indexOf(":") + 1) : libId;
+  if (unit != null && unit > 0) {
+    const keys = [
+      ...libPinKeysForUnit(short, libId, 0),
+      ...libPinKeysForUnit(short, libId, unit),
+    ];
+    const pins = mergePinsFromKeys(libPins, keys);
+    if (pins.length) return pins;
+  }
+  const direct = libPins.get(libId) ?? libPins.get(short);
+  if (direct?.length) return direct;
+
+  const unitRe = new RegExp(`^${escapeRegExp(short)}_(\\d+)_[01]$`);
+  const unitKeys = [...libPins.keys()]
+    .map((k) => {
+      const m = k.match(unitRe);
+      return m ? { k, u: Number(m[1]) } : null;
+    })
+    .filter((x): x is { k: string; u: number } => Boolean(x))
+    .sort((a, b) => a.u - b.u);
+  const merged = mergePinsFromKeys(
+    libPins,
+    unitKeys.map((x) => x.k),
+  );
   return merged.length ? merged : undefined;
 }
 
@@ -436,7 +476,7 @@ export function resolveConnectivity(
     if (power) {
       powerMeta.set(c.refdes, { libId: c.libId, value: c.value });
     }
-    let pins = lookupLibPins(libPins, libId);
+    let pins = lookupLibPins(libPins, libId, c.unit);
     if (!pins?.length) {
       pins = power
         ? [{ number: "1", name: c.value || "1", x: 0, y: 0 }]
@@ -448,7 +488,7 @@ export function resolveConnectivity(
     const ay = c.y ?? 0;
     const rot = c.rotation ?? 0;
     for (const pin of pins) {
-      const world = transformLocal(pin.x, pin.y, ax, ay, rot);
+      const world = transformLocal(pin.x, pin.y, ax, ay, rot, c.mirror);
       const key = `p:${roundKey(world)}`;
       const pinId = `${c.refdes}.${pin.number}`;
       uf.find(key);

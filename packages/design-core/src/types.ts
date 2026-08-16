@@ -27,11 +27,21 @@ export interface SnapshotComponent {
   uuid?: string;
   /** Set when lib_id could not be resolved via sym-lib-table / embedded libs. */
   libraryStatus?: "ok" | "unresolved";
+  /**
+   * KiCad multi-unit symbol unit index (1-based). Same refdes may appear
+   * once per unit; pin lists are per-unit.
+   */
+  unit?: number;
   pins?: SnapshotPin[];
   /** Optional schematic symbol position for visual diff (mm or schematic units) */
   x?: number;
   y?: number;
   rotation?: number;
+  /**
+   * KiCad instance mirror: `x` flips over the X axis (negates local Y),
+   * `y` flips over the Y axis (negates local X).
+   */
+  mirror?: "x" | "y" | "xy";
   /** Stable key: path of the owning `.kicad_pro` relative to the upload root. */
   boardKey?: string;
 }
