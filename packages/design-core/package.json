@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "tsc --noEmit",
-    "test": "node --import tsx --test src/index.test.ts src/__tests__/identity.test.ts src/__tests__/impact.test.ts src/__tests__/bom-mfg.test.ts src/__tests__/power-diff.test.ts"
+    "test": "node --import tsx --test src/index.test.ts src/__tests__/identity.test.ts src/__tests__/impact.test.ts src/__tests__/bom-mfg.test.ts src/__tests__/power-diff.test.ts src/__tests__/shadow.test.ts src/__tests__/artifacts.test.ts src/__tests__/tier-b.test.ts src/__tests__/output-class.test.ts"
   },
   "devDependencies": {
     "tsx": "^4.19.3",

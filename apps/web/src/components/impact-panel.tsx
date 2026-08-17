@@ -1,11 +1,34 @@
 "use client";
 
-import type { ImpactReport } from "@solderlab/design-core";
+import type { ImpactReport, ClassifiedProposal } from "@solderlab/design-core";
 import { Badge } from "@solderlab/ui";
+import {
+  AdvisoryBanner,
+  ClassBadge,
+  ProposalCard,
+} from "@/components/classified-surface";
 
-export function ImpactPanel({ report }: { report: ImpactReport }) {
+export function ImpactPanel({
+  report,
+  llm,
+  proposals = [],
+}: {
+  report: ImpactReport;
+  llm?: {
+    attempted: boolean;
+    succeeded: boolean;
+    error: string | null;
+  };
+  proposals?: ClassifiedProposal[];
+}) {
   return (
     <div className="space-y-6">
+      {llm?.attempted && !llm.succeeded ? (
+        <p className="border border-dashed border-[var(--border)] p-3 text-sm text-[var(--text-muted)]">
+          AI unavailable — showing deterministic impact only
+          {llm.error ? ` (${llm.error})` : ""}.
+        </p>
+      ) : null}
       <section className="border border-[var(--border)] p-4">
         <p className="text-xs uppercase tracking-[0.18em] text-[var(--text-muted)]">
           ECO draft
@@ -153,7 +176,10 @@ export function ImpactPanel({ report }: { report: ImpactReport }) {
       </section>
 
       <section className="space-y-3">
-        <h3 className="text-sm font-medium">Electrical claims (grounded)</h3>
+        <div className="flex items-center gap-2">
+          <ClassBadge outputClass="verified" />
+          <h3 className="text-sm font-medium">Electrical claims</h3>
+        </div>
         {report.electricalClaims.map((c, i) => (
           <div
             key={`g-${i}`}
@@ -167,6 +193,39 @@ export function ImpactPanel({ report }: { report: ImpactReport }) {
         ))}
         {!report.electricalClaims.length ? (
           <p className="text-sm text-[var(--text-muted)]">No grounded claims</p>
+        ) : null}
+
+        {proposals.length ? (
+          <>
+            <h3 className="pt-2 text-sm font-medium">Proposals</h3>
+            {proposals.map((p, i) => (
+              <ProposalCard key={`p-${p.class}-${i}`} proposal={p} />
+            ))}
+          </>
+        ) : null}
+
+        {(report.advisoryClaims ?? []).length ? (
+          <div className="space-y-2 pt-2">
+            <div className="flex items-center gap-2">
+              <ClassBadge outputClass="advisory" />
+              <h3 className="text-sm font-medium">Advisory</h3>
+            </div>
+            <AdvisoryBanner />
+            {(report.advisoryClaims ?? []).map((c, i) => (
+              <div
+                key={`a-${i}`}
+                className="border border-dashed border-[var(--border)] p-3 text-sm"
+              >
+                <p>{c.text}</p>
+                <p className="mt-1 font-mono text-[10px] text-[var(--text-muted)]">
+                  {c.type ?? "advisory"}
+                  {c.citations.length
+                    ? ` · ${c.citations.map((x) => `${x.kind}:${x.ref}`).join(" · ")}`
+                    : ""}
+                </p>
+              </div>
+            ))}
+          </div>
         ) : null}
 
         {report.unverifiedClaims.length ? (

@@ -1,4 +1,4 @@
-import type { DesignSnapshot } from "@solderlab/design-core";
+import { cloneSnapshot, type DesignSnapshot } from "@solderlab/design-core";
 import { generateBSC } from "@solderlab/bsc";
 import { sanitizeUntrustedValue } from "./sanitize.ts";
 
@@ -30,7 +30,7 @@ export function buildBoardCard(
   snapshot: DesignSnapshot,
   opts: { board?: string; revision?: string } = {},
 ): BoardCard {
-  const bsc = generateBSC(snapshot, {
+  const bsc = generateBSC(cloneSnapshot(snapshot), {
     boardName: opts.board,
     revisionId: opts.revision ?? null,
   });

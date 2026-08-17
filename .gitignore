@@ -15,6 +15,7 @@ apps/web/public/uploads
 .vercel
 coverage
 .design-refs/
+artifacts/
 
 # Real KiCad corpus (fetched locally / in CI when needed). Keep goldens + manifest.
 fixtures/corpus/**

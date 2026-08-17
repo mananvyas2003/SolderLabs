@@ -4,6 +4,9 @@ import { arg, flag, printUsage } from "./args";
 import { cmdBscPull } from "./bsc-pull";
 import { cmdBscCheck } from "./bsc-check";
 import { cmdDiff } from "./diff";
+import { cmdFirmwarePatch } from "./firmware-patch";
+import { cmdSynthesize } from "./synthesize";
+import { cmdAudit } from "./audit";
 
 async function cmdPush(argv: string[]): Promise<number> {
   const base = process.env.SOLDERLAB_URL ?? "http://localhost:3000";
@@ -83,6 +86,24 @@ async function main() {
 
   if (cmd === "diff") {
     process.exit(await cmdDiff(argv.slice(1), cwd));
+  }
+
+  if (cmd === "synthesize") {
+    process.exit(await cmdSynthesize(argv.slice(1), cwd));
+  }
+
+  if (cmd === "audit") {
+    process.exit(await cmdAudit(argv.slice(1), cwd));
+  }
+
+  if (cmd === "firmware") {
+    const sub = argv[1];
+    if (sub === "patch") {
+      process.exit(await cmdFirmwarePatch(argv.slice(2), cwd));
+    }
+    console.error("Usage: solderlab firmware patch [--scan src] [--out-dir dir] [--compile] [--apply]");
+    printUsage();
+    process.exit(1);
   }
 
   if (cmd === "bsc") {

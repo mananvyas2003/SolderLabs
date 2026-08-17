@@ -18,6 +18,21 @@ const corpusRoot = path.join(repoRoot, "fixtures/corpus");
 const manifestPath = path.join(corpusRoot, "manifest.json");
 const exclusionsPath = path.join(here, "netlist-exclusions.json");
 
+test("AI-0: pinset mismatch budgets stay under 300", () => {
+  const exclusions = JSON.parse(fs.readFileSync(exclusionsPath, "utf8")) as {
+    pinsetMismatchBudget?: Record<string, number>;
+  };
+  const budget = exclusions.pinsetMismatchBudget ?? {};
+  const entries = Object.entries(budget);
+  assert.ok(entries.length > 0, "pinsetMismatchBudget missing");
+  for (const [id, n] of entries) {
+    assert.ok(
+      n < 300,
+      `${id} pinset budget ${n} is not under 300`,
+    );
+  }
+});
+
 interface ManifestRev {
   label: string;
   status: string;

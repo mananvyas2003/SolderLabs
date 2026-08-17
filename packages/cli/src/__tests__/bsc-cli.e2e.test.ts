@@ -143,3 +143,99 @@ test("bsc check exits 0 when registry matches lock", () => {
   assert.equal(check.status, 0, check.stderr || check.stdout);
   assert.match(check.stdout, /OK/);
 });
+
+test("firmware patch compiles and bsc check passes after SDA reassignment", () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "solderlab-fw-patch-"));
+  const registry = path.join(tmp, "registry");
+  const consumer = path.join(tmp, "consumer");
+  const shadow = path.join(tmp, "shadow");
+  fs.mkdirSync(registry);
+  fs.mkdirSync(path.join(consumer, "src"), { recursive: true });
+  fs.mkdirSync(path.join(consumer, "include"), { recursive: true });
+
+  const baseline = JSON.parse(
+    fs.readFileSync(glasgowSrc, "utf8"),
+  ) as BoardSupportContract;
+  fs.writeFileSync(
+    path.join(registry, "glasgow.bsc.json"),
+    JSON.stringify(baseline, null, 2),
+  );
+  fs.writeFileSync(
+    path.join(consumer, "src/main.c"),
+    `#include "board.h"
+#define APP_SDA 16 /* SDA */
+int main(void) {
+  return APP_SDA + SOLDERLAB_PIN_SCL;
+}
+`,
+  );
+
+  const pull = runCli(
+    [
+      "bsc",
+      "pull",
+      "--board",
+      "glasgow",
+      "--rev",
+      "newer",
+      "--out",
+      "include",
+      "--format",
+      "c",
+      "--registry",
+      registry,
+    ],
+    consumer,
+  );
+  assert.equal(pull.status, 0, pull.stderr || pull.stdout);
+
+  const broken: BoardSupportContract = structuredClone(baseline);
+  const sda = broken.pins.find(
+    (p) => p.pinName && /SDA/i.test(p.pinName),
+  );
+  assert.ok(sda, "expected SDA pin");
+  sda.net = "HIJACKED_SDA_NET";
+  broken.revision = "broken";
+  broken.generatedFrom = {
+    ...broken.generatedFrom,
+    sha256: "b".repeat(64),
+    revisionId: "e2e-fw-patch",
+  };
+  fs.writeFileSync(
+    path.join(registry, "glasgow.bsc.json"),
+    JSON.stringify(broken, null, 2),
+  );
+
+  const report = path.join(tmp, "report.json");
+  const patch = runCli(
+    [
+      "firmware",
+      "patch",
+      "--scan",
+      "src",
+      "--out-dir",
+      shadow,
+      "--compile",
+      "--report",
+      report,
+      "--registry",
+      registry,
+    ],
+    consumer,
+  );
+  assert.equal(patch.status, 0, `${patch.stdout}\n${patch.stderr}`);
+  assert.equal(fs.existsSync(report), true);
+  const body = JSON.parse(fs.readFileSync(report, "utf8")) as {
+    compiled: boolean | null;
+    bscCheck: string | null;
+    status: string;
+    files: string[];
+  };
+  assert.equal(body.compiled, true, JSON.stringify(body));
+  assert.equal(body.bscCheck, "pass");
+  assert.notEqual(body.status, "unverifiable");
+  const patchedSrc = fs.readFileSync(path.join(shadow, "src/main.c"), "utf8");
+  assert.match(patchedSrc, /SOLDERLAB_PIN_SDA/);
+  assert.equal(patchedSrc.includes("16 /* SDA */"), false);
+});
+

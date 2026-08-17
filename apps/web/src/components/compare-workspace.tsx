@@ -2,12 +2,13 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import type { DiffBundleData, CopilotFinding, ImpactReport } from "@solderlab/design-core";
+import type { DiffBundleData, CopilotFinding, ImpactReport, ClassifiedProposal } from "@solderlab/design-core";
 import { Badge, Button, Input } from "@solderlab/ui";
 import Link from "next/link";
 import { runCopilot } from "@/lib/copilot-client";
 import { PcbDiffViewer } from "@/components/pcb-diff-viewer";
 import { ImpactPanel } from "@/components/impact-panel";
+import { ClassBadge } from "@/components/classified-surface";
 
 async function trackClient(
   name: "diff_viewed" | "ai_finding_action",
@@ -52,6 +53,12 @@ export function CompareWorkspace({
   const [highlight, setHighlight] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [impact, setImpact] = useState<ImpactReport | null>(null);
+  const [impactLlm, setImpactLlm] = useState<{
+    attempted: boolean;
+    succeeded: boolean;
+    error: string | null;
+  } | null>(null);
+  const [proposals, setProposals] = useState<ClassifiedProposal[]>([]);
   const [impactLoading, setImpactLoading] = useState(false);
   const [copilotBusy, setCopilotBusy] = useState(false);
   const [pcbSnaps, setPcbSnaps] = useState<{
@@ -133,7 +140,11 @@ export function CompareWorkspace({
         if (!r.ok) throw new Error(await r.text());
         return r.json();
       })
-      .then((j) => setImpact(j.data as ImpactReport))
+      .then((j) => {
+        setImpact(j.data as ImpactReport);
+        setImpactLlm(j.llm ?? null);
+        setProposals(Array.isArray(j.proposals) ? j.proposals : []);
+      })
       .catch(() => setImpact(null))
       .finally(() => setImpactLoading(false));
   }, [tab, impact, impactLoading, orgSlug, projectSlug, base, head]);
@@ -280,7 +291,10 @@ export function CompareWorkspace({
             {diff.summary.criticalElectrical
               ? ` / ${diff.summary.criticalElectrical} crit`
               : ""}{" "}
-            · gate {diff.summary.electricalGate ?? "—"}
+            · gate {diff.summary.electricalGate ?? "—"}{" "}
+            <span className="uppercase tracking-wide text-[var(--success)]">
+              verified
+            </span>
           </span>
         </div>
       ) : (
@@ -476,7 +490,11 @@ export function CompareWorkspace({
               Analyzing impact…
             </p>
           ) : impact ? (
-            <ImpactPanel report={impact} />
+            <ImpactPanel
+              report={impact}
+              llm={impactLlm ?? undefined}
+              proposals={proposals}
+            />
           ) : (
             <p className="text-sm text-[var(--text-muted)]">
               Impact analysis unavailable for this pair.
@@ -509,7 +527,7 @@ export function CompareWorkspace({
           </div>
           <div className="space-y-2">
             <p className="text-xs uppercase tracking-wider text-[var(--text-muted)]">
-              Findings
+              <ClassBadge outputClass="verified" /> Findings
             </p>
             {findings.map((f, i) => (
               <div

@@ -1,4 +1,5 @@
-export { emitC } from "./c";
+export { emitC, assignPinMacros, i2cAddrMacro, railMilliMacro } from "./c";
+export type { PinMacro } from "./c";
 export { emitZephyr } from "./zephyr";
 export { emitKconfig } from "./kconfig";
 export { emitRust } from "./rust";

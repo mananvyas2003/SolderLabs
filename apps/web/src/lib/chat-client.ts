@@ -1,10 +1,20 @@
-export type ChatTurn = { role: "user" | "assistant"; content: string };
+import type { ClassifiedProposal } from "@solderlab/design-core";
+
+export type ChatTurn = {
+  role: "user" | "assistant";
+  content: string;
+  proposals?: ClassifiedProposal[];
+};
 
 export type ChatResponse = {
   ok: boolean;
   reply: string;
   error?: string;
   revisionId?: string | null;
+  class?: "advisory";
+  banner?: string | null;
+  canGateMerge?: boolean;
+  proposals?: ClassifiedProposal[];
   llm?: {
     attempted: boolean;
     succeeded: boolean;
@@ -31,7 +41,10 @@ export async function sendProjectChat(opts: {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         message: opts.message,
-        messages: opts.messages,
+        messages: opts.messages.map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
         revisionId: opts.revisionId ?? undefined,
       }),
       signal: opts.signal,

@@ -11,8 +11,8 @@ export default async function AssistantPage({
       <div className="mb-4">
         <h2 className="text-lg font-semibold tracking-tight">Copilot</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Chat about this project&apos;s uploaded KiCad files. Electrical facts
-          are read from the latest parsed revision. Checks and merge stay
+          Chat is an advisory surface labelled not verified by SolderLabs.
+          Electrical facts come from tools. Checks and merge stay
           deterministic.
         </p>
       </div>

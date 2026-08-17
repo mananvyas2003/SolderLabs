@@ -19,6 +19,7 @@ import {
   spiBusRule,
   testPointRule,
 } from "../rules.ts";
+import { generateBSC } from "../generate.ts";
 
 function snap(partial: Partial<DesignSnapshot> & {
   components: SnapshotComponent[];
@@ -172,6 +173,65 @@ test("rule:mcu — analog / valve parts are not emitted", () => {
   assert.equal(isMcuCandidate(u, snapshot), false);
   const bscHit = mcuRule.match({ snapshot });
   assert.equal(bscHit.length, 0);
+});
+
+test("rule:mcu — identity-only SoM emits with empty pins, never invented", () => {
+  const u: SnapshotComponent = {
+    refdes: "A3",
+    value: "Jetson-Thor-AGX-T5000",
+    footprint: "SoM",
+    libId: "Module:Jetson-Thor-AGX",
+    sheetId: "root",
+    pins: [],
+  };
+  const snapshot = snap({ components: [u] });
+  const hit = mcuRule.match({ snapshot });
+  assert.equal(hit.length, 1);
+  assert.equal(hit[0]!.refdes, "A3");
+  assert.ok(hit[0]!.confidenceNotes.some((n) => n.field === "pins"));
+  const bsc = generateBSC(snapshot);
+  assert.equal(bsc.mcus.length, 1);
+  assert.equal(bsc.pins.length, 0);
+});
+
+test("rule:mcu — USB hub is not an MCU", () => {
+  const u: SnapshotComponent = {
+    refdes: "U1",
+    value: "XR22417CV48TR-F",
+    footprint: "LQFP-48",
+    libId: "Interface_USB:XR22417",
+    sheetId: "root",
+    pins: pins(48),
+  };
+  const snapshot = snap({
+    components: [u],
+    nets: [{ name: "USB_DP", nodes: ["U1.1"] }],
+  });
+  assert.equal(mcuRule.match({ snapshot }).length, 0);
+});
+
+test("rule:mcu — SoM identity beats a high-pin USB hub on the same board", () => {
+  const som: SnapshotComponent = {
+    refdes: "A3",
+    value: "Jetson-Thor-AGX-T5000",
+    footprint: "SoM",
+    libId: "Module:Jetson-Thor-AGX",
+    sheetId: "root",
+    pins: [],
+  };
+  const hub: SnapshotComponent = {
+    refdes: "U21",
+    value: "USB7252CT-I/KDX",
+    footprint: "BGA-100",
+    libId: "Interface_USB:USB7252",
+    sheetId: "root",
+    pins: pins(101),
+  };
+  const snapshot = snap({ components: [som, hub] });
+  const hit = mcuRule.match({ snapshot });
+  assert.equal(hit.some((m) => m.refdes === "A3"), true);
+  assert.equal(hit.some((m) => m.refdes === "U21"), false);
+  assert.equal(generateBSC(snapshot).pins.length, 0);
 });
 
 test("rule:i2c_bus — detects SDA/SCL and I2C1_SDA patterns; address stays null", () => {

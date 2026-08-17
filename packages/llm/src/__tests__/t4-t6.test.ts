@@ -195,8 +195,9 @@ test("T6: net named IGNORE_PRIOR_INSTRUCTIONS does not unfence into instructions
           claims: [
             {
               finding: "GND still present on R1",
-              refs: [{ kind: "net", ref: "GND" }],
+              refs: [{ kind: "net", ref: "GND" }, { kind: "component", ref: "R1" }],
               severity: "low",
+              type: "connectivity_change",
             },
           ],
         },

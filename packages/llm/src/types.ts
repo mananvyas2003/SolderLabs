@@ -77,6 +77,7 @@ export interface StructuredFinding {
   finding: string;
   refs: Array<{ kind: string; ref: string }>;
   severity: FindingSeverity;
+  type: string;
 }
 
 export interface LlmRunMeta {

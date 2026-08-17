@@ -14,6 +14,7 @@ import type {
   SnapshotNet,
 } from "./types";
 import type { SemanticDiffResult } from "./semantic-diff";
+import { isAdvisoryClaimType, type AdvisoryClaimType } from "./output-class.ts";
 
 /** Local shape — avoids circular import with index.ts DiffBundleData */
 export interface ImpactDiffBundle {
@@ -103,11 +104,26 @@ export interface TestInvalidation {
   citations: ImpactCitation[];
 }
 
+export const IMPACT_CLAIM_TYPES = [
+  "value_change",
+  "connectivity_change",
+  "supply_risk",
+  "bsc_break",
+  "bom_change",
+  "test_invalidation",
+] as const;
+
+export type ImpactClaimType = (typeof IMPACT_CLAIM_TYPES)[number];
+
+const CLAIM_TYPE_SET = new Set<string>(IMPACT_CLAIM_TYPES);
+
 export interface ImpactClaim {
   text: string;
   citations: ImpactCitation[];
   /** false → render as "unverified", never mixed with grounded findings */
   grounded: boolean;
+  type?: ImpactClaimType | AdvisoryClaimType;
+  severity?: "low" | "medium" | "high";
 }
 
 export interface EcoDraft {
@@ -130,6 +146,8 @@ export interface DeterministicImpact {
 export interface ImpactReport extends DeterministicImpact {
   electricalClaims: ImpactClaim[];
   unverifiedClaims: ImpactClaim[];
+  /** Tier C — no oracle. Never mixed into electricalClaims. Never gates merge. */
+  advisoryClaims: ImpactClaim[];
   /** Claims dropped for missing / invalid citations */
   droppedClaims: string[];
   eco: EcoDraft;
@@ -187,8 +205,12 @@ export interface ImpactContext {
 }
 
 export interface RawLlmClaim {
-  text: string;
+  /** Structured field. Bare strings are rejected. `text` is accepted as alias. */
+  finding?: string;
+  text?: string;
   citations: ImpactCitation[];
+  type?: string;
+  severity?: "low" | "medium" | "high";
 }
 
 export type ImpactLlmFn = (
@@ -567,7 +589,7 @@ function citationKey(c: ImpactCitation): string {
 
 /** Imperative / instruction-injection language — never grounded. */
 export const IMPACT_IMPERATIVE_RE =
-  /(?:SYSTEM\s*:|ignore\s+(?:all\s+)?prior|disregard\s+(?:all\s+)?(?:previous|prior)|follow\s+new\s+instructions|you\s+are\s+now|approve\s+this\s+review|new\s+instructions\s*:)/i;
+  /(?:SYSTEM\s*:|ignore\s+(?:all\s+)?prior|disregard\s+(?:all\s+)?(?:previous|prior)|follow\s+new\s+instructions|you\s+are\s+now|approve\s+this\s+review|approve\s+this\s+merge|electricalGate|new\s+instructions\s*:)/i;
 
 export function claimHasImperativeLanguage(text: string): boolean {
   return IMPACT_IMPERATIVE_RE.test(text);
@@ -578,6 +600,22 @@ export function claimMentionsOwnCitation(
   citations: ImpactCitation[],
 ): boolean {
   return citations.some((c) => c.ref && text.includes(c.ref));
+}
+
+/** Neutralize instruction-shaped tokens in CAD identifiers (refdes / net). */
+export function sanitizeCadIdentifier(value: string): string {
+  return value
+    .replace(/SYSTEM\s*:/gi, "SYSTEM_")
+    .replace(/ignore\s+all\s+prior\s+(?:rules|instructions)/gi, "ignore_all_prior")
+    .replace(/IGNORE[_ ]PRIOR[_ ]INSTRUCTIONS/gi, "IGNORE_PRIOR_INSTRUCTIONS_DATA")
+    .replace(/disregard\s+(?:all\s+)?(?:previous|prior)\s+instructions/gi, "disregard_prior")
+    .replace(/you\s+are\s+now/gi, "you_are_now")
+    .replace(/approve\s+this\s+(?:review|merge)/gi, "approve_this")
+    .replace(/new\s+instructions\s*:/gi, "new_instructions_");
+}
+
+export function isAllowedClaimType(type: string | undefined): type is ImpactClaimType {
+  return typeof type === "string" && CLAIM_TYPE_SET.has(type);
 }
 
 /**
@@ -591,40 +629,76 @@ export function gateImpactClaims(
 ): {
   grounded: ImpactClaim[];
   unverified: ImpactClaim[];
+  advisory: ImpactClaim[];
   dropped: string[];
 } {
   const universe = buildCitationUniverse(ground);
   const grounded: ImpactClaim[] = [];
   const unverified: ImpactClaim[] = [];
+  const advisory: ImpactClaim[] = [];
   const dropped: string[] = [];
 
   for (const claim of raw) {
-    const text = claim.text?.trim();
+    const text = (claim.finding ?? claim.text)?.trim();
     if (!text) {
       dropped.push("(empty claim)");
       continue;
     }
-    const citations = (claim.citations ?? []).filter(
-      (c) => c?.kind && c?.ref,
-    );
+    if (typeof text !== "string" || Array.isArray(claim as unknown)) {
+      dropped.push("(non-object claim)");
+      continue;
+    }
+    if (claimHasImperativeLanguage(text)) {
+      dropped.push(text);
+      continue;
+    }
+    const citations = (claim.citations ?? [])
+      .filter((c) => c?.kind && c?.ref)
+      .map((c) => ({ ...c, ref: sanitizeCadIdentifier(c.ref) }));
+
+    if (isAdvisoryClaimType(claim.type)) {
+      if (citations.length && !citations.every((c) => universe.has(citationKey(c)))) {
+        dropped.push(text);
+        continue;
+      }
+      advisory.push({
+        text,
+        citations,
+        grounded: false,
+        type: claim.type,
+        severity: claim.severity,
+      });
+      continue;
+    }
+
+    if (!isAllowedClaimType(claim.type)) {
+      dropped.push(text);
+      continue;
+    }
     if (!citations.length) {
       dropped.push(text);
       continue;
     }
-    if (claimHasImperativeLanguage(text) || !claimMentionsOwnCitation(text, citations)) {
+    if (!claimMentionsOwnCitation(text, citations)) {
       dropped.push(text);
       continue;
     }
     const allValid = citations.every((c) => universe.has(citationKey(c)));
+    const typed: ImpactClaim = {
+      text,
+      citations,
+      grounded: allValid,
+      type: claim.type,
+      severity: claim.severity,
+    };
     if (allValid) {
-      grounded.push({ text, citations, grounded: true });
+      grounded.push(typed);
     } else {
-      // Partial / unknown citations → unverified, never mixed with grounded
-      unverified.push({ text, citations, grounded: false });
+      unverified.push(typed);
     }
   }
 
-  return { grounded, unverified, dropped };
+  return { grounded, unverified, advisory, dropped };
 }
 
 /**
@@ -673,6 +747,7 @@ export function localElectricalReasoning(
         text: `Value change on ${ref} (${before} → ${after}) shares net connectivity with ${regulatorNeighbor}; verify the regulator / load still within its supply envelope.`,
         citations,
         grounded: true,
+        type: "value_change",
       });
     }
   }
@@ -683,6 +758,7 @@ export function localElectricalReasoning(
       text: `BSC breaking change: ${b.message}`,
       citations: b.citations,
       grounded: true,
+      type: "bsc_break",
     });
   }
 
@@ -826,6 +902,7 @@ export async function analyzeImpact(
 
   let grounded = [...local];
   let unverified: ImpactClaim[] = [];
+  let advisory: ImpactClaim[] = [];
   let dropped: string[] = [];
 
   if (opts?.llm) {
@@ -833,6 +910,7 @@ export async function analyzeImpact(
     const gated = gateImpactClaims(raw, ground);
     grounded = [...grounded, ...gated.grounded];
     unverified = gated.unverified;
+    advisory = gated.advisory;
     dropped = gated.dropped;
     if (dropped.length && process.env.DEBUG_IMPACT === "1") {
       console.warn(
@@ -846,6 +924,7 @@ export async function analyzeImpact(
     ...ground,
     electricalClaims: grounded,
     unverifiedClaims: unverified,
+    advisoryClaims: advisory,
     droppedClaims: dropped,
     eco: draftEco(ground, grounded),
   };
@@ -862,6 +941,7 @@ export function analyzeImpactSync(
     ...ground,
     electricalClaims: local,
     unverifiedClaims: [],
+    advisoryClaims: [],
     droppedClaims: [],
     eco: draftEco(ground, local),
   };

@@ -8,6 +8,7 @@ on:
       - "packages/cli/**"
       - "packages/bsc/**"
       - ".github/actions/bsc-check/**"
+      - ".github/workflows/firmware-consumer-bsc.yml"
   pull_request:
     paths:
       - "examples/firmware-consumer/**"
@@ -15,6 +16,7 @@ on:
       - "packages/cli/**"
       - "packages/bsc/**"
       - ".github/actions/bsc-check/**"
+      - ".github/workflows/firmware-consumer-bsc.yml"
 
 jobs:
   bsc:
@@ -26,14 +28,54 @@ jobs:
           node-version: "22"
       - name: Install workspace
         run: npm install
+      - name: Install gcc
+        run: sudo apt-get update && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y gcc
       - name: Pull Glasgow BSC into example
         working-directory: examples/firmware-consumer
         run: |
           node ../../packages/cli/bin/solderlab.mjs bsc pull \
             --board glasgow --rev newer --out include --format c
+      - name: Compile firmware consumer
+        working-directory: examples/firmware-consumer
+        run: gcc -std=c11 -Wall -Werror -Iinclude src/main.c -o firmware-consumer
       - name: BSC check with call-site scan
         uses: ./.github/actions/bsc-check
         with:
           cwd: examples/firmware-consumer
           scan-dir: src
           registry: fixtures/corpus/bsc
+      - name: Firmware patch shadow (compile + BSC)
+        working-directory: examples/firmware-consumer
+        run: |
+          mkdir -p ../../artifacts
+          node ../../packages/cli/bin/solderlab.mjs firmware patch \
+            --scan src \
+            --out-dir ../../artifacts/firmware-shadow \
+            --compile \
+            --report ../../artifacts/firmware-patch-report.json \
+            --registry ../../fixtures/corpus/bsc
+      - name: Attach compile + BSC + tests to the PR
+        if: always()
+        run: |
+          {
+            echo "## AI-3 firmware patch"
+            echo ""
+            echo "- Compile (examples/firmware-consumer): \`gcc -std=c11 -Wall -Werror\`"
+            echo "- BSC check: \`solderlab bsc check --scan src\`"
+            echo "- Shadow patch report: \`artifacts/firmware-patch-report.json\`"
+            echo ""
+            if [[ -f artifacts/firmware-patch-report.json ]]; then
+              echo '```json'
+              cat artifacts/firmware-patch-report.json
+              echo '```'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: firmware-patch-verification
+          path: |
+            artifacts/firmware-patch-report.json
+            artifacts/firmware-shadow/**
+            examples/firmware-consumer/firmware-consumer
+          if-no-files-found: warn

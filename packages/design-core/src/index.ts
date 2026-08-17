@@ -27,6 +27,10 @@ export * from "./unintended-connectivity";
 export * from "./bom-reconcile";
 export * from "./bom-history";
 export * from "./mfg-lint";
+export * from "./shadow";
+export * from "./artifacts";
+export * from "./tier-b";
+export * from "./output-class";
 
 /** Power flags / #PWR* — noise for BOM and format-migration diffs. */
 export function isPowerSymbol(c: {

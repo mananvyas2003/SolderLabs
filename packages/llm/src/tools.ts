@@ -1,10 +1,33 @@
 import {
+  auditDecoupling,
+  auditNetNames,
+  auditSubstitutions,
+  auditTestPointCoverage,
   blameAllBomLines,
+  cloneSnapshot,
+  createShadowSnapshot,
   diffSnapshots,
+  generateChangelog,
+  generateCommitNotes,
+  generateReviewSynthesis,
+  isShadowId,
+  listDecouplingForRefdes,
   snapshotToBom,
+  type BomPlatformMeta,
+  type ChangeOperation,
   type DesignSnapshot,
 } from "@solderlab/design-core";
-import { generateBSC } from "@solderlab/bsc";
+import {
+  diffBSC,
+  generateBSC,
+  generateBringUpScript,
+  generateFirmwarePatch,
+  isPowerRailNet,
+  lookupPinFunctions,
+  type BoardSupportContract,
+  type FirmwareFile,
+  type PinFunctionRecord,
+} from "@solderlab/bsc";
 import type { LlmToolSpec } from "./types.ts";
 
 export interface ToolCheckRow {
@@ -32,6 +55,17 @@ export interface ToolHost {
       manufacturer?: string | null;
     }>;
   }>;
+  partSupplyFor?(mpn: string): unknown;
+  searchDatasheet?(mpn: string, query: string): unknown;
+  firmware?: {
+    locked: BoardSupportContract;
+    current: BoardSupportContract;
+    files: FirmwareFile[];
+  };
+  /** Library second-sources. Never accepted from tool arguments. */
+  bomPlatform?: BomPlatformMeta[];
+  /** Datasheet pin-function rows. Never accepted from tool arguments. */
+  pinFunctionTable?: PinFunctionRecord[];
 }
 
 export const BOARD_TOOL_SPECS: LlmToolSpec[] = [
@@ -113,6 +147,191 @@ export const BOARD_TOOL_SPECS: LlmToolSpec[] = [
       properties: { revisionId: { type: "string" } },
     },
   },
+  {
+    name: "get_power_tree",
+    description: "Return power and ground nets from the head snapshot.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: "get_decoupling",
+    description:
+      "Return capacitors that share nets with the given refdes.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required: ["refdes"],
+      properties: { refdes: { type: "string" } },
+    },
+  },
+  {
+    name: "get_part_supply",
+    description: "Look up part supply data for an MPN when a provider is configured.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required: ["mpn"],
+      properties: { mpn: { type: "string" } },
+    },
+  },
+  {
+    name: "search_datasheet",
+    description: "Search a datasheet store for an MPN when a provider is configured.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required: ["mpn", "query"],
+      properties: {
+        mpn: { type: "string" },
+        query: { type: "string" },
+      },
+    },
+  },
+  {
+    name: "simulate_change",
+    description:
+      "Apply structured change operations to a cloned snapshot, rebuild nets, and return an engine verdict. Does not write CAD or create a revision.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required: ["operations"],
+      properties: {
+        operations: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["op"],
+            properties: {
+              op: { type: "string" },
+              refdes: { type: "string" },
+              value: { type: "string" },
+              mpn: { type: "string" },
+              pin: { type: "string" },
+              net: { type: "string" },
+              libId: { type: "string" },
+              from: { type: "string" },
+              to: { type: "string" },
+              connections: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  required: ["pin", "net"],
+                  properties: {
+                    pin: { type: "string" },
+                    net: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    name: "generate_firmware_patch",
+    description:
+      "Deterministic firmware patch from locked vs current BSC. Emits board.h and conservative source migrations. Does not write CAD.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: "generate_bringup",
+    description:
+      "Deterministic bring-up script from the head BSC. Unknown voltages and I2C addresses are withheld.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: "generate_review_synthesis",
+    description:
+      "Engine review rollup of base vs head. electricalGate is copied from the diff; the model cannot set it.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: "generate_changelog",
+    description:
+      "Changelog entries copied from the semantic diff, BOM, and BSC. Identifiers only from the engine.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: "generate_commit_notes",
+    description:
+      "Commit subject/body/trailers from the engine diff summary. Does not invent refdes.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: "audit_substitution",
+    description:
+      "Substitution candidates from library alternates or same value/footprint MPNs already on the board. Never invents an MPN.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: { refdes: { type: "string" } },
+    },
+  },
+  {
+    name: "audit_decoupling",
+    description:
+      "IC power pins whose net has no capacitor. Does not recommend a capacitance.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: "audit_test_points",
+    description: "Power and ground nets that already have a TP* on them.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: "audit_net_names",
+    description:
+      "Anonymous nets plus pin names already on them. Does not invent net names.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {},
+    },
+  },
+  {
+    name: "lookup_pin_functions",
+    description:
+      "Fill pin functions only from a configured datasheet table. Unverifiable without a table. Ignores functions in tool arguments.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      properties: {},
+    },
+  },
 ];
 
 function asString(v: unknown): string {
@@ -122,6 +341,99 @@ function asString(v: unknown): string {
 function asInt(v: unknown, fallback: number): number {
   const n = typeof v === "number" ? v : Number(v);
   return Number.isFinite(n) ? Math.max(0, Math.floor(n)) : fallback;
+}
+
+function rejectShadowRevision(revisionId: string): { error: string; revisionId: string } | null {
+  if (!isShadowId(revisionId)) return null;
+  return { error: "shadow snapshots are not revisions", revisionId };
+}
+
+const OPS = new Set([
+  "set_component_value",
+  "set_component_mpn",
+  "connect_pin",
+  "disconnect_pin",
+  "add_component",
+  "remove_component",
+  "rename_net",
+  "add_test_point",
+]);
+
+function parseOperations(
+  raw: unknown,
+): { ops: ChangeOperation[]; errors: string[] } | { error: string } {
+  if (!Array.isArray(raw)) {
+    return { error: "simulate_change requires operations[]" };
+  }
+  const ops: ChangeOperation[] = [];
+  const errors: string[] = [];
+  for (const row of raw) {
+    if (!row || typeof row !== "object") {
+      errors.push("operation is not an object");
+      continue;
+    }
+    const o = row as Record<string, unknown>;
+    const op = asString(o.op);
+    if (!OPS.has(op)) {
+      errors.push(`unknown operation ${op || "(empty)"}`);
+      continue;
+    }
+    if (op === "set_component_value") {
+      ops.push({
+        op,
+        refdes: asString(o.refdes),
+        value: asString(o.value),
+      });
+      continue;
+    }
+    if (op === "set_component_mpn") {
+      ops.push({ op, refdes: asString(o.refdes), mpn: asString(o.mpn) });
+      continue;
+    }
+    if (op === "connect_pin") {
+      ops.push({
+        op,
+        refdes: asString(o.refdes),
+        pin: asString(o.pin),
+        net: asString(o.net),
+      });
+      continue;
+    }
+    if (op === "disconnect_pin") {
+      ops.push({ op, refdes: asString(o.refdes), pin: asString(o.pin) });
+      continue;
+    }
+    if (op === "add_component") {
+      const connections = Array.isArray(o.connections)
+        ? o.connections.map((x) => {
+            const c = x as { pin?: unknown; net?: unknown };
+            return { pin: asString(c.pin), net: asString(c.net) };
+          })
+        : [];
+      ops.push({
+        op,
+        refdes: asString(o.refdes),
+        libId: asString(o.libId),
+        value: asString(o.value),
+        connections,
+      });
+      continue;
+    }
+    if (op === "remove_component") {
+      ops.push({ op, refdes: asString(o.refdes) });
+      continue;
+    }
+    if (op === "rename_net") {
+      ops.push({ op, from: asString(o.from), to: asString(o.to) });
+      continue;
+    }
+    ops.push({
+      op: "add_test_point",
+      net: asString(o.net),
+      refdes: asString(o.refdes),
+    });
+  }
+  return { ops, errors };
 }
 
 /** Existing snapshot pin/net membership — no new connectivity rules. */
@@ -177,6 +489,8 @@ export function trace_from(
 }
 
 export function diff_revisions(host: ToolHost, baseId: string, headId: string) {
+  const shadow = rejectShadowRevision(baseId) ?? rejectShadowRevision(headId);
+  if (shadow) return { error: shadow.error, baseId, headId };
   const base = host.snapshotFor(baseId);
   const head = host.snapshotFor(headId);
   if (!base || !head) {
@@ -189,6 +503,8 @@ export function diff_revisions(host: ToolHost, baseId: string, headId: string) {
 }
 
 export function get_bom_drift(host: ToolHost, revisionId: string) {
+  const shadow = rejectShadowRevision(revisionId);
+  if (shadow) return shadow;
   const revs = host.bomRevisionsFor?.(revisionId);
   if (revs?.length) {
     const map = blameAllBomLines(revs);
@@ -199,13 +515,202 @@ export function get_bom_drift(host: ToolHost, revisionId: string) {
 }
 
 export function run_checks(host: ToolHost, revisionId: string) {
+  const shadow = rejectShadowRevision(revisionId);
+  if (shadow) return shadow;
   return host.checksFor?.(revisionId) ?? [];
 }
 
 export function get_bsc(host: ToolHost, revisionId: string) {
+  const shadow = rejectShadowRevision(revisionId);
+  if (shadow) return shadow;
   const snap = host.snapshotFor(revisionId);
   if (!snap) return { error: "snapshot missing", revisionId };
-  return generateBSC(snap, { revisionId });
+  return generateBSC(cloneSnapshot(snap), { revisionId });
+}
+
+export function get_power_tree(host: ToolHost) {
+  const rails = host.head.nets.filter(isPowerRailNet).map((n) => ({
+    name: n.name,
+    class: n.class ?? null,
+    nodes: n.nodes,
+  }));
+  const bsc = generateBSC(cloneSnapshot(host.head), {
+    revisionId: host.headRevisionId ?? null,
+  });
+  return { rails, bscRails: bsc.powerRails };
+}
+
+export function get_decoupling(host: ToolHost, refdes: string) {
+  return listDecouplingForRefdes(host.head, refdes);
+}
+
+export function audit_substitution(host: ToolHost, refdes?: string) {
+  return auditSubstitutions(
+    host.head,
+    host.bomPlatform ?? [],
+    refdes?.trim() ? refdes : undefined,
+  );
+}
+
+export function audit_decoupling(host: ToolHost) {
+  return auditDecoupling(host.head);
+}
+
+export function audit_test_points(host: ToolHost) {
+  return auditTestPointCoverage(host.head);
+}
+
+export function audit_net_names(host: ToolHost) {
+  return auditNetNames(host.head);
+}
+
+export function lookup_pin_functions(host: ToolHost) {
+  const bsc = generateBSC(cloneSnapshot(host.head), {
+    revisionId: host.headRevisionId ?? null,
+  });
+  return lookupPinFunctions(bsc, host.pinFunctionTable);
+}
+
+export function get_part_supply(host: ToolHost, mpn: string) {
+  if (!host.partSupplyFor) {
+    return { error: "parts provider not configured", mpn, status: "unverifiable" };
+  }
+  return host.partSupplyFor(mpn);
+}
+
+export function search_datasheet(host: ToolHost, mpn: string, query: string) {
+  if (!host.searchDatasheet) {
+    return {
+      error: "datasheet store not configured",
+      mpn,
+      query,
+      status: "unverifiable",
+    };
+  }
+  return host.searchDatasheet(mpn, query);
+}
+
+export function simulate_change(host: ToolHost, operationsRaw: unknown) {
+  const parsed = parseOperations(operationsRaw);
+  if ("error" in parsed) {
+    return {
+      status: "unverifiable" as const,
+      error: parsed.error,
+      coverage: 0,
+      refutations: [parsed.error],
+    };
+  }
+  const { ops, errors } = parsed;
+  if (ops.length === 0 && errors.length > 0) {
+    return {
+      id: null,
+      status: "refuted" as const,
+      coverage: 0,
+      refutations: errors,
+      verification: {
+        status: "refuted" as const,
+        checkDeltas: [],
+        bscDelta: null,
+        netGraphDelta: { added: [], removed: [], rewired: [] },
+        refutations: errors,
+        coverage: 0,
+      },
+    };
+  }
+  const frozen = JSON.stringify(host.head);
+  const beforeBsc = generateBSC(cloneSnapshot(host.head), {
+    revisionId: host.headRevisionId ?? null,
+  });
+  const draft = createShadowSnapshot(host.head, ops, {
+    baseRevisionId: host.headRevisionId ?? "head",
+    createdBy: "ai",
+  });
+  const afterBsc = generateBSC(cloneSnapshot(draft.derived), { revisionId: null });
+  const bscDelta = diffBSC(beforeBsc, afterBsc);
+  if (JSON.stringify(host.head) !== frozen) {
+    throw new Error("simulate_change mutated host.head");
+  }
+  const refutations = [...errors, ...draft.verification.refutations];
+  let status = draft.verification.status;
+  if (errors.length && status === "verified") status = "verified_with_warnings";
+  return {
+    id: draft.id,
+    baseRevisionId: draft.baseRevisionId,
+    createdAt: draft.createdAt,
+    expiresAt: draft.expiresAt,
+    createdBy: draft.createdBy,
+    operations: ops,
+    verification: {
+      ...draft.verification,
+      bscDelta,
+      refutations,
+      status,
+    },
+    derivedSummary: {
+      componentCount: draft.derived.components.length,
+      netCount: draft.derived.nets.length,
+    },
+  };
+}
+
+export function generate_firmware_patch(host: ToolHost) {
+  if (!host.firmware) {
+    return {
+      status: "unverifiable" as const,
+      error: "firmware tree not configured",
+      coverage: 0,
+    };
+  }
+  return generateFirmwarePatch(host.firmware);
+}
+
+function revisionDiff(host: ToolHost) {
+  const base = host.base ?? null;
+  if (!base) {
+    return { error: "base snapshot missing", status: "unverifiable" as const };
+  }
+  return diffSnapshots(base, host.head, {
+    baseRevisionId: host.baseRevisionId ?? "base",
+    headRevisionId: host.headRevisionId ?? "head",
+  });
+}
+
+export function generate_bringup(host: ToolHost) {
+  const bsc = generateBSC(cloneSnapshot(host.head), {
+    revisionId: host.headRevisionId ?? null,
+  });
+  return generateBringUpScript(bsc);
+}
+
+export function generate_review_synthesis(host: ToolHost) {
+  const diff = revisionDiff(host);
+  if ("error" in diff) return diff;
+  const checks = host.headRevisionId
+    ? host.checksFor?.(host.headRevisionId)
+    : host.checksFor?.("head");
+  return generateReviewSynthesis(diff, { checks: checks ?? [] });
+}
+
+export function generate_changelog(host: ToolHost) {
+  const diff = revisionDiff(host);
+  if ("error" in diff) return diff;
+  const base = host.base!;
+  const bscChanges = diffBSC(
+    generateBSC(cloneSnapshot(base), { revisionId: host.baseRevisionId ?? null }),
+    generateBSC(cloneSnapshot(host.head), { revisionId: host.headRevisionId ?? null }),
+  );
+  return generateChangelog(diff, { bscChanges });
+}
+
+export function generate_commit_notes(host: ToolHost) {
+  const diff = revisionDiff(host);
+  if ("error" in diff) return diff;
+  const base = host.base!;
+  const bscChanges = diffBSC(
+    generateBSC(cloneSnapshot(base), { revisionId: host.baseRevisionId ?? null }),
+    generateBSC(cloneSnapshot(host.head), { revisionId: host.headRevisionId ?? null }),
+  );
+  return generateCommitNotes(diff, { bscChanges });
 }
 
 export function executeBoardTool(
@@ -233,6 +738,39 @@ export function executeBoardTool(
       return run_checks(host, asString(args.revisionId));
     case "get_bsc":
       return get_bsc(host, asString(args.revisionId));
+    case "get_power_tree":
+      return get_power_tree(host);
+    case "get_decoupling":
+      return get_decoupling(host, asString(args.refdes));
+    case "get_part_supply":
+      return get_part_supply(host, asString(args.mpn));
+    case "search_datasheet":
+      return search_datasheet(host, asString(args.mpn), asString(args.query));
+    case "simulate_change":
+      return simulate_change(host, args.operations);
+    case "generate_firmware_patch":
+      return generate_firmware_patch(host);
+    case "generate_bringup":
+      return generate_bringup(host);
+    case "generate_review_synthesis":
+      return generate_review_synthesis(host);
+    case "generate_changelog":
+      return generate_changelog(host);
+    case "generate_commit_notes":
+      return generate_commit_notes(host);
+    case "audit_substitution":
+      return audit_substitution(
+        host,
+        args.refdes ? asString(args.refdes) : undefined,
+      );
+    case "audit_decoupling":
+      return audit_decoupling(host);
+    case "audit_test_points":
+      return audit_test_points(host);
+    case "audit_net_names":
+      return audit_net_names(host);
+    case "lookup_pin_functions":
+      return lookup_pin_functions(host);
     default:
       return { error: `unknown tool ${name}` };
   }

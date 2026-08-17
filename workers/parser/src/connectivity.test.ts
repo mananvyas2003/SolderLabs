@@ -25,7 +25,10 @@ test("parse r1 resolves pin nets from wires", () => {
   assert.ok(u1?.pins?.length);
   const vdd = snap.nets.find((n) => n.name === "VDD");
   assert.ok(vdd);
-  assert.ok(vdd!.nodes.includes("C12.1") || vdd!.nodes.includes("R1.1"));
+  assert.ok(
+    vdd!.nodes.some((n) => n.startsWith("C12.") || n.startsWith("R1.")),
+    `VDD nodes=${vdd!.nodes.join(",")}`,
+  );
   const gnd = snap.nets.find((n) => n.name === "GND");
   assert.ok(gnd?.nodes.length);
 });
@@ -312,16 +315,16 @@ test("mirror y flips capacitor pin world positions onto the correct net", () => 
   )
 )
 `;
-  // Without mirror, pin1 is at +y (GND). With mirror y on a vertical pin pair,
-  // X flips are no-ops; use mirror x so pin1 (+y) maps to -y (VDD side).
+  // Library Y-up: pin1 at +y becomes schematic -y, then mirror x (flip schematic Y)
+  // puts pin1 back on the GND wire at +y.
   const srcX = src.replace("(mirror y)", "(mirror x)");
   const snap = parseKicadSchematicText(srcX);
   const c9 = snap.components.find((c) => c.refdes === "C9");
   assert.equal(c9?.mirror, "x");
   const p1 = c9?.pins?.find((p) => p.number === "1");
   const p2 = c9?.pins?.find((p) => p.number === "2");
-  assert.equal(p1?.net, "VDD", `pin1 net=${p1?.net}`);
-  assert.equal(p2?.net, "GND", `pin2 net=${p2?.net}`);
+  assert.equal(p1?.net, "GND", `pin1 net=${p1?.net}`);
+  assert.equal(p2?.net, "VDD", `pin2 net=${p2?.net}`);
 });
 
 test("sheetId is namespaced with board key on single- and multi-board paths", () => {
@@ -349,4 +352,124 @@ test("sheetId is namespaced with board key on single- and multi-board paths", ()
   assert.ok(idsAlone.length);
   assert.deepEqual(idsAlone, idsTree);
   assert.ok(idsAlone.every((id) => id.startsWith("pic_programmer.kicad_pro:")));
+});
+
+test("lib Y-up maps stacked GND pins onto the schematic GND flag", () => {
+  const src = `
+(kicad_sch
+  (lib_symbols
+    (symbol "Mod:BM"
+      (symbol "BM_1_1"
+        (pin power_in line (at 0 -38.1 270) (length 2.54)
+          (name "GND" (effects (font (size 1.27 1.27))))
+          (number "A1" (effects (font (size 1.27 1.27))))
+        )
+        (pin power_in line (at 0 38.1 90) (length 2.54)
+          (name "VDD" (effects (font (size 1.27 1.27))))
+          (number "B8" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+  )
+  (symbol (lib_id "Mod:BM") (at 137.16 90.17 0) (unit 1)
+    (property "Reference" "U1" (at 137.16 90.17 0))
+    (property "Value" "BM" (at 137.16 90.17 0))
+  )
+  (symbol (lib_id "power:GND") (at 137.16 128.27 0) (unit 1)
+    (property "Reference" "#PWR1" (at 137.16 128.27 0))
+    (property "Value" "GND" (at 137.16 128.27 0))
+  )
+  (symbol (lib_id "power:VDD") (at 137.16 52.07 0) (unit 1)
+    (property "Reference" "#PWR2" (at 137.16 52.07 0))
+    (property "Value" "VDD" (at 137.16 52.07 0))
+  )
+)
+`;
+  const snap = parseKicadSchematicText(src);
+  const u1 = snap.components.find((c) => c.refdes === "U1");
+  const gnd = u1?.pins?.find((p) => p.number === "A1");
+  const vdd = u1?.pins?.find((p) => p.number === "B8");
+  assert.equal(gnd?.net, "GND", `A1 net=${gnd?.net}`);
+  assert.equal(vdd?.net, "VDD", `B8 net=${vdd?.net}`);
+});
+
+test("same-name power_in pins on one IC share a net without a global VIN merge", () => {
+  const src = `
+(kicad_sch
+  (lib_symbols
+    (symbol "Reg:U"
+      (symbol "U_1_1"
+        (pin power_in line (at 0 0 0) (length 2.54)
+          (name "VIN" (effects (font (size 1.27 1.27))))
+          (number "28" (effects (font (size 1.27 1.27))))
+        )
+        (pin power_in line (at 5 0 0) (length 2.54)
+          (name "VIN" (effects (font (size 1.27 1.27))))
+          (number "29" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+  )
+  (symbol (lib_id "Reg:U") (at 0 0 0) (unit 1)
+    (property "Reference" "U8" (at 0 0 0))
+    (property "Value" "MPM" (at 0 0 0))
+  )
+  (symbol (lib_id "power:+12V") (at 5 0 0) (unit 1)
+    (property "Reference" "#PWR1" (at 5 0 0))
+    (property "Value" "+12V" (at 5 0 0))
+  )
+)
+`;
+  const snap = parseKicadSchematicText(src);
+  const u8 = snap.components.find((c) => c.refdes === "U8");
+  const p28 = u8?.pins?.find((p) => p.number === "28");
+  const p29 = u8?.pins?.find((p) => p.number === "29");
+  assert.equal(p29?.net, "+12V", `U8.29 net=${p29?.net}`);
+  assert.equal(p28?.net, "+12V", `U8.28 net=${p28?.net}`);
+  assert.equal(
+    snap.nets.some((n) => n.name === "VIN" && n.nodes.includes("U8.28")),
+    false,
+  );
+});
+
+test("no_connect markers isolate stacked pins from a nearby rail", () => {
+  const src = `
+(kicad_sch
+  (lib_symbols
+    (symbol "Mem:DDR"
+      (symbol "DDR_1_1"
+        (pin no_connect line (at 0 0 0) (length 2.54)
+          (name "NC" (effects (font (size 1.27 1.27))))
+          (number "A1" (effects (font (size 1.27 1.27))))
+        )
+        (pin no_connect line (at 0 0 0) (length 2.54)
+          (name "NC" (effects (font (size 1.27 1.27))))
+          (number "A2" (effects (font (size 1.27 1.27))))
+        )
+        (pin power_in line (at 0 0.1 0) (length 2.54)
+          (name "+0V675_REF" (effects (font (size 1.27 1.27))))
+          (number "V1" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+  )
+  (symbol (lib_id "Mem:DDR") (at 10 10 0) (unit 1)
+    (property "Reference" "U2" (at 10 10 0))
+    (property "Value" "DDR" (at 10 10 0))
+  )
+  (no_connect (at 10 10) (uuid "00000000-0000-0000-0000-000000000001"))
+  (symbol (lib_id "power:+0V675_REF") (at 10 9.9 0) (unit 1)
+    (property "Reference" "#PWR1" (at 10 9.9 0))
+    (property "Value" "+0V675_REF" (at 10 9.9 0))
+  )
+)
+`;
+  const snap = parseKicadSchematicText(src);
+  const u2 = snap.components.find((c) => c.refdes === "U2");
+  const a1 = u2?.pins?.find((p) => p.number === "A1");
+  const a2 = u2?.pins?.find((p) => p.number === "A2");
+  const v1 = u2?.pins?.find((p) => p.number === "V1");
+  assert.notEqual(a1?.net, a2?.net, `NC pins merged: ${a1?.net}`);
+  assert.notEqual(a1?.net, v1?.net);
+  assert.notEqual(a2?.net, v1?.net);
 });

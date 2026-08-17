@@ -83,7 +83,7 @@ export function AiAssistantDock({
               Copilot
             </p>
             <p className="mt-0.5 truncate text-[11px] text-[var(--text-subtle)]">
-              Ask about this board · Ctrl+J
+              Advisory — not verified by SolderLabs
             </p>
           </div>
           <Link

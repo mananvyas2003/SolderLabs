@@ -29,9 +29,10 @@ function transformLocal(
   rotDeg: number,
   mirror?: "x" | "y" | "xy",
 ): Pt {
+  // Library / lib_symbols coordinates are Y-up; the schematic sheet is Y-down.
   let x = lx;
-  let y = ly;
-  // KiCad applies mirror before rotation.
+  let y = -ly;
+  // KiCad applies mirror before rotation, in schematic space.
   if (mirror === "y" || mirror === "xy") x = -x;
   if (mirror === "x" || mirror === "xy") y = -y;
   const r = (rotDeg * Math.PI) / 180;
@@ -395,6 +396,12 @@ export function resolveConnectivity(
   if (extraLibPins) mergeLibPinMaps(libPins, extraLibPins);
   const segments: Array<{ a: Pt; b: Pt }> = [];
 
+  const noConnectKeys = new Set<string>();
+  for (const nc of extractBlocks(src, "no_connect")) {
+    const at = parseAt(nc);
+    if (at) noConnectKeys.add(roundKey(at));
+  }
+
   for (const wire of extractBlocks(src, "wire")) {
     const pts = [...wire.matchAll(/\(xy\s+([-\d.]+)\s+([-\d.]+)\)/g)].map(
       (m) => ({ x: Number(m[1]), y: Number(m[2]) }),
@@ -527,11 +534,14 @@ export function resolveConnectivity(
     const rot = c.rotation ?? 0;
     for (const pin of pins) {
       const world = transformLocal(pin.x, pin.y, ax, ay, rot, c.mirror);
-      const key = `p:${roundKey(world)}`;
       const pinId = `${c.refdes}.${pin.number}`;
+      const isolated =
+        (pin.electrical ?? "").toLowerCase() === "no_connect" ||
+        noConnectKeys.has(roundKey(world));
+      const key = isolated ? `nc:${pinId}` : `p:${roundKey(world)}`;
       uf.find(key);
       uf.union(key, `pin:${pinId}`);
-      stitchToWires(world);
+      if (!isolated) stitchToWires(world);
       pinPoints.push({
         pinId,
         key,
@@ -541,6 +551,7 @@ export function resolveConnectivity(
         sheetPath: c.sheetPath ?? "",
         unit: c.unit,
       });
+      if (isolated) continue;
       if (power) {
         const netName = normalizeNetName(c.value || pin.name || "GND");
         uf.union(`pin:${pinId}`, `name:${netName}`);
@@ -550,20 +561,24 @@ export function resolveConnectivity(
           display: c.value || netName,
           priority: 3,
         });
-      } else if (
-        isGlobalPowerPinType(pin.electrical) &&
-        isImplicitGlobalPowerName(pin.name)
-      ) {
-        // KiCad: power_in/out pins with the same rail name are globally
-        // connected even without wires (e.g. PCIe +12V → +12V net).
+      } else if (isGlobalPowerPinType(pin.electrical)) {
         const netName = normalizeNetName(pin.name);
-        uf.union(`pin:${pinId}`, `name:${netName}`);
-        namedPoints.push({
-          key,
-          name: netName,
-          display: pin.name,
-          priority: 1,
-        });
+        if (isImplicitGlobalPowerName(pin.name)) {
+          // KiCad: power_in/out pins with voltage-notation names are
+          // globally connected even without wires (PCIe +12V → +12V).
+          uf.union(`pin:${pinId}`, `name:${netName}`);
+          namedPoints.push({
+            key,
+            name: netName,
+            display: pin.name,
+            priority: 1,
+          });
+        } else if (netName && netName !== "~") {
+          // Same-name power_in pins on one IC are internally tied
+          // (regulator VIN). Do not promote VIN/GND/VCCINT to a
+          // board-wide implicit net — that merged FPGA rails.
+          uf.union(`pin:${pinId}`, `localpwr:${c.refdes}:${netName}`);
+        }
       }
     }
   }

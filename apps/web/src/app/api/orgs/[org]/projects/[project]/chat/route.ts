@@ -91,6 +91,10 @@ export async function POST(
         reply: "",
         llm,
         revisionId: headRevisionId,
+        class: result.surface.class,
+        banner: result.surface.banner,
+        canGateMerge: false,
+        proposals: result.proposals,
       },
       { status: result.attempted ? 502 : 200 },
     );
@@ -101,5 +105,9 @@ export async function POST(
     reply: result.reply,
     llm,
     revisionId: headRevisionId,
+    class: result.surface.class,
+    banner: result.surface.banner,
+    canGateMerge: result.surface.canGateMerge,
+    proposals: result.proposals,
   });
 }

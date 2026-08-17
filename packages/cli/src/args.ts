@@ -18,6 +18,9 @@ Usage:
   solderlab push --org <slug> --project <slug> --file <zip> [--message msg]
   solderlab bsc pull --board <slug> --rev <rev|latest> --out <dir> --format c|zephyr|rust|json|kconfig
   solderlab bsc check [--scan <src-dir>] [--lock <path>] [--cwd <dir>]
+  solderlab firmware patch [--scan src] [--out-dir dir] [--compile] [--report file] [--apply]
+  solderlab synthesize --head <dir> [--base <dir>]
+  solderlab audit --dir <dir> [--bom-platform file] [--pin-functions file]
 
 Env:
   SOLDERLAB_URL, SOLDERLAB_EMAIL, SOLDERLAB_PASSWORD   (push)

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { cx } from "@solderlab/ui";
 import { sendProjectChat, type ChatTurn } from "@/lib/chat-client";
 import { CopilotMark } from "@/components/copilot-mark";
+import { AdvisoryBanner, ProposalCard } from "@/components/classified-surface";
 
 const SUGGESTIONS = [
   "What's on this board?",
@@ -49,7 +50,11 @@ export function AiChatThread({
       });
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: result.reply },
+        {
+          role: "assistant",
+          content: result.reply,
+          proposals: result.proposals ?? [],
+        },
       ]);
     } catch (e) {
       setError((e as Error).message || "Assistant failed");
@@ -79,8 +84,9 @@ export function AiChatThread({
             </p>
             <p className="max-w-sm text-[13px] leading-relaxed text-[var(--text-muted)]">
               Ask about uploaded KiCad files. Electrical names come from the
-              parsed board.
+              parsed board. Chat is advisory — not verified by SolderLabs.
             </p>
+            <AdvisoryBanner />
             <div className="mt-1 flex w-full flex-col gap-1.5">
               {SUGGESTIONS.map((s) => (
                 <button
@@ -107,8 +113,14 @@ export function AiChatThread({
                   You
                 </span>
               )}
-              <div className="min-w-0 flex-1 whitespace-pre-wrap pt-0.5 text-[13px] leading-relaxed text-[var(--text-soft)]">
-                {m.content}
+              <div className="min-w-0 flex-1 space-y-2 pt-0.5">
+                {m.role === "assistant" ? <AdvisoryBanner /> : null}
+                <div className="whitespace-pre-wrap text-[13px] leading-relaxed text-[var(--text-soft)]">
+                  {m.content}
+                </div>
+                {m.proposals?.map((p, pi) => (
+                  <ProposalCard key={`${m.role}-${i}-p-${pi}`} proposal={p} />
+                ))}
               </div>
             </div>
           ))
@@ -161,7 +173,7 @@ export function AiChatThread({
           </button>
         </div>
         <p className="mt-1.5 text-center text-[10px] text-[var(--text-subtle)]">
-          Enter to send · Shift+Enter for a new line
+          Advisory — not verified by SolderLabs · Enter to send
         </p>
       </form>
     </div>

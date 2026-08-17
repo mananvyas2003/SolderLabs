@@ -1,4 +1,10 @@
-import type { DeterministicImpact, RawLlmClaim } from "@solderlab/design-core";
+import {
+  classifyAdvisoryText,
+  type ClassifiedProposal,
+  type ClassifiedSurface,
+  type DeterministicImpact,
+  type RawLlmClaim,
+} from "@solderlab/design-core";
 import { createGroqProvider } from "./groq.ts";
 import type { BoardCard } from "./board-card.ts";
 import {
@@ -19,6 +25,7 @@ import {
   executeBoardTool,
   type ToolHost,
 } from "./tools.ts";
+import { proposalsFromToolMessages } from "./surfaces.ts";
 import type {
   FetchImpl,
   LlmEnv,
@@ -74,14 +81,22 @@ export function parseStructuredFindings(
       const c = x as { kind?: string; ref?: string };
       return { kind: String(c?.kind ?? ""), ref: String(c?.ref ?? "") };
     });
-    out.push({ finding: r.finding, refs, severity: r.severity });
+    out.push({
+      finding: r.finding,
+      refs,
+      severity: r.severity,
+      type: typeof r.type === "string" ? r.type : "",
+    });
   }
   return { ok: true, findings: out };
 }
 
 export function findingsToClaims(findings: StructuredFinding[]): RawLlmClaim[] {
   return findings.map((f) => ({
+    finding: f.finding,
     text: f.finding,
+    type: f.type,
+    severity: f.severity,
     citations: f.refs.map((r) => ({
       kind: r.kind as RawLlmClaim["citations"][number]["kind"],
       ref: r.ref,
@@ -102,6 +117,7 @@ export interface MaybeRunLlmOptions {
 export interface MaybeRunLlmResult extends LlmRunMeta {
   claims: RawLlmClaim[];
   findings: StructuredFinding[];
+  proposals: ClassifiedProposal[];
 }
 
 function emptyMeta(env: LlmEnv, extra: Partial<LlmRunMeta> = {}): LlmRunMeta {
@@ -176,6 +192,17 @@ export interface RunChatOptions {
 
 export interface RunChatResult extends LlmRunMeta {
   reply: string;
+  surface: ClassifiedSurface;
+  proposals: ClassifiedProposal[];
+}
+
+function emptyChat(env: LlmEnv, extra: Partial<LlmRunMeta> = {}): RunChatResult {
+  return {
+    ...emptyMeta(env, extra),
+    reply: "",
+    surface: classifyAdvisoryText(""),
+    proposals: [],
+  };
 }
 
 export async function runChat(opts: RunChatOptions): Promise<RunChatResult> {
@@ -183,24 +210,18 @@ export async function runChat(opts: RunChatOptions): Promise<RunChatResult> {
   const started = Date.now();
   const userMessage = opts.userMessage.trim();
   if (!userMessage) {
-    return {
-      ...emptyMeta(env, {
-        attempted: false,
-        error: "Message is empty",
-      }),
-      reply: "",
-    };
+    return emptyChat(env, {
+      attempted: false,
+      error: "Message is empty",
+    });
   }
   if (!hasLlmKey(env) && !opts.provider) {
-    return {
-      ...emptyMeta(env, {
-        attempted: false,
-        provider: env.LLM_PROVIDER ?? null,
-        model: null,
-        error: "AI is not configured (LLM_API_KEY)",
-      }),
-      reply: "",
-    };
+    return emptyChat(env, {
+      attempted: false,
+      provider: env.LLM_PROVIDER ?? null,
+      model: null,
+      error: "AI is not configured (LLM_API_KEY)",
+    });
   }
 
   const provider = opts.provider ?? getProvider(env, opts.fetchImpl);
@@ -255,19 +276,20 @@ export async function runChat(opts: RunChatOptions): Promise<RunChatResult> {
     toolCallCount = toolLoop.toolCallCount;
     if (!toolLoop.ok) {
       return {
-        ...emptyMeta(env, {
+        ...emptyChat(env, {
           attempted: true,
           succeeded: false,
           error: toolLoop.error,
           latencyMs: Date.now() - started,
           toolCallCount,
         }),
-        reply: "",
+        proposals: proposalsFromToolMessages(toolLoop.messages),
       };
     }
     messages = toolLoop.messages;
   }
 
+  const proposals = proposalsFromToolMessages(messages);
   const text = await provider.completeText({
     system: SYSTEM_PROMPT_CHAT,
     messages,
@@ -275,14 +297,14 @@ export async function runChat(opts: RunChatOptions): Promise<RunChatResult> {
   });
   if (!text.ok) {
     return {
-      ...emptyMeta(env, {
+      ...emptyChat(env, {
         attempted: true,
         succeeded: false,
         error: text.error,
         latencyMs: Date.now() - started,
         toolCallCount,
       }),
-      reply: "",
+      proposals,
     };
   }
 
@@ -295,6 +317,8 @@ export async function runChat(opts: RunChatOptions): Promise<RunChatResult> {
     toolCallCount,
     error: null,
     reply: text.text,
+    surface: classifyAdvisoryText(text.text),
+    proposals,
   };
 }
 
@@ -308,6 +332,7 @@ export async function maybeRunLlmClaims(
       ...emptyMeta(env, { attempted: false, provider: env.LLM_PROVIDER ?? null, model: null }),
       claims: [],
       findings: [],
+      proposals: [],
     };
   }
 
@@ -341,10 +366,12 @@ export async function maybeRunLlmClaims(
       }),
       claims: [],
       findings: [],
+      proposals: proposalsFromToolMessages(toolLoop.messages),
     };
   }
   const messages = toolLoop.messages;
   const toolCallCount = toolLoop.toolCallCount;
+  const proposals = proposalsFromToolMessages(messages);
 
   const structured = await provider.completeStructured({
     system: SYSTEM_PROMPT_STRUCTURED,
@@ -363,6 +390,7 @@ export async function maybeRunLlmClaims(
       }),
       claims: [],
       findings: [],
+      proposals,
     };
   }
 
@@ -378,6 +406,7 @@ export async function maybeRunLlmClaims(
       }),
       claims: [],
       findings: [],
+      proposals,
     };
   }
 
@@ -391,13 +420,15 @@ export async function maybeRunLlmClaims(
     error: null,
     findings: parsed.findings,
     claims: findingsToClaims(parsed.findings),
+    proposals,
   };
 }
 
 export function formatImpactHttpBody<T>(
   report: T,
   llm: LlmRunMeta,
-): { data: T; llm: LlmRunMeta } {
+  proposals: ClassifiedProposal[] = [],
+): { data: T; llm: LlmRunMeta; proposals: ClassifiedProposal[] } {
   return {
     data: report,
     llm: {
@@ -409,5 +440,6 @@ export function formatImpactHttpBody<T>(
       toolCallCount: llm.toolCallCount,
       error: llm.error,
     },
+    proposals,
   };
 }

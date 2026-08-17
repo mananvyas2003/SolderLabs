@@ -22,7 +22,18 @@ if (cwdIdx >= 0 && forwarded[cwdIdx + 1]) {
 }
 
 // Absolutize common path flags relative to the caller's cwd
-for (const flag of ["--out", "--scan", "--registry", "--lock", "--file"]) {
+for (const flag of [
+  "--out",
+  "--scan",
+  "--registry",
+  "--lock",
+  "--file",
+  "--dir",
+  "--head",
+  "--base",
+  "--bom-platform",
+  "--pin-functions",
+]) {
   const i = forwarded.indexOf(flag);
   if (i >= 0 && forwarded[i + 1] && !forwarded[i + 1].startsWith("-")) {
     forwarded[i + 1] = path.resolve(callerCwd, forwarded[i + 1]);

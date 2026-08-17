@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "tsc --noEmit",
-    "test": "node --import tsx --test src/connectivity.test.ts src/__tests__/corpus.test.ts"
+    "test": "node --import tsx --test src/connectivity.test.ts src/__tests__/corpus.test.ts src/__tests__/ai0.test.ts"
   },
   "dependencies": {
     "@solderlab/design-core": "*",

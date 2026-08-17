@@ -171,7 +171,7 @@ export function ReviewRail({
             Rule-based review with evidence links
           </p>
           <p className="text-[11px] text-[var(--text-subtle)]">
-            Local grounded assistant · Ctrl+`
+            Verified rule-based review · Ctrl+`
           </p>
           <Link
             href={`/app/${orgSlug}/${projectSlug}/assistant`}

@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build": "tsc --noEmit",
-    "test": "node --import tsx --test src/__tests__/rules.test.ts src/__tests__/generate.test.ts src/__tests__/emit-diff.test.ts src/__tests__/emit-goldens.test.ts src/__tests__/symbols.test.ts",
+    "test": "node --import tsx --test src/__tests__/rules.test.ts src/__tests__/generate.test.ts src/__tests__/emit-diff.test.ts src/__tests__/emit-goldens.test.ts src/__tests__/symbols.test.ts src/__tests__/firmware-patch.test.ts src/__tests__/bringup.test.ts src/__tests__/pin-functions.test.ts",
     "golden": "node --import tsx scripts/generate-corpus-goldens.mjs",
     "golden:emit": "node --import tsx scripts/generate-emit-goldens.mjs"
   },

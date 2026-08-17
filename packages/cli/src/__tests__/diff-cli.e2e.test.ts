@@ -50,3 +50,25 @@ test("solderlab diff r1→r2 returns machine-readable summary", () => {
   assert.equal(j.uploaded, false);
   assert.ok(j.summary);
 });
+
+test("solderlab synthesize emits bring-up + review + changelog + commit from blinky", () => {
+  const base = path.join(repoRoot, "fixtures/kicad/blinky/r1");
+  const head = path.join(repoRoot, "fixtures/kicad/blinky/r2");
+  const r = spawnSync(
+    process.execPath,
+    [cli, "synthesize", "--base", base, "--head", head, "--cwd", repoRoot],
+    { encoding: "utf8", cwd: path.join(repoRoot, "packages/cli"), env: process.env },
+  );
+  assert.equal(r.status, 0, r.stderr || r.stdout);
+  const j = JSON.parse(r.stdout) as {
+    bringup: { steps: unknown[]; coverage: number };
+    review: { verdict: string; electricalGate: string | null };
+    changelog: { entries: unknown[] };
+    commit: { subject: string; electricalGate: string | null };
+  };
+  assert.ok(Array.isArray(j.bringup.steps));
+  assert.equal(j.review.verdict, "verified");
+  assert.equal(j.review.electricalGate, j.commit.electricalGate);
+  assert.ok(j.changelog.entries.length >= 1);
+  assert.match(j.commit.subject, /electricalGate=/);
+});

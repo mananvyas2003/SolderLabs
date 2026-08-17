@@ -19,7 +19,8 @@ const ANALOG_RE =
 const PMIC_RE = /\b(TPS\d|BQ\d|nPM\d|AP2112|78L?\d{2}|LT1373|AMS1117|NCP718|AP226)/i;
 const MODULE_RE =
   /ComputeModule|\bCM5\b|Jetson|Thor-AGX|Raspberry.?Pi|RP2040|RP2350|SC0914|PIC1[268]|PIC32|nRF52\d|nRF54[LH]|ESP32|ESP8266|MCF52|XCZU|ZYNQ|XC4\d{3}|XC7|XCR3/i;
-const HUB_RE = /\b(USB.?HUB|XR224|USB251|USB2422|USB7\d{3}|TUSB2|GL850|FE1\.1)\b/i;
+const HUB_RE =
+  /\b(USB.?HUB|USB251|USB2422|USB7\d{3}|TUSB2|GL850|FE1\.1)\b|XR224/i;
 const GAUGE_RE = /\b(BM15|MAX1704|BQ27|LC709)\b/i;
 const LEVEL_RE = /TXB\d|TXS\d|TXU\d|NTS01|LevelShifter|LevelTranslator/i;
 const MEMORY_RE = /\b(24C\w*|24LC|AT24|W25Q|SST26|EEPROM|SRAM|628128|IS62)\b/i;
@@ -169,6 +170,9 @@ function skipComponent(c: SnapshotComponent): boolean {
   if (MEMORY_RE.test(partBlob(c))) return true;
   if (UART_BRIDGE_RE.test(partBlob(c))) return true;
   if (GAUGE_RE.test(partBlob(c))) return true;
+  if (HUB_RE.test(partBlob(c))) return true;
+  if (/\b(HD3SS|SLB967|TPM)\b/i.test(partBlob(c))) return true;
+  if (/USB\d{4}/i.test(partBlob(c))) return true;
   if (isPmic(c) && !MODULE_RE.test(partBlob(c))) return true;
   if (/CONN_/i.test(c.value) || /CONN_/i.test(c.footprint)) return true;
   return false;
@@ -415,21 +419,20 @@ export function emittedMcusFromCache(snapshot: DesignSnapshot): BscMcu[] {
   const eligible = cache.candidates.filter(
     (cand) => cand.score >= cache.threshold && cand.pinCount > 0,
   );
-  const identityNoPins = cache.candidates.find(
+  const identityNoPins = cache.candidates.filter(
     (cand) =>
       cand.score >= cache.threshold &&
       (cand.parts.identity ?? 0) > 0 &&
       cand.pinCount === 0,
   );
-  if (identityNoPins && !eligible.some((c) => (c.parts.identity ?? 0) > 0)) {
-    return [];
-  }
-  const withFamily = eligible.filter((cand) => (cand.parts.identity ?? 0) > 0);
+  const withFamily = [
+    ...eligible.filter((cand) => (cand.parts.identity ?? 0) > 0),
+    ...identityNoPins,
+  ].sort((a, b) => b.score - a.score || b.pinCount - a.pinCount);
   const hubOnly = eligible.filter((cand) => (cand.parts.hub ?? 0) < 0);
-  const ranked = (withFamily.length ? withFamily : eligible.length ? eligible : hubOnly).slice(
-    0,
-    3,
-  );
+  const ranked = (
+    withFamily.length ? withFamily : eligible.length ? eligible : hubOnly
+  ).slice(0, 3);
   const out: BscMcu[] = [];
   for (const cand of ranked) {
     const c = byKey.get(`${cand.boardKey ?? ""}\0${cand.refdes}`);
@@ -440,6 +443,13 @@ export function emittedMcusFromCache(snapshot: DesignSnapshot): BscMcu[] {
         reason: `Computed score ${cand.score.toFixed(3)} from pins=${cand.pinCount} identity=${cand.parts.identity} rails=${cand.parts.rails} functions=${cand.parts.functions}`,
       },
     ];
+    if (cand.pinCount === 0) {
+      notes.push({
+        field: "pins",
+        reason:
+          "Symbol body has no extractable pins; identity from Value/lib, pin list left empty",
+      });
+    }
     const mpn = cand.identity;
     if (!c.mpn) {
       notes.push({

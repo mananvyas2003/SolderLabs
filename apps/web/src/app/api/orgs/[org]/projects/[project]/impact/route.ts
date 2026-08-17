@@ -195,5 +195,5 @@ export async function POST(
     llm: async () => llm.claims,
   });
 
-  return Response.json(formatImpactHttpBody(report, llm));
+  return Response.json(formatImpactHttpBody(report, llm, llm.proposals));
 }

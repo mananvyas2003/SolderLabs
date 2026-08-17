@@ -46,9 +46,10 @@ function walk(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-/**
- * Grep firmware sources for exact symbol tokens (word-boundary-ish).
- */
+export function listFirmwareSourceFiles(srcDir: string): string[] {
+  return walk(path.resolve(srcDir));
+}
+
 export function scanCallSites(
   srcDir: string,
   symbols: string[],
@@ -62,8 +63,10 @@ export function scanCallSites(
     let text: string;
     try {
       text = fs.readFileSync(file, "utf8");
-    } catch {
-      continue;
+    } catch (e) {
+      throw new Error(
+        `Cannot read firmware file ${file}: ${e instanceof Error ? e.message : e}`,
+      );
     }
     const lines = text.split(/\r?\n/);
     for (let i = 0; i < lines.length; i++) {
