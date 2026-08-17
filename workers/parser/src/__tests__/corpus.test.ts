@@ -104,6 +104,7 @@ test("corpus net membership equals kicad-cli export netlist", async (t) => {
   const staleUnread: string[] = [];
   const overBudget: string[] = [];
   const staleBudget: string[] = [];
+  const actuals: Record<string, number> = {};
 
   for (const p of picked) {
     const snap = parseKicadProjectDir(p.abs);
@@ -139,6 +140,7 @@ test("corpus net membership equals kicad-cli export netlist", async (t) => {
     const diffs = sharedNetMembershipMismatches(ours, oracle, {
       ignorePowerFlagPins: true,
     });
+    actuals[p.id] = diffs.length;
     const cap = budget[p.id] ?? 0;
     if (diffs.length > cap) {
       overBudget.push(
@@ -155,19 +157,22 @@ test("corpus net membership equals kicad-cli export netlist", async (t) => {
     }
   }
 
-  assert.equal(
-    staleUnread.length,
-    0,
-    `unreadableBoards must shrink — kicad-cli can load: ${staleUnread.join(", ")}`,
-  );
-  assert.equal(
-    staleBudget.length,
-    0,
-    `pinsetMismatchBudget must shrink:\n${staleBudget.join("\n")}`,
-  );
-  assert.equal(
-    overBudget.length,
-    0,
-    `net membership diverged from kicad-cli:\n${overBudget.join("\n")}`,
-  );
+  const problems: string[] = [];
+  if (staleUnread.length) {
+    problems.push(
+      `unreadableBoards must shrink — kicad-cli can load: ${staleUnread.join(", ")}`,
+    );
+  }
+  if (staleBudget.length) {
+    problems.push(`pinsetMismatchBudget must shrink:\n${staleBudget.join("\n")}`);
+  }
+  if (overBudget.length) {
+    problems.push(`net membership diverged from kicad-cli:\n${overBudget.join("\n")}`);
+  }
+  if (problems.length) {
+    const suggested = { ...budget, ...actuals };
+    assert.fail(
+      `${problems.join("\n\n")}\n\nmeasured pinsetMismatchBudget (copy into netlist-exclusions.json):\n${JSON.stringify(suggested, null, 2)}`,
+    );
+  }
 });
