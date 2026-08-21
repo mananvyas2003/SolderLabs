@@ -432,6 +432,63 @@ test("same-name power_in pins on one IC share a net without a global VIN merge",
   );
 });
 
+test("PWR_FLAG does not globally short distinct power rails", () => {
+  // Two rails each with a PWR_FLAG — KiCad ERC marker must not publish
+  // name:PWR_FLAG or HT and GND collapse into one net.
+  const src = `
+(kicad_sch
+  (lib_symbols
+    (symbol "Device:C"
+      (symbol "C_1_1"
+        (pin passive line (at 0 3.81 270) (length 2.54)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "1" (effects (font (size 1.27 1.27))))
+        )
+        (pin passive line (at 0 -3.81 90) (length 2.54)
+          (name "~" (effects (font (size 1.27 1.27))))
+          (number "2" (effects (font (size 1.27 1.27))))
+        )
+      )
+    )
+  )
+  (wire (pts (xy 10 6.19) (xy 10 5)) (uuid "w1"))
+  (wire (pts (xy 10 13.81) (xy 10 15)) (uuid "w2"))
+  (symbol (lib_id "Device:C") (at 10 10 0) (unit 1)
+    (property "Reference" "C1" (at 10 10 0))
+    (property "Value" "100n" (at 10 10 0))
+  )
+  (symbol (lib_id "power:HT") (at 10 5 0) (unit 1)
+    (property "Reference" "#PWR1" (at 10 5 0))
+    (property "Value" "HT" (at 10 5 0))
+  )
+  (symbol (lib_id "power:GND") (at 10 15 0) (unit 1)
+    (property "Reference" "#PWR2" (at 10 15 0))
+    (property "Value" "GND" (at 10 15 0))
+  )
+  (symbol (lib_id "power:PWR_FLAG") (at 10 5 0) (unit 1)
+    (property "Reference" "#FLG1" (at 10 5 0))
+    (property "Value" "PWR_FLAG" (at 10 5 0))
+  )
+  (symbol (lib_id "power:PWR_FLAG") (at 10 15 0) (unit 1)
+    (property "Reference" "#FLG2" (at 10 15 0))
+    (property "Value" "PWR_FLAG" (at 10 15 0))
+  )
+)
+`;
+  const snap = parseKicadSchematicText(src);
+  const c1 = snap.components.find((c) => c.refdes === "C1");
+  const p1 = c1?.pins?.find((p) => p.number === "1");
+  const p2 = c1?.pins?.find((p) => p.number === "2");
+  assert.notEqual(p1?.net, p2?.net, `C1 pins shorted via PWR_FLAG: ${p1?.net}`);
+  assert.equal(p1?.net, "HT");
+  assert.equal(p2?.net, "GND");
+  assert.equal(
+    snap.nets.some((n) => n.name === "PWR_FLAG"),
+    false,
+    "PWR_FLAG must not become a net name",
+  );
+});
+
 test("no_connect markers isolate stacked pins from a nearby rail", () => {
   const src = `
 (kicad_sch

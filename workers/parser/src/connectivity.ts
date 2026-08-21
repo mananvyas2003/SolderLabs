@@ -556,6 +556,7 @@ export function resolveConnectivity(
       const isolated =
         (pin.electrical ?? "").toLowerCase() === "no_connect" ||
         noConnectKeys.has(roundKey(world));
+
       const key = isolated ? `nc:${pinId}` : `p:${roundKey(world)}`;
       uf.find(key);
       uf.union(key, `pin:${pinId}`);
@@ -571,14 +572,22 @@ export function resolveConnectivity(
       });
       if (isolated) continue;
       if (power) {
-        const netName = normalizeNetName(c.value || pin.name || "GND");
-        uf.union(`pin:${pinId}`, `name:${netName}`);
-        namedPoints.push({
-          key,
-          name: netName,
-          display: c.value || netName,
-          priority: 3,
-        });
+        // PWR_FLAG is an ERC marker only — attach to the wired net, but never
+        // publish `name:PWR_FLAG`. Doing so globally shorts every rail that
+        // carries a flag (HT/+12V → GND on complex_hierarchy).
+        const rawVal = (c.value || pin.name || "").trim();
+        if (/^PWR_FLAG$/i.test(rawVal)) {
+          /* geometric attach only */
+        } else {
+          const netName = normalizeNetName(rawVal || "GND");
+          uf.union(`pin:${pinId}`, `name:${netName}`);
+          namedPoints.push({
+            key,
+            name: netName,
+            display: c.value || netName,
+            priority: 3,
+          });
+        }
       } else if (isGlobalPowerPinType(pin.electrical)) {
         const netName = normalizeNetName(pin.name);
         if (isImplicitGlobalPowerName(pin.name)) {
