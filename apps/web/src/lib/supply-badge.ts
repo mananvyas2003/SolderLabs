@@ -1,5 +1,12 @@
 import type { PartWatch, SolderLabDb } from "@solderlab/db";
-import { watchIsStale } from "@solderlab/parts";
+
+const WATCH_STALE_MAX_AGE_MS = 36 * 3600 * 1000;
+
+function watchIsStale(watch: PartWatch, nowMs: number): boolean {
+  if (watch.lifecycleStatus === "unknown") return true;
+  if (!watch.lastCheckedAt) return true;
+  return nowMs - new Date(watch.lastCheckedAt).getTime() > WATCH_STALE_MAX_AGE_MS;
+}
 
 export type SupplyBadgeLevel = "critical" | "warning" | "unknown" | "ok";
 

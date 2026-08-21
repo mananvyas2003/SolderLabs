@@ -1,0 +1,11 @@
+{
+  "name": "@solderlab/physics-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Vendored new_sch MNA/topology engine + JSON CLI (solderlab-physics)",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node -e \"console.log('physics-engine: build with npm run build -w @solderlab/physics-engine')\""
+  }
+}

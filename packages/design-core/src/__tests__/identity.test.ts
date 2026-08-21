@@ -8,7 +8,7 @@ import {
   type DesignSnapshot,
   type SnapshotComponent,
 } from "../index.ts";
-import { parseKicadProjectDir } from "../../../../workers/parser/src/index.ts";
+import { parseKicadProjectDir } from "@solderlab/parser";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, "../../../../");

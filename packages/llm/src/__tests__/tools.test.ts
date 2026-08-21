@@ -264,3 +264,54 @@ test("Tier B tools ignore extra args; missing datasheet table stays unverifiable
   assert.equal(JSON.stringify(pins).includes("INVENTED_FN"), false);
 });
 
+test("physics tools wrap engine; extras cannot invent MPN or force verified", async () => {
+  const { physicsBinaryAvailable } = await import("@solderlab/physics");
+  if (!physicsBinaryAvailable()) {
+    // Optional binary — same pattern as kicad-cli skips
+    return;
+  }
+  const host = hostFor(snapshot());
+  const dc = executeBoardTool(host, "solve_dc_circuit", {
+    nodes: 2,
+    stamps: [
+      { kind: "V", a: 1, b: 0, value: 5 },
+      { kind: "R", a: 1, b: 2, value: 10000 },
+      { kind: "R", a: 2, b: 0, value: 10000 },
+    ],
+    probes: [{ name: "VOUT", node: 2, expected: 2.5 }],
+    verified: true,
+    mpn: "FAKE-MPN-999",
+    voltage: 99,
+  }) as {
+    status: string;
+    findingsText: string[];
+    engineResults: { probes?: Array<{ voltage: number }> };
+  };
+  assert.equal(dc.status, "verified");
+  assert.ok(Math.abs((dc.engineResults.probes?.[0]?.voltage ?? 0) - 2.5) < 1e-6);
+  assert.equal(JSON.stringify(dc).includes("FAKE-MPN-999"), false);
+  assert.ok(dc.findingsText.every((t) => /Engine/i.test(t)));
+
+  const syn = executeBoardTool(host, "synthesize_topology_block", {
+    topology: "resistor_divider",
+    vin: 12,
+    vout: 3.3,
+    class: "verified",
+    mpn: "INVENTED",
+  }) as {
+    outputClass: string;
+    canGateMerge: boolean;
+    classified: { class: string };
+  };
+  assert.equal(syn.canGateMerge, false);
+  assert.equal(syn.outputClass, "proposed");
+  assert.equal(syn.classified.class, "proposed");
+  assert.equal(JSON.stringify(syn).includes("INVENTED") && syn.classified.class === "verified", false);
+
+  const float = executeBoardTool(host, "solve_dc_circuit", {
+    nodes: 2,
+    stamps: [{ kind: "R", a: 1, b: 2, value: 100 }],
+  }) as { status: string };
+  assert.equal(float.status, "refuted");
+});
+

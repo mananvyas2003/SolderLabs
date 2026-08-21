@@ -15,6 +15,7 @@
     "@solderlab/analytics": "*",
     "@solderlab/design-core": "*",
     "@solderlab/parser": "*",
+    "@solderlab/physics": "*",
     "tsx": "^4.19.3"
   },
   "devDependencies": {

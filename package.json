@@ -20,7 +20,8 @@
     "corpus:refresh": "node --import tsx scripts/refresh-manifest-counts.mjs",
     "bsc:golden": "npm run golden -w @solderlab/bsc",
     "bsc:golden:emit": "npm run golden:emit -w @solderlab/bsc",
-    "parts:watch": "npm run watch -w @solderlab/parts"
+    "parts:watch": "npm run watch -w @solderlab/parts",
+    "physics:build": "npm run build -w @solderlab/physics-engine"
   },
   "engines": {
     "node": ">=22.13"

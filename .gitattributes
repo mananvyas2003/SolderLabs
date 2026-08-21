@@ -1,0 +1,3 @@
+# BSC goldens are byte-compared against LF emitter output; never let
+# autocrlf rewrite them as CRLF on checkout.
+fixtures/corpus/bsc/** text eol=lf

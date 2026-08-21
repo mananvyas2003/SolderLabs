@@ -15,6 +15,7 @@
   "dependencies": {
     "@solderlab/bsc": "*",
     "@solderlab/design-core": "*",
+    "@solderlab/physics": "*",
     "openai": "^4.104.0"
   },
   "devDependencies": {

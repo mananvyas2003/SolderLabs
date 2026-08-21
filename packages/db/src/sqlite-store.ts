@@ -136,7 +136,9 @@ export function captureRowSnapshot(db: SolderLabDb): RowSnapshot {
   const out = {} as RowSnapshot;
   for (const table of TABLE_NAMES) {
     const m = new Map<string, string>();
-    for (const row of db[table] as Array<Record<string, unknown> & { id: string }>) {
+    for (const row of db[table] as unknown as Array<
+      Record<string, unknown> & { id: string }
+    >) {
       m.set(row.id, JSON.stringify(encodeRow(table, row)));
     }
     out[table] = m;

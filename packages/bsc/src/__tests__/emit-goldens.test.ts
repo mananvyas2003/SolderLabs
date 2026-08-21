@@ -47,7 +47,9 @@ test("corpus emit goldens match pure emitters for every project × format", () =
         fs.existsSync(goldenPath),
         `missing emit golden ${path.relative(repoRoot, goldenPath)} — run npm run golden:emit -w @solderlab/bsc`,
       );
-      const expected = fs.readFileSync(goldenPath, "utf8");
+      // Goldens are stored with LF; git autocrlf may check them out as CRLF.
+      // Emitters deterministically emit LF, so normalize before comparing.
+      const expected = fs.readFileSync(goldenPath, "utf8").replace(/\r\n/g, "\n");
       const actual = emitBSC(bsc, fmt);
       assert.equal(
         actual,

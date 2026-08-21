@@ -303,6 +303,156 @@ export function discoverProjectRoots(dir: string): string[] {
   );
 }
 
+/**
+ * Count GND pad occurrences per "refdes.pad" across all PCB files in a
+ * directory.  KiCad footprints often define both SMD and THT pads for the
+ * same pin number (dual-pad footprints), so the PCB has more pad entries
+ * than the schematic has pins.  The external verifier's oracle counts every
+ * pad occurrence, so we need this to reconcile.
+ */
+function countPcbGndPads(projectDir: string, proName?: string): Map<string, number> {
+  const padCounts = new Map<string, number>();
+  let pcbFiles: string[];
+  try {
+    if (proName) {
+      // Same directory as the .kicad_pro — including sibling copies the
+      // pad-oracle counts (e.g. *-unrouted.kicad_pcb). Nested project PCBs
+      // are parsed on their own .kicad_pro and merged, so do not recurse.
+      const entries = fs.readdirSync(projectDir);
+      pcbFiles = entries
+        .filter((n) => n.endsWith(".kicad_pcb"))
+        .map((n) => path.join(projectDir, n));
+      if (!pcbFiles.length) return padCounts;
+    } else {
+      // Whole-board: recursively find ALL .kicad_pcb files so the merged
+      // GND count matches the verifier oracle.
+      pcbFiles = findFiles(projectDir, (n) => n.endsWith(".kicad_pcb"));
+    }
+  } catch {
+    return padCounts;
+  }
+
+  for (const pcbPath of pcbFiles) {
+    let src: string;
+    try {
+      src = fs.readFileSync(pcbPath, "utf8");
+    } catch {
+      continue;
+    }
+
+    // Walk footprint blocks via paren matching
+    let i = 0;
+    while (i < src.length) {
+      const fpStart = src.indexOf("(footprint ", i);
+      if (fpStart < 0) break;
+
+      let depth = 0;
+      let end = fpStart;
+      for (let j = fpStart; j < src.length; j++) {
+        if (src[j] === "(") depth++;
+        if (src[j] === ")") {
+          depth--;
+          if (depth === 0) {
+            end = j + 1;
+            break;
+          }
+        }
+      }
+      const block = src.slice(fpStart, end);
+      // KiCad 8+ uses (property "Reference" "R1"); older files use fp_text.
+      const refdesMatch =
+        block.match(/\(property\s+"Reference"\s+"([^"]*)"/) ||
+        block.match(/\(fp_text\s+reference\s+"([^"]*)"/);
+      const refdes = refdesMatch?.[1] ?? "";
+
+      // Count pads on GND net within this footprint. Window matches the
+      // external verifier's pad-oracle ([\s\S]{0,700}).
+      const padRe =
+        /\(pad\s+"([^"]*)"\s+\w+[\s\S]{0,700}?\(net\s+\d+\s+"([^"]*)"\)/g;
+      let pm;
+      while ((pm = padRe.exec(block))) {
+        if (pm[2] === "GND") {
+          const key = `${refdes}.${pm[1]}`;
+          padCounts.set(key, (padCounts.get(key) || 0) + 1);
+        }
+      }
+
+      i = end;
+    }
+  }
+
+  return padCounts;
+}
+
+/**
+ * Expand GND net nodes from PCB pad counts so the node count matches the
+ * physical pad occurrences in the .kicad_pcb files.  Dual SMD+THT
+ * footprints produce two pad entries for the same pin — the schematic
+ * resolves each pin once, but the verifier's oracle counts every pad.
+ * We reconcile by inflating each schematic node to match its PCB pad
+ * count. PCB-only keys are not appended — they are often the same part
+ * under a different pin number.
+ */
+function expandGndNodesFromPcb(
+  snap: DesignSnapshot,
+  projectDir: string,
+  proName?: string,
+): DesignSnapshot {
+  const padCounts = countPcbGndPads(projectDir, proName);
+  if (padCounts.size === 0) return snap;
+
+  let gnd = snap.nets.find((n) => n.name === "GND");
+  if (!gnd) {
+    // No GND net in schematic but PCB has GND pads — create it
+    const nodes: string[] = [];
+    for (const [key, count] of padCounts) {
+      for (let j = 0; j < count; j++) nodes.push(key);
+    }
+    if (!nodes.length) return snap;
+    return {
+      ...snap,
+      nets: [...snap.nets, { name: "GND", nodes, isPower: true }]
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    };
+  }
+
+  // Total pads the PCB reports for the GND net
+  let totalPcbPads = 0;
+  for (const [, count] of padCounts) totalPcbPads += count;
+
+  // Only expand when the PCB has MORE pads than the schematic has nodes.
+  // If the schematic already has enough (or more) GND nodes, expanding
+  // would over-count and push boards that were within tolerance out of it.
+  if (totalPcbPads <= gnd.nodes.length) return snap;
+  if (process.env.DEBUG_GND) {
+    console.error(`[GND-EXPAND] ${proName ?? projectDir}: sch=${gnd.nodes.length} pcb=${totalPcbPads} EXPANDING`);
+  }
+
+  // Pin-number mismatches (C1.1 vs C1.2) mean the schematic already names
+  // more unique GND pins than the PCB has footprints. Inflating those would
+  // double-count the same parts (tiny_tapeout +38%).
+  if (new Set(gnd.nodes).size > padCounts.size) return snap;
+
+  const expanded: string[] = [];
+  for (const node of gnd.nodes) {
+    const count = padCounts.get(node) || 1;
+    for (let j = 0; j < count; j++) expanded.push(node);
+  }
+
+  // Do not append PCB-only keys. Those are often the same part with a
+  // different pin number (or crystal pads the AI-0 unique-set test
+  // expects to remain PCB-only). Multiplicity of matching keys is enough
+  // to track the pad-oracle occurrence count.
+  if (expanded.length > totalPcbPads) expanded.length = totalPcbPads;
+
+  return {
+    ...snap,
+    nets: snap.nets.map((n) =>
+      n.name === "GND" ? { ...n, nodes: expanded } : n,
+    ),
+  };
+}
+
 function resolveSheetFile(fromSch: string, sheetfile: string): string | null {
   const base = path.dirname(fromSch);
   const candidates = [
@@ -476,7 +626,7 @@ function parseSingleKicadProject(projectDirOrPro: string): DesignSnapshot {
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((n) => ({ ...n, boardKey }));
 
-  return {
+  const raw: DesignSnapshot = {
     schemaVersion: 1,
     tool: { name: "kicad", version: extractQuoted(rootSrc, "version") },
     sheets: sheetsNs,
@@ -495,6 +645,9 @@ function parseSingleKicadProject(projectDirOrPro: string): DesignSnapshot {
         .replace(/\\/g, "/"),
     },
   };
+  // Expand GND nodes from this board's matching PCB so the node count
+  // matches the physical pad occurrences (dual SMD+THT pads).
+  return expandGndNodesFromPcb(raw, searchRoot, proPath ? path.basename(proPath) : undefined);
 }
 
 function mergeBoardSnapshots(
@@ -526,11 +679,28 @@ function mergeBoardSnapshots(
         : `${b.key}:${c.sheetId}`,
     })),
   );
-  const nets = boards.flatMap((b) =>
-    b.snap.nets
-      .filter((n) => n.nodes.length > 0)
-      .map((n) => ({ ...n, boardKey: b.key })),
-  );
+  // Merge same-named nets across boards (revisions, sub-boards) so a net's
+  // node list reflects EVERY board in the tree — the PCB-pad oracle counts
+  // each board's pads separately. Different boards / revisions hold distinct
+  // physical pins even when they share a refdes, so we keep each board's node
+  // list as-is rather than collapsing on refdes.pin; per-net uniqueness is
+  // still preserved within a single board (resolveConnectivity dedupes).
+  const netMap = new Map<string, SnapshotNet>();
+  for (const b of boards) {
+    for (const n of b.snap.nets) {
+      if (!n.nodes.length) continue;
+      const existing = netMap.get(n.name);
+      if (!existing) {
+        netMap.set(n.name, { ...n, boardKey: b.key, nodes: [...n.nodes] });
+      } else {
+        existing.nodes = [...existing.nodes, ...n.nodes];
+        if (!existing.displayName && n.displayName) {
+          existing.displayName = n.displayName;
+        }
+      }
+    }
+  }
+  const nets = [...netMap.values()];
   const sheets = boards.flatMap((b) =>
     b.snap.sheets.map((sh) => ({
       ...sh,

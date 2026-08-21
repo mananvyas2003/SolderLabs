@@ -194,7 +194,7 @@ test("rule:mcu — identity-only SoM emits with empty pins, never invented", () 
   assert.equal(bsc.pins.length, 0);
 });
 
-test("rule:mcu — USB hub is not an MCU", () => {
+test("rule:mcu — lone USB hub is not a scored MCU but is reported as the primary IC", () => {
   const u: SnapshotComponent = {
     refdes: "U1",
     value: "XR22417CV48TR-F",
@@ -207,7 +207,14 @@ test("rule:mcu — USB hub is not an MCU", () => {
     components: [u],
     nets: [{ name: "USB_DP", nodes: ["U1.1"] }],
   });
-  assert.equal(mcuRule.match({ snapshot }).length, 0);
+  // The hub never clears the microcontroller score threshold, but on a board
+  // whose only active IC is this controller it is the board's primary IC and
+  // is reported as a sub-threshold fallback with no invented pin map.
+  const hit = mcuRule.match({ snapshot });
+  assert.equal(hit.length, 1);
+  assert.equal(hit[0]!.refdes, "U1");
+  assert.ok(hit[0]!.confidence < 0.4, "hub must be a sub-threshold fallback, not a scored MCU");
+  assert.equal(generateBSC(snapshot).pins.length, 0);
 });
 
 test("rule:mcu — SoM identity beats a high-pin USB hub on the same board", () => {

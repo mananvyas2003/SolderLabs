@@ -21,11 +21,16 @@ Usage:
   solderlab firmware patch [--scan src] [--out-dir dir] [--compile] [--report file] [--apply]
   solderlab synthesize --head <dir> [--base <dir>]
   solderlab audit --dir <dir> [--bom-platform file] [--pin-functions file]
+  solderlab physics solve-dc --json <file>
+  solderlab physics synthesize --topology <name> --vin <V> --vout <V>
+  solderlab physics candidates --type resistor --value <ohms>
+  solderlab physics ping
 
 Env:
   SOLDERLAB_URL, SOLDERLAB_EMAIL, SOLDERLAB_PASSWORD   (push)
   SOLDERLAB_BSC_DIR   Registry directory of <board>.bsc.json (default: fixtures/corpus/bsc)
+  SOLDERLAB_PHYSICS_BIN   Optional path to solderlab-physics binary
 
-Note: \`diff\` runs the parser locally — nothing is uploaded.
+Note: \`diff\` and \`physics\` run locally — nothing is uploaded.
 `);
 }

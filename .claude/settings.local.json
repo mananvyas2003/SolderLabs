@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp docs/verify-solderlabs.mjs verify-solderlabs.mjs)",
+      "Read(//d/testcorpus/kicad-demos/**)",
+      "Bash(export CORPUS=\"D:/Github for Hardware/fixtures/kicad-source-mirror/demos\")",
+      "Bash(node --import tsx verify-solderlabs.mjs)",
+      "Bash(node --import tsx verify-solderlabs.mjs --only=V1)",
+      "Bash(node --import tsx verify-solderlabs.mjs --only=V1,V2)",
+      "Bash(npm test *)",
+      "Bash(node --import tsx scripts/diag-mcu.mjs)",
+      "Bash(node --import tsx verify-solderlabs.mjs --only=V3)",
+      "Bash(npx tsx *)",
+      "Bash(node --import tsx verify-solderlabs.mjs --only=V4)",
+      "Bash(node scripts/diag-strict.mjs \"fixtures/kicad-source-mirror/demos/royalblue54L_feather/RoyalBlue54L-Feather.kicad_pcb\")",
+      "Bash(npm run *)"
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "hashes": {
+    "workers/parser/src/__tests__/netlist-exclusions.json": "34d27a784aef9856",
+    "workers/parser/src/kicad-netlist-oracle.ts": "4a27310a9d34cb46",
+    "workers/parser/src/__tests__/corpus.test.ts": "ab962ff80427e982"
+  },
+  "createdAt": "2026-08-17T21:17:21.272Z"
+}

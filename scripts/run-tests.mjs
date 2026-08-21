@@ -8,6 +8,7 @@ const workspaces = [
   "@solderlab/design-core",
   "@solderlab/parser",
   "@solderlab/bsc",
+  "@solderlab/physics",
   "@solderlab/llm",
   "@solderlab/analytics",
   "@solderlab/cli",

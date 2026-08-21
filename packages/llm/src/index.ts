@@ -53,6 +53,9 @@ export {
   audit_test_points,
   audit_net_names,
   lookup_pin_functions,
+  solve_dc_circuit,
+  synthesize_topology_block,
+  find_jlcpcb_candidates,
   type ToolHost,
 } from "./tools.ts";
 export {

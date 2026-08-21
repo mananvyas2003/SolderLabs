@@ -33,7 +33,7 @@ export interface ArtifactDiffInput {
 export interface ArtifactCheckRow {
   name: string;
   status: string;
-  summary: string;
+  summary: string | null;
 }
 
 export interface ArtifactRef {

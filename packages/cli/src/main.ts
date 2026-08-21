@@ -7,6 +7,7 @@ import { cmdDiff } from "./diff";
 import { cmdFirmwarePatch } from "./firmware-patch";
 import { cmdSynthesize } from "./synthesize";
 import { cmdAudit } from "./audit";
+import { cmdPhysics } from "./physics";
 
 async function cmdPush(argv: string[]): Promise<number> {
   const base = process.env.SOLDERLAB_URL ?? "http://localhost:3000";
@@ -94,6 +95,10 @@ async function main() {
 
   if (cmd === "audit") {
     process.exit(await cmdAudit(argv.slice(1), cwd));
+  }
+
+  if (cmd === "physics") {
+    process.exit(await cmdPhysics(argv.slice(1), cwd));
   }
 
   if (cmd === "firmware") {

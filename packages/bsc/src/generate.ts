@@ -11,6 +11,7 @@ import {
   testPointRule,
   type RuleContext,
 } from "./rules";
+import { MCU_SCORE_THRESHOLD } from "./mcu-score";
 import {
   BSC_SCHEMA_VERSION,
   type BoardSupportContract,
@@ -182,7 +183,14 @@ export function generateBSC(
   void DETECTION_RULES; // inspectable table — individual rules invoked below
 
   const mcus = mcuRule.match(ctx);
-  const pins = mcus.flatMap((m) => buildMcuPins(snapshot, m.refdes, m.boardKey));
+  // Primary-IC fallback emits (confidence below the score threshold) are
+  // identity-only: we do not claim a pin map for a part we did not positively
+  // identify as a microcontroller.
+  const pins = mcus.flatMap((m) =>
+    m.confidence >= MCU_SCORE_THRESHOLD
+      ? buildMcuPins(snapshot, m.refdes, m.boardKey)
+      : [],
+  );
   const busDevices = [...i2cBusRule.match(ctx), ...spiBusRule.match(ctx)].sort(
     (a, b) => a.refdes.localeCompare(b.refdes, undefined, { numeric: true }),
   );

@@ -1,5 +1,6 @@
 node_modules
 .next
+.next-*/
 dist
 .turbo
 *.log
@@ -11,6 +12,11 @@ data/
 *.sqlite
 *.sqlite-wal
 *.sqlite-shm
+# Physics engine build + ephemeral DBs
+packages/physics-engine/bin/
+packages/physics-engine/build/
+solderlab_physics_*.db
+data/jlcpcb/
 apps/web/public/uploads
 .vercel
 coverage

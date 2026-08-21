@@ -8,7 +8,7 @@ import type { PartDataProvider, PartDataResult } from "../types.ts";
 import { runPartWatchJob } from "../job.ts";
 import { evaluateBomLifecycle } from "../check.ts";
 import { DEFAULT_BATCH_SIZE } from "../types.ts";
-import { revisionChecksPassing } from "../../../../apps/web/src/lib/check-gate.ts";
+import { revisionChecksPassing } from "@solderlab/db";
 
 function isolatedDb() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "solderlab-parts-"));

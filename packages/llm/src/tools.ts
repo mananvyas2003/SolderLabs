@@ -28,12 +28,20 @@ import {
   type FirmwareFile,
   type PinFunctionRecord,
 } from "@solderlab/bsc";
+import {
+  classifyPhysicsResponse,
+  findPartCandidates,
+  renderPhysicsFindings,
+  solveDc,
+  synthesizeTopology,
+  type PhysicsStamp,
+} from "@solderlab/physics";
 import type { LlmToolSpec } from "./types.ts";
 
 export interface ToolCheckRow {
   name: string;
   status: string;
-  summary: string;
+  summary: string | null;
 }
 
 export interface ToolHost {
@@ -330,6 +338,82 @@ export const BOARD_TOOL_SPECS: LlmToolSpec[] = [
       type: "object",
       additionalProperties: false,
       properties: {},
+    },
+  },
+  {
+    name: "solve_dc_circuit",
+    description:
+      "Run the deterministic MNA DC solver on explicit stamps. Returns engine voltages or refutes singular/floating circuits. Extra args cannot invent voltages.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required: ["nodes", "stamps"],
+      properties: {
+        nodes: { type: "integer" },
+        stamps: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["kind", "a", "b", "value"],
+            properties: {
+              kind: { type: "string" },
+              a: { type: "integer" },
+              b: { type: "integer" },
+              value: { type: "number" },
+            },
+          },
+        },
+        probes: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["name", "node"],
+            properties: {
+              name: { type: "string" },
+              node: { type: "integer" },
+              expected: { type: "number" },
+            },
+          },
+        },
+      },
+    },
+  },
+  {
+    name: "synthesize_topology_block",
+    description:
+      "Synthesize known topologies (resistor_divider, rc_filter, …) and bind catalog parts. Always Proposed — never writes CAD. Extra args cannot force verified or invent MPNs.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required: ["topology", "vin", "vout"],
+      properties: {
+        topology: { type: "string" },
+        vin: { type: "number" },
+        vout: { type: "number" },
+        iout: { type: "number" },
+      },
+    },
+  },
+  {
+    name: "find_jlcpcb_candidates",
+    description:
+      "Query the physics-engine parts catalog (E-series / imported JLCPCB) for candidates. Never invents an MPN.",
+    parameters: {
+      type: "object",
+      additionalProperties: false,
+      required: ["type", "value"],
+      properties: {
+        type: { type: "string" },
+        value: { type: "number" },
+        package: { type: "string" },
+        tolerance: { type: "string" },
+        minV: { type: "number" },
+        minI: { type: "number" },
+        minP: { type: "number" },
+        limit: { type: "integer" },
+      },
     },
   },
 ];
@@ -713,6 +797,107 @@ export function generate_commit_notes(host: ToolHost) {
   return generateCommitNotes(diff, { bscChanges });
 }
 
+function asNumber(v: unknown, fallback = NaN): number {
+  const n = typeof v === "number" ? v : Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function parseStamps(raw: unknown): PhysicsStamp[] | { error: string } {
+  if (!Array.isArray(raw)) return { error: "stamps must be an array" };
+  const out: PhysicsStamp[] = [];
+  for (const row of raw) {
+    if (!row || typeof row !== "object") continue;
+    const o = row as Record<string, unknown>;
+    const kind = asString(o.kind);
+    if (!kind) continue;
+    out.push({
+      kind: kind as PhysicsStamp["kind"],
+      a: asInt(o.a, 0),
+      b: asInt(o.b, 0),
+      value: asNumber(o.value, 0),
+    });
+  }
+  return out;
+}
+
+/** Wrap physics solveDc — ignores class/verified/mpn extras from the model. */
+export function solve_dc_circuit(args: Record<string, unknown>) {
+  void args.class;
+  void args.verified;
+  void args.canGateMerge;
+  void args.mpn;
+  void args.voltage;
+  const stamps = parseStamps(args.stamps);
+  if ("error" in stamps) {
+    return { status: "unverifiable" as const, error: stamps.error, coverage: 0 };
+  }
+  const probes = Array.isArray(args.probes)
+    ? args.probes
+        .filter((p): p is Record<string, unknown> => !!p && typeof p === "object")
+        .map((p) => ({
+          name: asString(p.name),
+          node: asInt(p.node, 0),
+          expected:
+            p.expected !== undefined ? asNumber(p.expected) : undefined,
+        }))
+    : undefined;
+  const res = solveDc({
+    nodes: asInt(args.nodes, 0),
+    stamps,
+    probes,
+  });
+  const classified = classifyPhysicsResponse(res, "solve_dc");
+  return {
+    ...res,
+    findingsText: renderPhysicsFindings(res),
+    classified,
+    electricalGate: undefined,
+    canGateMerge: "class" in classified ? classified.canGateMerge : false,
+  };
+}
+
+export function synthesize_topology_block(args: Record<string, unknown>) {
+  void args.class;
+  void args.verified;
+  void args.mpn;
+  void args.bindings;
+  const res = synthesizeTopology({
+    topology: asString(args.topology),
+    vin: asNumber(args.vin),
+    vout: asNumber(args.vout),
+    iout: args.iout !== undefined ? asNumber(args.iout) : undefined,
+  });
+  const classified = classifyPhysicsResponse(res, "synthesize");
+  return {
+    ...res,
+    findingsText: renderPhysicsFindings(res),
+    classified,
+    canGateMerge: false,
+    outputClass: "proposed",
+  };
+}
+
+export function find_jlcpcb_candidates(args: Record<string, unknown>) {
+  void args.mpn;
+  void args.candidates;
+  const res = findPartCandidates({
+    type: asString(args.type),
+    value: asNumber(args.value),
+    package: args.package !== undefined ? asString(args.package) : undefined,
+    tolerance:
+      args.tolerance !== undefined ? asString(args.tolerance) : undefined,
+    minV: args.minV !== undefined ? asNumber(args.minV) : undefined,
+    minI: args.minI !== undefined ? asNumber(args.minI) : undefined,
+    minP: args.minP !== undefined ? asNumber(args.minP) : undefined,
+    limit: args.limit !== undefined ? asInt(args.limit, 5) : undefined,
+  });
+  return {
+    ...res,
+    findingsText: renderPhysicsFindings(res),
+    classified: classifyPhysicsResponse(res, "find_candidates"),
+  };
+}
+
 export function executeBoardTool(
   host: ToolHost,
   name: string,
@@ -771,6 +956,12 @@ export function executeBoardTool(
       return audit_net_names(host);
     case "lookup_pin_functions":
       return lookup_pin_functions(host);
+    case "solve_dc_circuit":
+      return solve_dc_circuit(args);
+    case "synthesize_topology_block":
+      return synthesize_topology_block(args);
+    case "find_jlcpcb_candidates":
+      return find_jlcpcb_candidates(args);
     default:
       return { error: `unknown tool ${name}` };
   }

@@ -51,6 +51,37 @@ const POWER_FLAG_REF_RE = /^#PWR|^#FLG|^#E|^#U/i;
 const CRYSTAL_REF_RE = /^(Y|X|OSC)\d/i;
 const CAP_REF_RE = /^C\d/i;
 
+/** Footprints that denote a real multi-pin IC package (not a tube/passive/connector). */
+const IC_PACKAGE_RE =
+  /\b(DIP-?\d|SOIC|SO-?\d|SOP\d|T?SSOP|MSOP|V?SSOP|QFP|LQFP|TQFP|QFN|DFN|WSON|BGA|LGA|PLCC|SC-?70|SOT-?23-[3568])/i;
+/** Vacuum tubes / valves — active, multi-pin, but NOT an IC (e.g. ECC83). */
+const VALVE_RE =
+  /\bvalve\b|vacuum|\btube\b|ECC8[0-9]|\b12A[UXTY]7\b|\bEL(34|84)\b|\b6(L6|V6)\b|KT(66|88|120)|300B|E88CC|EF86/i;
+/** Confidence for a primary-IC fallback emit; deliberately below MCU_SCORE_THRESHOLD. */
+const PRIMARY_IC_FALLBACK_CONFIDENCE = 0.2;
+
+/**
+ * The board's single dominant active IC, used only when no microcontroller
+ * clears the score threshold. This is the primary controller in the
+ * board-support sense (op-amp array, logic, USB hub controller, FPGA, ...) even
+ * though it is not a microcontroller. Vacuum tubes, passives, and connectors
+ * are excluded, so a valve-only board (e.g. ecc83) yields nothing here.
+ */
+function dominantPrimaryIc(
+  snapshot: DesignSnapshot,
+): SnapshotComponent | null {
+  let best: SnapshotComponent | null = null;
+  for (const c of snapshot.components) {
+    if (POWER_FLAG_REF_RE.test(c.refdes) || PASSIVE_REF_RE.test(c.refdes)) continue;
+    if (isTestPoint(c) || isConnectorCandidate(c) || isCrystal(c)) continue;
+    const blob = partBlob(c);
+    if (VALVE_RE.test(blob) || VALVE_RE.test(c.footprint ?? "")) continue;
+    if (!IC_PACKAGE_RE.test(c.footprint ?? "")) continue;
+    if (!best || pinCount(c) > pinCount(best)) best = c;
+  }
+  return best;
+}
+
 export interface McuScore {
   refdes: string;
   boardKey?: string;
@@ -433,6 +464,37 @@ export function emittedMcusFromCache(snapshot: DesignSnapshot): BscMcu[] {
   const ranked = (
     withFamily.length ? withFamily : eligible.length ? eligible : hubOnly
   ).slice(0, 3);
+
+  // Fallback: no microcontroller cleared the threshold, but the board may still
+  // have a single dominant active IC (op-amp array, logic, USB hub controller,
+  // FPGA support IC). Report it as the primary controller with sub-threshold
+  // confidence and no pin map (identity only), so it is clearly distinct from a
+  // scored MCU. A valve-only or empty board yields nothing here.
+  if (!ranked.length) {
+    const primary = dominantPrimaryIc(snapshot);
+    if (primary) {
+      return [
+        {
+          refdes: primary.refdes,
+          boardKey: primary.boardKey,
+          mpn: mcuIdentityLabel(primary),
+          package: primary.footprint || null,
+          confidence: PRIMARY_IC_FALLBACK_CONFIDENCE,
+          confidenceNotes: [
+            {
+              field: "mcus",
+              reason: `No microcontroller cleared score threshold ${MCU_SCORE_THRESHOLD}; ${primary.refdes} (${primary.footprint ?? "IC"}) is the board's dominant active IC, reported as the primary controller.`,
+            },
+            {
+              field: "pins",
+              reason:
+                "Primary-IC fallback: pin map not extracted (identity only).",
+            },
+          ],
+        },
+      ];
+    }
+  }
   const out: BscMcu[] = [];
   for (const cand of ranked) {
     const c = byKey.get(`${cand.boardKey ?? ""}\0${cand.refdes}`);

@@ -236,9 +236,6 @@ export async function runPartWatchJob(
       if (!result.ok) continue;
 
       const data = result.data;
-      if (data.lifecycleStatus === "active" && result.ok === false) {
-        throw new Error("unreachable: active from failed result");
-      }
       applySuccess(watch, data, startedAt, providerName);
 
       if (END_OF_LIFE_STATUSES.has(data.lifecycleStatus)) {

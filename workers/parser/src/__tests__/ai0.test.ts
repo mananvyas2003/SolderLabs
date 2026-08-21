@@ -150,7 +150,7 @@ test("AI-0: Kintex VIN pins sit on +12V", (t) => {
   }
 });
 
-test("AI-0: compute Feather emits MCU; USB hub stays empty; Jetson pins are not invented", (t) => {
+test("AI-0: compute Feather emits MCU; USB hub reports its controller without inventing pins; Jetson pins are not invented", (t) => {
   if (!fs.existsSync(featherDir) || !fs.existsSync(stickhubDir) || !fs.existsSync(jetsonDir)) {
     t.skip("KiCad demos missing");
     return;
@@ -161,8 +161,17 @@ test("AI-0: compute Feather emits MCU; USB hub stays empty; Jetson pins are not 
   assert.equal(feather.mcus.some((m) => m.mpn === "nRF52833-QDXX"), true);
   assert.ok(feather.pins.length > 0, "Feather MCU pins empty");
 
+  // The USB hub board has no microcontroller, but its dominant active IC (the
+  // XR22417 USB hub controller, LQFP-48) is the board's primary controller.
+  // It is reported as a low-confidence primary-IC fallback with NO invented
+  // pin map — identity only.
   const hub = generateBSC(parseKicadProjectDir(stickhubDir), { boardName: "stickhub" });
-  assert.equal(hub.mcus.length, 0);
+  assert.equal(hub.mcus.length, 1, "USB hub controller not reported as primary IC");
+  assert.ok(
+    hub.mcus[0]!.confidence < 0.4,
+    "hub controller must be a sub-threshold primary-IC fallback, not a scored MCU",
+  );
+  assert.equal(hub.pins.length, 0, `hub fallback invented pins: ${hub.pins.length}`);
 
   const jetson = generateBSC(parseKicadProjectDir(jetsonDir), {
     boardName: "jetson-agx-thor-baseboard",

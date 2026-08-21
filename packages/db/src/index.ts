@@ -23,6 +23,7 @@ import { TABLE_NAMES, type TableName } from "./sqlite-schema";
 
 export * from "./schema";
 export * from "./password";
+export * from "./check-gate";
 export {
   jsonPathToSqlitePath,
   loadAll,

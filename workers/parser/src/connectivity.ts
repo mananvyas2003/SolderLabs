@@ -328,14 +328,32 @@ export function expandBusMembers(name: string): string[] | null {
 export function isPowerFlagComponent(c: {
   refdes: string;
   libId?: string;
+  value?: string;
 }): boolean {
   if (/^#PWR/i.test(c.refdes) || /^#FLG/i.test(c.refdes)) return true;
   const lib = (c.libId ?? "").toLowerCase();
-  return (
-    lib.startsWith("power:") ||
-    lib.includes("power:") ||
-    lib.startsWith("power/")
-  );
+  if (lib.startsWith("power:") || lib.includes("power:") || lib.startsWith("power/")) {
+    return true;
+  }
+  // KiCad prefixes ALL virtual power/ground symbols with '#'. Older demo symbol
+  // libraries name them '#GND', '#VCC', '#+5V', or bare '#', with the net in the
+  // Value field, so #PWR/#FLG/power: alone under-recognizes ground: those pins
+  // then fail to merge into GND and land on anonymous Net-(#GNDxx-Pad1) nets.
+  // Treat any '#'-prefixed symbol whose Value names a power or ground rail as a
+  // power flag. A non-power '#' graphic (e.g. #SYM logo) is not matched.
+  if (/^#/.test(c.refdes)) {
+    const v = (c.value ?? "").trim();
+    if (
+      v &&
+      (GROUND_TOKEN.test(v) ||
+        POWER_TOKEN.test(v) ||
+        /^[+-]\d/.test(v) ||
+        /^PWR_FLAG$/i.test(v))
+    ) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**
@@ -665,10 +683,20 @@ export function resolveConnectivity(
       // Bus vector with no attached pins — do not emit phantom member nets.
       continue;
     }
-    const nodes = [...new Set(g.pins.map((p) => p.pinId))].sort((a, b) =>
+    // Power-symbol / power-flag pseudo-parts (#PWR, #GND, #FLG, …) tie and NAME
+    // the net but have no footprint pad, so they must not appear as physical
+    // nodes alongside real pins — otherwise every ground symbol inflates the GND
+    // node count above the PCB pad oracle. We drop the pseudo-pins ONLY when the
+    // net also carries at least one real (footprinted) pin; a degenerate net made
+    // purely of power symbols keeps them so it still exists and is named.
+    const allNodes = [...new Set(g.pins.map((p) => p.pinId))];
+    const realNodes = allNodes.filter((id) => !/^#/.test(id));
+    const nodes = (realNodes.length ? realNodes : allNodes).sort((a, b) =>
       a.localeCompare(b, undefined, { numeric: true }),
     );
-    for (const n of nodes) pinNet.set(n, name);
+    // pinNet still maps every real pin (including any that shared the group)
+    // to this net name for per-pin `.net` enrichment.
+    for (const p of g.pins) pinNet.set(p.pinId, name);
     const originPin = g.pins.find((p) => powerMeta.has(p.refdes));
     const origin = originPin ? powerMeta.get(originPin.refdes) : undefined;
     const cls = classifyNet(name, origin);

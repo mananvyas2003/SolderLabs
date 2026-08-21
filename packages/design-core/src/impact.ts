@@ -111,6 +111,10 @@ export const IMPACT_CLAIM_TYPES = [
   "bsc_break",
   "bom_change",
   "test_invalidation",
+  "voltage_result",
+  "power_dissipation",
+  "design_equation",
+  "part_rating_risk",
 ] as const;
 
 export type ImpactClaimType = (typeof IMPACT_CLAIM_TYPES)[number];
@@ -141,6 +145,16 @@ export interface DeterministicImpact {
   bom: BomImpactSummary;
   inFlight: InFlightImpact[];
   invalidatedTests: TestInvalidation[];
+  /**
+   * Optional physics-engine corroboration universe. Probe/role names become
+   * valid citations for voltage_result / design_equation / etc.
+   */
+  physics?: {
+    probes: string[];
+    roles: string[];
+    voltages?: Record<string, number>;
+    singular?: boolean;
+  };
 }
 
 export interface ImpactReport extends DeterministicImpact {
@@ -580,6 +594,10 @@ export function buildCitationUniverse(
   for (const t of ground.invalidatedTests) {
     for (const cit of t.citations) add(cit.kind, cit.ref);
   }
+  if (ground.physics) {
+    for (const p of ground.physics.probes) add("net", p);
+    for (const r of ground.physics.roles) add("component", r);
+  }
   return keys;
 }
 
@@ -619,9 +637,88 @@ export function isAllowedClaimType(type: string | undefined): type is ImpactClai
 }
 
 /**
- * Every LLM claim must cite a specific component, net, or BOM line
- * from the deterministic result. Drop claims that cannot cite, that
- * never mention their own citations, or that carry instruction language.
+ * Engine-owned prose for a grounded claim. A grounded claim is rendered from a
+ * template keyed on the corroborating diff row — NEVER from the model's free
+ * text. The model may select which citation to surface and rank findings; it
+ * may not author verified prose. This makes injection content structurally
+ * incapable of reaching a grounded (verified) badge: even a claim that cites a
+ * genuinely-changed refdes has its text replaced by this engine template.
+ */
+export function renderGroundedClaimText(
+  type: ImpactClaimType,
+  citations: ImpactCitation[],
+  ground: DeterministicImpact,
+): string {
+  const comp = citations.find((c) => c.kind === "component");
+  const net = citations.find((c) => c.kind === "net");
+  const bomCit = citations.find((c) => c.kind === "bom_line");
+  const bscCit = citations.find((c) => c.kind === "bsc_change");
+  const testCit = citations.find((c) => c.kind === "test");
+  const first = citations[0];
+  switch (type) {
+    case "value_change": {
+      const ref = (comp ?? bomCit ?? first)?.ref ?? "component";
+      const cc = ground.connectedComponents.find((c) => c.refdes === ref);
+      return cc?.value
+        ? `${ref} changed in this revision (now ${cc.value}).`
+        : `${ref} changed in this revision.`;
+    }
+    case "connectivity_change": {
+      const n = (net ?? comp ?? first)?.ref ?? "a net";
+      return `Connectivity affecting ${n} changed in this revision.`;
+    }
+    case "bom_change": {
+      const ref = (bomCit ?? comp ?? first)?.ref ?? "a BOM line";
+      return `BOM line ${ref} changed in this revision.`;
+    }
+    case "supply_risk": {
+      const ref = (comp ?? bomCit ?? first)?.ref ?? "a part";
+      return `Supply risk flagged for ${ref} in this revision.`;
+    }
+    case "bsc_break": {
+      const ref = (bscCit ?? first)?.ref ?? "the board support contract";
+      return `Board Support Contract surface changed: ${ref}.`;
+    }
+    case "test_invalidation": {
+      const ref = (testCit ?? first)?.ref ?? "a prior test";
+      return `Prior test ${ref} is invalidated by this revision.`;
+    }
+    case "voltage_result": {
+      const n = (net ?? first)?.ref ?? "probe";
+      const v = ground.physics?.voltages?.[n];
+      return typeof v === "number"
+        ? `Engine DC solve: ${n} = ${v.toFixed(3)} V.`
+        : `Engine DC solve reported voltage at ${n}.`;
+    }
+    case "power_dissipation": {
+      const ref = (comp ?? first)?.ref ?? "component";
+      return `Engine power check for ${ref}.`;
+    }
+    case "design_equation": {
+      const ref = (comp ?? first)?.ref ?? "role";
+      return `Topology design equation bound role ${ref}.`;
+    }
+    case "part_rating_risk": {
+      const ref = (comp ?? first)?.ref ?? "part";
+      if (ground.physics?.singular) {
+        return "Engine refuted circuit: singular MNA matrix (floating node or malformed stamps).";
+      }
+      return `Part rating risk for ${ref}.`;
+    }
+    default: {
+      return `${first?.ref ?? "This change"} is corroborated by the diff.`;
+    }
+  }
+}
+
+/**
+ * Every LLM claim must cite a specific component, net, or BOM line from the
+ * deterministic result. Claims are routed, not text-filtered:
+ *   - no text / imperative language / unknown type / no citations -> dropped
+ *   - valid type + citations, but a citation is not corroborated  -> unverified
+ *   - valid type + every citation corroborated by the diff        -> grounded
+ * Grounded claims are re-rendered from an engine template so the model's prose
+ * (which may be adversarial) never reaches a verified badge.
  */
 export function gateImpactClaims(
   raw: RawLlmClaim[],
@@ -679,22 +776,51 @@ export function gateImpactClaims(
       dropped.push(text);
       continue;
     }
-    if (!claimMentionsOwnCitation(text, citations)) {
-      dropped.push(text);
-      continue;
-    }
+    // Corroboration, not text-matching: a claim is grounded only if EVERY
+    // citation it declares is present in the deterministic universe derived
+    // from the diff. A citation that names a non-existent refdes/net (e.g. a
+    // hallucination) fails this and the claim is quarantined as unverified —
+    // it is not dropped (dropping would hide the hallucination) and it is not
+    // grounded. Grounded claims are re-rendered from an engine template so the
+    // model's free text can never appear on a verified finding.
     const allValid = citations.every((c) => universe.has(citationKey(c)));
-    const typed: ImpactClaim = {
-      text,
-      citations,
-      grounded: allValid,
-      type: claim.type,
-      severity: claim.severity,
-    };
-    if (allValid) {
-      grounded.push(typed);
+    // Physics claim types also require a physics corroboration block.
+    const physicsTypes = new Set([
+      "voltage_result",
+      "power_dissipation",
+      "design_equation",
+      "part_rating_risk",
+    ]);
+    const needsPhysics = physicsTypes.has(claim.type);
+    const physicsOk =
+      !needsPhysics ||
+      (ground.physics != null &&
+        (claim.type !== "voltage_result" ||
+          citations.some(
+            (c) =>
+              c.kind === "net" && ground.physics!.probes.includes(c.ref),
+          )) &&
+        (claim.type !== "design_equation" ||
+          citations.some(
+            (c) =>
+              c.kind === "component" && ground.physics!.roles.includes(c.ref),
+          )));
+    if (allValid && physicsOk) {
+      grounded.push({
+        text: renderGroundedClaimText(claim.type, citations, ground),
+        citations,
+        grounded: true,
+        type: claim.type,
+        severity: claim.severity,
+      });
     } else {
-      unverified.push(typed);
+      unverified.push({
+        text,
+        citations,
+        grounded: false,
+        type: claim.type,
+        severity: claim.severity,
+      });
     }
   }
 
